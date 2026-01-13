@@ -8,20 +8,25 @@ import { LoginComponent } from './auth/components/loginComponent/loginComponent'
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { authInterceptor } from './auth/interceptors/auth.interceptor';
+import { PerfilComponent } from './auth/components/perfil.component/perfil.component';
+import ServicePerfil from './auth/services/service.perfil';
 
 @NgModule({
-  declarations: [
+  declarations: 
+  [
     App,
+    PerfilComponent
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule,LoginComponent
-
+    AppRoutingModule,
+    LoginComponent
   ],
   providers: [
 
     provideBrowserGlobalErrorListeners(),
-    provideHttpClient(withInterceptors([authInterceptor]))
+    provideHttpClient(withInterceptors([authInterceptor])),
+    ServicePerfil
   ],
   bootstrap: [App]
 })
