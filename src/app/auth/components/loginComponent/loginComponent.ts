@@ -32,6 +32,7 @@ onSubmit(){
 
   this.authService.login(userName!,password!).subscribe({
     next:(response)=>{
+      this.router.navigate(['/perfil']);
       console.log('Login exitoso',response);
 
     },
