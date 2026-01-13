@@ -19,10 +19,10 @@ export class AuthService {
 
     constructor(){
         const token=this._token();
-        if(!token){
-            this.isAuthenticated=false;
-        }else{
+        if(token){
             this.isAuthenticated=true;
+        }else{
+            this.isAuthenticated=false;
         }
     }
 
