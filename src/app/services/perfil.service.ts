@@ -2,7 +2,9 @@ import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { environment } from "../../environments/environment";
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export default class ServicePerfil
 {
     constructor(private _http:HttpClient) {}

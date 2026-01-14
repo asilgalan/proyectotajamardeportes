@@ -3,18 +3,14 @@
     
     <h2>Bienvenido</h2>
 
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input id="email" type="text" formControlName="userName" placeholder="ejemplo@correo.com" />
-      
-      @if(loginForm.get('userName')?.touched && loginForm.get('userName')?.invalid){
-        <div class="error-message">
-          @if(loginForm.get('userName')?.errors?.['required']){ <small>El email es obligatorio.</small> }
-          @if(loginForm.get('userName')?.errors?.['email']){ <small>El email no es válido.</small> }
-        </div>
-      }
-    </div>
-
+ <div class="form-group">
+  <label for="email">Usuario</label>
+  <div class="input-wrapper">
+    <input id="email" type="text" formControlName="userName" placeholder="nombre.usuario" />
+    <span class="domain-label">@tajamar365.com</span>
+  </div>
+  
+  </div>
     <div class="form-group">
       <label for="password">Contraseña</label>
       <input id="password" type="password" formControlName="password" placeholder="••••••" />
@@ -125,5 +121,35 @@ button:disabled {
   background-color: #9ca3af;
   cursor: not-allowed;
   opacity: 0.7;
+}
+
+/* Contenedor relativo para posicionar el hijo */
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-wrapper input {
+  width: 100%;
+  /* Añadimos espacio a la derecha para que el texto no choque con el dominio */
+  padding-right: 140px; 
+}
+
+/* El dominio fijo */
+.domain-label {
+  position: absolute;
+  right: 12px;
+  color: #9ca3af; /* Gris suave */
+  font-size: 0.9rem;
+  pointer-events: none; /* Para que si hacen clic sobre el texto, el input reciba el foco */
+  user-select: none;    /* No se puede seleccionar el texto */
+  font-weight: 500;
+}
+
+/* Ajuste de foco para que el borde azul se vea en el input */
+.input-wrapper input:focus {
+  border-color: #2563eb;
+  background-color: #f8fafc;
 }
 </style>
