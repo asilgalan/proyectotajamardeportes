@@ -33,7 +33,7 @@ onSubmit(){
    const emailCompleto = `${userName}@tajamar365.com`;
   this.authService.login(emailCompleto!,password!).subscribe({
     next:(response)=>{
-      this.router.navigate(['/perfil']);
+      this.router.navigate(['/home']);
       console.log('Login exitoso',response);
     },
     error:(error)=>{

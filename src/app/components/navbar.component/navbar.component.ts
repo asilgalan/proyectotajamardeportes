@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { AuthService } from './../../auth/services/auth.service';
+import { Component, inject, OnInit } from '@angular/core';
 import Perfil from '../../models/Perfil';
 import ServicePerfil from '../../services/perfil.service';
 
@@ -10,6 +11,7 @@ import ServicePerfil from '../../services/perfil.service';
 })
 export class NavbarComponent {
   public perfil!:Perfil
+   AuthService=inject(AuthService);
 
   constructor(private _service: ServicePerfil){
 
@@ -20,5 +22,9 @@ export class NavbarComponent {
     this._service.getPerfil(token).then(response => {
       this.perfil = response;
     })
+  }
+
+  logout() {
+    this.AuthService.logout();
   }
 }

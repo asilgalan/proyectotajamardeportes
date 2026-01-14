@@ -13,6 +13,10 @@ export const routes: Routes = [
   {
     path: 'perfil', 
     component: PerfilComponent
+  },
+    {
+    path: 'home', 
+    component: HomeComponent
   }
 ];
 

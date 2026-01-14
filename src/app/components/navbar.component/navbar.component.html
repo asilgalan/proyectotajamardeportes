@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-lg custom-navbar px-4">
   <div class="container-fluid">
 
-    <a class="navbar-brand p-0" [routerLink]="['/']">
+    <a class="navbar-brand p-0" [routerLink]="['/home']">
         <img src="images/logoTajamar.png" alt="Logo" class="navbar-logo">
     </a>
 
@@ -15,7 +15,7 @@
         
         <li class="nav-item">
           <a class="nav-link nav-pill-item me-2" 
-             [routerLink]="['/']" 
+             [routerLink]="['/home']" 
              routerLinkActive="active-link"
              [routerLinkActiveOptions]="{exact: true}">
             <i class="bi bi-house-door me-2"></i> Home
@@ -48,7 +48,7 @@
               </a>
             </li>
             <li>
-              <a class="dropdown-item pill-item d-flex align-items-center justify-content-center" [routerLink]="['/']">
+              <a type="button" class="dropdown-item pill-item d-flex align-items-center justify-content-center" [routerLink]="['/']" (click)="logout()">
                <i class="bi bi-box-arrow-right fs-4"></i> Cerrar Sesión
               </a>
             </li>

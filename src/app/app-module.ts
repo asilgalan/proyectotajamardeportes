@@ -14,14 +14,15 @@ import { PerfilComponent } from './components/perfil.component/perfil.component'
 import { NavbarComponent } from './components/navbar.component/navbar.component';
 import { HomeComponent } from './components/home.component/home.component';
 
+import { EquipoComponent } from './components/equipo/equipo.component';
+
 @NgModule({
   declarations: [
-    App,LoginComponent,PerfilComponent, NavbarComponent, HomeComponent
+    App,LoginComponent,PerfilComponent, NavbarComponent, HomeComponent, EquipoComponent
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule,ReactiveFormsModule,CommonModule
-
+    AppRoutingModule,ReactiveFormsModule,CommonModule,RouterModule
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),

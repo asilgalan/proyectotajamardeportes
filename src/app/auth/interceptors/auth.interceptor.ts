@@ -10,7 +10,7 @@ export function authInterceptor(
 ) {
   const token = inject(AuthService).token();
   const route=inject(Router);
-if (!token) {
+    if (!token) {
     route.navigate(['']);
  
   }

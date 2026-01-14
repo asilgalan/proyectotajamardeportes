@@ -12,6 +12,7 @@ export class EquipoService {
     private http=inject(HttpClient);
     private apiurl=environment.apiUrl
 
+    
     getEquipos():Observable<EquipoResponse[]>{
 
         return this.http.get<EquipoResponse[]>(`${this.apiurl}/Equipos`)
