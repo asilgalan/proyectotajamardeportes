@@ -15,12 +15,11 @@ export default class ServicePerfil
         let endPoint = "/UsuariosDeportes/Perfil";
 
         let header = new HttpHeaders();
-        header = header.set("Authorization", `Bearer ${token}`);
-        header = header.set("Content-Type", "application/json");
+
         
         let promise = new Promise((resolve) =>
         {
-            this._http.get(url+endPoint, {headers:header}).subscribe(response =>
+            this._http.get(url+endPoint).subscribe(response =>
             {
                 resolve(response);
             })

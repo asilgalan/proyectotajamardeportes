@@ -3,6 +3,7 @@ import { environment } from '../../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { AuthResponse } from '../interface/auth.interface';
+import { Router } from '@angular/router';
 
 
 
@@ -14,6 +15,7 @@ export class AuthService {
 
     private http=inject(HttpClient);
     private isAuthenticated = false;
+    private route=inject(Router);
 
   private _token= signal<string | null>(localStorage.getItem('token'));
 
@@ -45,8 +47,10 @@ export class AuthService {
     }
 
     logout(){
+
         localStorage.removeItem('token');
         this._token.set(null);
         this.isAuthenticated = false;
+        this.route.navigate(['']);
     }
 }

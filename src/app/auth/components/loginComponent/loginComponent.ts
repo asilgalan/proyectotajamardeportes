@@ -15,6 +15,7 @@ export class LoginComponent {
 private fb=inject(FormBuilder)
 authService=inject(AuthService)
 router=inject(Router)
+mensajeError:string=''
 
 
 loginForm=this.fb.group({
@@ -28,8 +29,8 @@ onSubmit(){
     return;
   }
 
-  const {userName,password}=this.loginForm.value;
-const emailCompleto = `${userName}@tajamar365.com`;
+   const {userName,password}=this.loginForm.value;
+   const emailCompleto = `${userName}@tajamar365.com`;
   this.authService.login(emailCompleto!,password!).subscribe({
     next:(response)=>{
       this.router.navigate(['/perfil']);
@@ -37,7 +38,7 @@ const emailCompleto = `${userName}@tajamar365.com`;
     },
     error:(error)=>{
       console.error('Error en el login',error);
-      alert('Credenciales invalidas');
+      this.mensajeError='Usuario o contraseña incorrectos';
     }
   })    
 }

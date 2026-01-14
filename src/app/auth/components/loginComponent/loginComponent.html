@@ -23,6 +23,11 @@
       }
     </div>
 
+    @if(mensajeError){
+      <div class="error-message">
+        <small>{{mensajeError}}</small>
+      </div>
+    }
     <button type="submit" [disabled]="loginForm.invalid">Iniciar Sesión</button>
   </form>
 </div>
