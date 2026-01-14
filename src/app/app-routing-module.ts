@@ -1,12 +1,17 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import Perfil from './models/Perfil';
+import { LoginComponent } from './auth/components/loginComponent/loginComponent';
+import { PerfilComponent } from './components/perfil.component/perfil.component';
 
-const routes: Routes = [
+export const routes: Routes = [
   {
-    path:'',
-    loadComponent() {
-      return import('./auth/components/loginComponent/loginComponent').then(m=>m.LoginComponent);
-    }
+    path: '',
+      component:LoginComponent
+  },
+  {
+    path: 'perfil', 
+    component: PerfilComponent
   }
 ];
 
