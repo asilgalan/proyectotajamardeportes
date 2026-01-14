@@ -10,13 +10,15 @@ import { RouterLink } from '@angular/router';
 import { authInterceptor } from './auth/interceptors/auth.interceptor';
 import { PerfilComponent } from './components/perfil.component/perfil.component';
 import ServicePerfil from './services/service.perfil';
+import { PagosComponent } from './components/pagos.component/pagos.component';
 
 @NgModule
 ({
   declarations: 
   [
     App,
-    PerfilComponent
+    PerfilComponent,
+    PagosComponent
   ],
   imports: [
     BrowserModule,
