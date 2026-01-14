@@ -29,7 +29,7 @@ export class PerfilComponent implements OnInit
       //si no esta, volver al inicio de sesion
     }
 
-    this._service.getPerfil(token).then(response =>
+    this._service.getPerfil().then(response =>
     {
       this.perfil = response;
     }) 
