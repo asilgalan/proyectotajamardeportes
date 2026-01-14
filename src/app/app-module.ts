@@ -11,10 +11,12 @@ import { authInterceptor } from './auth/interceptors/auth.interceptor';
 import { CommonModule } from '@angular/common';
 
 import { PerfilComponent } from './components/perfil.component/perfil.component';
+import { NavbarComponent } from './components/navbar.component/navbar.component';
+import { HomeComponent } from './components/home.component/home.component';
 
 @NgModule({
   declarations: [
-    App,LoginComponent,PerfilComponent
+    App,LoginComponent,PerfilComponent, NavbarComponent, HomeComponent
   ],
   imports: [
     BrowserModule,

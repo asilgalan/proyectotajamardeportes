@@ -1,0 +1,150 @@
+/* navbar.component.css */
+
+:host {
+  --nav-bg-color: #dbeafe; 
+  --nav-border-color: #bfdbfe; 
+
+  --accent-color: #2563eb; 
+  --accent-hover: #1d4ed8;
+  --text-main: #1e3a8a;    
+  --white: #ffffff;
+
+  --font-size-nav-links: 1.15rem; 
+  --font-size-user-name: 1.2rem;
+  --font-size-dropdown: 1.1rem;
+}
+
+/* 1. CONFIGURACIÓN GENERAL DE LA BARRA */
+.custom-navbar {
+  background-color: var(--nav-bg-color);
+  border-bottom: 1px solid var(--nav-border-color);
+  /* Padding pequeño para navbar delgado */
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+/* LOGO - Ajustado para que el navbar no se vea gigante */
+.navbar-logo {
+  max-height: 95px; 
+  width: auto;
+  object-fit: contain;
+}
+
+/* ============================================================
+   2. ENLACES CENTRALES DINÁMICOS
+   ============================================================ */
+
+/* ESTILO BASE (Transparente por defecto) */
+.nav-pill-item {
+   color: var(--text-main) !important;
+   font-weight: 700;
+   font-size: var(--font-size-nav-links);
+   border-radius: 50px; /* Siempre redondeado */
+   padding: 0.6rem 1.5rem !important; /* Tamaño del botón */
+   transition: all 0.3s ease; /* Animación suave */
+   display: flex;
+   align-items: center;
+}
+
+/* Estado Hover (Cuando pasas el ratón por el que NO está activo) */
+.nav-pill-item:hover {
+  background-color: rgba(37, 99, 235, 0.1); /* Tinte azul muy suave */
+  color: var(--accent-color) !important;
+}
+
+/* CLASE ACTIVA (Angular la añade automáticamente) 
+   Esta clase pinta el fondo azul y letras blancas */
+.active-link {
+  background-color: var(--accent-color) !important;
+  color: var(--white) !important;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Hover sobre el elemento activo */
+.active-link:hover {
+  background-color: var(--accent-hover) !important;
+  color: var(--white) !important;
+  box-shadow: 0 6px 10px -1px rgba(37, 99, 235, 0.3);
+}
+
+
+/* 3. ESTILOS DEL USUARIO Y DROPDOWN */
+
+.user-dropdown-trigger .dropdown-toggle {
+  background-color: var(--accent-color);
+  border-radius: 50px;
+  border: none;
+  padding: 0.4rem 1rem 0.4rem 0.4rem !important;
+  transition: background-color 0.2s;
+}
+
+.user-dropdown-trigger .dropdown-toggle:hover {
+  background-color: var(--accent-hover);
+}
+
+.user-name-text {
+    color: var(--white);
+    font-weight: 600;
+    font-size: var(--font-size-user-name);
+}
+
+.user-icon-circle {
+  background-color: var(--white);
+  color: var(--accent-color);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+/* CAJA DEL MENÚ FLOTANTE */
+.custom-dropdown-menu {
+  background-color: var(--accent-color); 
+  border: none;
+  border-radius: 20px;
+  min-width: 200px; 
+  margin-top: 15px !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* ITEMS INTERNOS */
+.pill-item {
+  background-color: var(--white);
+  border-radius: 50px;
+  padding: 0.7rem 1rem;
+  color: var(--accent-color) !important;
+  font-weight: 700;
+  font-size: var(--font-size-dropdown);
+  text-align: center;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.pill-item:hover {
+  background-color: #f1f5f9;
+  transform: scale(1.03);
+  color: var(--accent-hover) !important;
+}
+
+.pill-item i {
+    vertical-align: middle;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* RESPONSIVE */
+@media (max-width: 991px) {
+  .nav-links-container {
+    margin: 1rem 0;
+  }
+  .nav-pill-item {
+      margin-bottom: 5px; /* Separación en móvil */
+  }
+}
