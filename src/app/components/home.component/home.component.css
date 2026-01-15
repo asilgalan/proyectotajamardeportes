@@ -160,7 +160,7 @@
 /* --- NUEVO: LIMITADOR DE ANCHO CENTRAL --- */
 /* Esto es lo que hace que no ocupe todo el ancho y quede centrado */
 .content-limiter {
-  max-width: 850px; /* Ajusta este valor si lo quieres más o menos ancho */
+  max-width: 1200px; 
   margin: 0 auto;   /* Centra el bloque horizontalmente */
 }
 
@@ -399,4 +399,112 @@ details[open] summary .transition-icon { transform: rotate(180deg); }
 .past-row:hover .btn-outline-accent:hover {
     background-color: var(--accent-color);
     color: var(--white);
+}
+
+.welcome-header {
+  /* Un pequeño borde abajo sutil para separar, opcional */
+  border-bottom: 1px dashed var(--nav-border-color);
+  padding-bottom: 1.5rem;
+}
+
+.welcome-title {
+  color: var(--text-main); /* Azul oscuro corporativo */
+  font-weight: 800;        /* Letra muy gordita */
+  font-size: 2.2rem;       /* Tamaño grande */
+  margin-bottom: 0.2rem;
+  letter-spacing: -0.5px;
+}
+
+.user-highlight {
+  color: var(--accent-color); /* Tu azul eléctrico (Royal Blue) */
+}
+
+.welcome-subtitle {
+  color: #64748b; /* Gris suave */
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Animación para el saludo (la manita) */
+.wave-emoji {
+  display: inline-block;
+  animation: wave-animation 2.5s infinite;
+  transform-origin: 70% 70%;
+}
+
+@keyframes wave-animation {
+  0% { transform: rotate( 0.0deg) }
+  10% { transform: rotate(14.0deg) }  
+  20% { transform: rotate(-8.0deg) }
+  30% { transform: rotate(14.0deg) }
+  40% { transform: rotate(-4.0deg) }
+  50% { transform: rotate(10.0deg) }
+  60% { transform: rotate( 0.0deg) }  
+  100% { transform: rotate( 0.0deg) }
+}
+
+.calendar-wrapper {
+  font-family: inherit; /* Usa tu fuente global */
+}
+
+/* Título del mes (ej: ENERO 2026) */
+:host ::ng-deep .fc-toolbar-title {
+  font-size: 1.5rem !important;
+  color: var(--text-main);
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+/* Botones del calendario (Prev, Next, Today) */
+:host ::ng-deep .fc-button-primary {
+  background-color: var(--white) !important;
+  border-color: var(--nav-border-color) !important;
+  color: var(--text-main) !important;
+  font-weight: 600;
+  text-transform: capitalize;
+  transition: all 0.2s;
+}
+
+:host ::ng-deep .fc-button-primary:hover,
+:host ::ng-deep .fc-button-primary:active {
+  background-color: var(--nav-bg-color) !important;
+  color: var(--accent-color) !important;
+  border-color: var(--accent-color) !important;
+}
+
+:host ::ng-deep .fc-button-active {
+  background-color: var(--accent-color) !important;
+  color: var(--white) !important;
+  border-color: var(--accent-color) !important;
+}
+
+/* Encabezados de días (Lun, Mar...) */
+:host ::ng-deep .fc-col-header-cell-cushion {
+  color: #64748b;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding-bottom: 10px;
+}
+
+/* Día actual (fondo amarillo suave o azul suave) */
+:host ::ng-deep .fc-day-today {
+  background-color: #eff6ff !important; /* Azul muy suave */
+}
+
+/* Eventos dentro del calendario */
+:host ::ng-deep .fc-event {
+  border: none !important;
+  padding: 2px 4px;
+  font-size: 0.85rem;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Quitar subrayado de los eventos */
+:host ::ng-deep .fc-event-main {
+  color: white !important; 
+  font-weight: 500;
 }

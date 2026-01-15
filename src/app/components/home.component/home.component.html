@@ -1,5 +1,11 @@
 <div class="container-fluid main-container p-4 content-limiter">
 
+    <div class="welcome-header mb-4">
+    <h1 class="welcome-title">
+      Hola, <span class="user-highlight"> {{perfil.nombre}} !</span>
+    </h1>
+  </div>
+
   <details class="section-wrapper mb-4" open>
     <summary class="section-header d-flex align-items-center justify-content-between p-3 rounded">
       <div class="d-flex align-items-center">
@@ -75,8 +81,17 @@
     </div>
   </details>
 
-  <div class="calendar-section mt-5 text-center p-5 bg-white rounded shadow-sm border">
-     <h3 class="text-muted">Espacio para el Calendario</h3>
+  <div class="calendar-section mt-5 p-4 bg-white rounded shadow-sm border">
+     
+     <div class="d-flex align-items-center mb-4">
+        <i class="bi bi-calendar3 text-accent fs-3 me-2"></i>
+        <h3 class="text-main fw-bold mb-0">Calendario</h3>
+     </div>
+
+     <div class="calendar-wrapper">
+        <full-calendar [options]="calendarOptions"></full-calendar>
+     </div>
+
   </div>
 
 </div>

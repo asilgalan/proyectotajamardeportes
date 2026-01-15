@@ -9,6 +9,7 @@ import { ReactiveFormsModule,FormGroup,FormControl } from '@angular/forms';
 import { RouterLink, RouterModule,  } from '@angular/router';
 import { authInterceptor } from './auth/interceptors/auth.interceptor';
 import { CommonModule } from '@angular/common';
+import { FullCalendarModule } from '@fullcalendar/angular';
 
 import { PerfilComponent } from './components/perfil.component/perfil.component';
 import { NavbarComponent } from './components/navbar.component/navbar.component';
@@ -23,7 +24,7 @@ import { EquipoComponent } from './components/equipo/equipo.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule,ReactiveFormsModule,CommonModule,RouterModule
+    AppRoutingModule,ReactiveFormsModule,CommonModule,RouterModule, FullCalendarModule
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),
