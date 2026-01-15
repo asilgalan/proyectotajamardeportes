@@ -16,6 +16,7 @@ import { HomeComponent } from './components/home.component/home.component';
 
 import { EquipoComponent } from './components/equipo/equipo.component';
 
+
 @NgModule({
   declarations: [
     App,LoginComponent,PerfilComponent, NavbarComponent, HomeComponent, EquipoComponent

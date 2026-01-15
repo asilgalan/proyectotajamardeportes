@@ -1,0 +1,402 @@
+/* Importamos las variables para mantener la consistencia con el Navbar */
+:host {
+  --nav-bg-color: #dbeafe; 
+  --nav-border-color: #bfdbfe; 
+  --accent-color: #2563eb; 
+  --accent-hover: #1d4ed8;
+  --text-main: #1e3a8a;    
+  --white: #ffffff;
+  --card-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.1), 0 4px 6px -2px rgba(37, 99, 235, 0.05);
+}
+
+/* CONTENEDOR PRINCIPAL */
+.main-container {
+  /* Fondo suave para toda la página, igual que el navbar */
+  background-color: #f8fafc; 
+  min-height: 100vh;
+}
+
+.page-title {
+  color: var(--text-main);
+  font-weight: 800;
+  font-size: 2rem;
+  margin-bottom: 0;
+}
+
+/* SISTEMA DE GRID (RESPONSIVE) */
+.cards-grid {
+  display: grid;
+  /* Esto crea columnas automáticas. Mínimo 280px de ancho, si cabe más, se estira */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+  padding-bottom: 2rem;
+}
+
+/* --- DISEÑO DE LA TARJETA (CARD) --- */
+.event-card {
+  background-color: var(--white);
+  border-radius: 20px; /* Bordes muy redondeados estilo Navbar */
+  border: 1px solid var(--nav-border-color);
+  box-shadow: var(--card-shadow);
+  transition: all 0.3s ease;
+  overflow: hidden; /* Para que nada se salga de los bordes redondeados */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Efecto Hover: La tarjeta sube un poco y la sombra crece */
+.event-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 25px -5px rgba(37, 99, 235, 0.2), 0 10px 10px -5px rgba(37, 99, 235, 0.1);
+  border-color: var(--accent-color);
+}
+
+/* CABECERA DE FECHA (Parte superior azul) */
+.card-date-header {
+  background-color: var(--nav-bg-color); /* Fondo azul clarito */
+  padding: 1.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid var(--nav-border-color);
+}
+
+.day-number {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--accent-color); /* Azul eléctrico */
+  line-height: 1;
+}
+
+.month-year {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: 1px;
+  margin-top: 5px;
+}
+
+/* CUERPO DE LA TARJETA */
+.card-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+/* FILAS DE INFORMACIÓN (Hora y Profesor) */
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Círculos de iconos */
+.icon-circle {
+  width: 45px;
+  height: 45px;
+  background-color: #eff6ff; /* Azul muy muy pálido */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-color);
+  font-size: 1.2rem;
+  transition: background-color 0.3s;
+}
+
+.event-card:hover .icon-circle {
+  background-color: var(--accent-color);
+  color: var(--white);
+}
+
+.info-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #64748b; /* Gris texto secundario */
+  font-weight: 600;
+}
+
+.value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+/* FOOTER ID */
+.card-footer-id {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--nav-border-color);
+  text-align: right;
+  color: #94a3b8;
+}
+
+/* MANTENEMOS TUS VARIABLES IGUAL */
+:host {
+  --nav-bg-color: #dbeafe; 
+  --nav-border-color: #bfdbfe; 
+  --accent-color: #2563eb; 
+  --accent-hover: #1d4ed8;
+  --text-main: #1e3a8a;    
+  --white: #ffffff;
+}
+
+.main-container {
+  background-color: #f8fafc; 
+  min-height: 100vh;
+  /* Quitamos el padding global grande, lo gestionará el limiter */
+  padding: 2rem 1rem !important; 
+}
+
+/* --- NUEVO: LIMITADOR DE ANCHO CENTRAL --- */
+/* Esto es lo que hace que no ocupe todo el ancho y quede centrado */
+.content-limiter {
+  max-width: 850px; /* Ajusta este valor si lo quieres más o menos ancho */
+  margin: 0 auto;   /* Centra el bloque horizontalmente */
+}
+
+/* --- ESTILOS DE ACORDEÓN (Mantenidos casi igual) --- */
+details { display: block; }
+summary { list-style: none; cursor: pointer; outline: none; }
+summary::-webkit-details-marker { display: none; }
+
+.section-header {
+  background-color: var(--white);
+  border: 1px solid var(--nav-border-color);
+  transition: all 0.2s;
+}
+.section-header:hover { background-color: #f1f5f9; }
+
+/* Pequeño ajuste: cuando se abre, quitamos el borde redondeado inferior del header */
+details[open] .section-header {
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-bottom-color: transparent;
+}
+
+.header-secondary { background-color: #e2e8f0; border-color: #cbd5e1; }
+.section-title { font-size: 1.25rem; font-weight: 700; color: var(--text-main); }
+.icon-box { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.bg-accent { background-color: var(--accent-color); }
+.transition-icon { transition: transform 0.3s ease; font-size: 1.2rem; color: #64748b; }
+details[open] summary .transition-icon { transform: rotate(180deg); }
+
+
+/* --- NUEVO DISEÑO: FILA RECTANGULAR (.event-row) --- */
+
+.event-row {
+    display: flex;
+    background-color: var(--white);
+    border-radius: 12px; /* Bordes redondeados */
+    overflow: hidden;    /* Para que el badge izquierdo no se salga */
+    border: 1px solid var(--nav-border-color);
+    transition: all 0.2s ease;
+    /* Sombra suave para dar profundidad */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+}
+
+.event-row:hover {
+    transform: translateY(-2px); /* Efecto ligero al pasar el mouse */
+    border-color: var(--accent-color);
+    box-shadow: 0 5px 15px rgba(37, 99, 235, 0.15) !important;
+}
+
+/* Badge de fecha a la izquierda (Azul) */
+.date-badge-left {
+    background-color: var(--accent-color);
+    color: var(--white);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* Ancho fijo para que todos queden alineados */
+    min-width: 90px; 
+    padding: 0.8rem;
+    line-height: 1;
+}
+
+.day-number {
+    font-size: 1.8rem;
+    font-weight: 800;
+}
+.month-name {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-top: 4px;
+}
+
+/* Cuerpo de la fila (Derecha) */
+.row-body {
+    flex-grow: 1; /* Ocupa el resto del espacio */
+    padding: 1rem 1.5rem;
+}
+
+.text-accent { color: var(--accent-color) !important; }
+
+
+/* --- ESTILO PARA EVENTOS PASADOS (Gris) --- */
+.past-row {
+    filter: grayscale(100%);
+    opacity: 0.6;
+}
+/* El badge de los pasados lo ponemos gris oscuro en vez de azul */
+.past-row .date-badge-left {
+    background-color: #475569; 
+}
+
+.past-row:hover {
+    filter: grayscale(0%);
+    opacity: 1;
+}
+.past-row:hover .date-badge-left {
+     background-color: var(--accent-color);
+}
+
+/* ... TUS VARIABLES Y ESTILOS GENERALES SE MANTIENEN ... */
+
+:host {
+  --nav-bg-color: #dbeafe; 
+  --nav-border-color: #bfdbfe; 
+  --accent-color: #2563eb; 
+  --accent-hover: #1d4ed8;
+  --text-main: #1e3a8a;    
+  --white: #ffffff;
+}
+
+.main-container {
+  background-color: #f8fafc; 
+  min-height: 100vh;
+  padding: 2rem 1rem !important; 
+}
+
+.content-limiter {
+  max-width: 850px; 
+  margin: 0 auto;   
+}
+
+/* ... ESTILOS DE DETAILS/SUMMARY SE MANTIENEN IGUAL ... */
+details { display: block; }
+summary { list-style: none; cursor: pointer; outline: none; }
+summary::-webkit-details-marker { display: none; }
+.section-header { background-color: var(--white); border: 1px solid var(--nav-border-color); transition: all 0.2s; }
+.section-header:hover { background-color: #f1f5f9; }
+details[open] .section-header { border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important; border-bottom-color: transparent; }
+.header-secondary { background-color: #e2e8f0; border-color: #cbd5e1; }
+.section-title { font-size: 1.25rem; font-weight: 700; color: var(--text-main); }
+.icon-box { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.bg-accent { background-color: var(--accent-color); }
+.transition-icon { transition: transform 0.3s ease; font-size: 1.2rem; color: #64748b; }
+details[open] summary .transition-icon { transform: rotate(180deg); }
+
+
+/* --- ESTILOS DE LA FILA DEL EVENTO --- */
+
+.event-row {
+    display: flex;
+    background-color: var(--white);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--nav-border-color);
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+}
+
+.event-row:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent-color);
+    box-shadow: 0 5px 15px rgba(37, 99, 235, 0.15) !important;
+}
+
+.date-badge-left {
+    background-color: var(--accent-color);
+    /* CAMBIO AQUÍ: Color blanco forzado */
+    color: var(--white) !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 90px; 
+    padding: 0.8rem;
+    line-height: 1;
+}
+
+.day-number {
+    font-size: 1.8rem;
+    font-weight: 800;
+    /* CAMBIO AQUÍ: Aseguramos blanco */
+    color: var(--white) !important;
+}
+.month-name {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-top: 4px;
+    /* CAMBIO AQUÍ: Aseguramos blanco */
+    color: var(--white) !important;
+}
+
+.row-body {
+    flex-grow: 1;
+    padding: 0.8rem 1.5rem; /* Un poco menos de padding vertical para que el botón no lo haga muy alto */
+}
+
+.text-accent { color: var(--accent-color) !important; }
+
+/* --- NUEVO ESTILO PARA EL BOTÓN --- */
+.btn-outline-accent {
+    color: var(--accent-color);
+    border-color: var(--accent-color);
+    background-color: transparent;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-outline-accent:hover {
+    background-color: var(--accent-color);
+    color: var(--white);
+}
+
+
+/* --- ESTILO PARA EVENTOS PASADOS --- */
+.past-row {
+    filter: grayscale(100%);
+    opacity: 0.6;
+    transition: all 0.3s ease;
+}
+.past-row .date-badge-left {
+    background-color: #475569; 
+}
+
+/* Hacemos que el botón también se vea gris en los pasados por defecto */
+.past-row .btn-outline-accent {
+    color: #64748b;
+    border-color: #64748b;
+}
+
+/* Al pasar el mouse sobre un evento pasado, recupera el color */
+.past-row:hover {
+    filter: grayscale(0%);
+    opacity: 1;
+}
+.past-row:hover .date-badge-left {
+     background-color: var(--accent-color);
+}
+/* Y el botón también recupera su color azul al hover de la fila */
+.past-row:hover .btn-outline-accent {
+    color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+/* Hover específico del botón dentro de una fila pasada */
+.past-row:hover .btn-outline-accent:hover {
+    background-color: var(--accent-color);
+    color: var(--white);
+}
