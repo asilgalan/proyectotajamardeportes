@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import Perfil from '../../models/Perfil';
 import ServicePerfil from '../../services/perfil.service';
 
+
 @Component
 ({
   selector: 'app-perfil',
@@ -9,6 +10,7 @@ import ServicePerfil from '../../services/perfil.service';
   templateUrl: './perfil.component.html',
   styleUrl: './perfil.component.css',
 })
+
 export class PerfilComponent implements OnInit
 {
   public perfil!:Perfil
@@ -17,19 +19,8 @@ export class PerfilComponent implements OnInit
 
   ngOnInit(): void 
   {
-    //this.perfil = 
-    //new Perfil(1, 'María', 'Pérez', 'maria.perez@email.com', true,  
-    //          'https://i.pravatar.cc/150?img=12', 2, 'Administradora',    
-    //           101, 'Angular Avanzado', 1001);             
 
-
-    let token = localStorage.getItem('token');
-    if (!token)
-    {
-      //si no esta, volver al inicio de sesion
-    }
-
-    this._service.getPerfil(token).then(response =>
+    this._service.getPerfil().then(response =>
     {
       this.perfil = response;
     }) 
