@@ -1,0 +1,129 @@
+/* ================================
+   VARIABLES (ya estaban en :host)
+   ================================ */
+:host {
+  --nav-bg-color: #dbeafe; 
+  --nav-border-color: #bfdbfe; 
+
+  --accent-color: #2563eb; 
+  --accent-hover: #1d4ed8;
+  --text-main: #1e3a8a;    
+  --white: #ffffff;
+
+  --font-size-nav-links: 1.15rem; 
+  --font-size-user-name: 1.2rem;
+  --font-size-dropdown: 1.1rem;
+}
+
+/* ================================
+   CONTENEDOR PERFIL (reutiliza navbar)
+   ================================ */
+.custom-navbar {
+  background-color: var(--nav-bg-color);
+  border-bottom: 1px solid var(--nav-border-color);
+  padding: 1.5rem;
+}
+
+/* ================================
+   BOTÓN "DETALLES"
+   ================================ */
+.nav-pill-item {
+  color: var(--text-main) !important;
+  font-weight: 700;
+  font-size: var(--font-size-nav-links);
+  border-radius: 50px;
+  padding: 0.6rem 1.5rem !important;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+}
+
+.nav-pill-item:hover {
+  background-color: rgba(37, 99, 235, 0.1);
+  color: var(--accent-color) !important;
+}
+
+.active-link {
+  background-color: var(--accent-color) !important;
+  color: var(--white) !important;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+  transform: translateY(-1px);
+}
+
+.active-link:hover {
+  background-color: var(--accent-hover) !important;
+}
+
+/* ================================
+   AVATAR USUARIO
+   ================================ */
+.user-icon-circle {
+  background-color: var(--white);
+  color: var(--accent-color);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Imagen dentro del círculo */
+.user-icon-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ================================
+   TEXTO PERFIL
+   ================================ */
+.profile-name {
+  color: var(--text-main);
+  margin: 0;
+}
+
+.profile-role {
+  color: var(--accent-color);
+  font-weight: 600;
+  margin: 0;
+}
+
+/* ================================
+   ESTADO USUARIO (Activo / Inactivo)
+   ================================ */
+.pill-item {
+  background-color: var(--white);
+  border-radius: 50px;
+  padding: 0.6rem 1.2rem;
+  color: var(--accent-color);
+  font-weight: 700;
+  font-size: var(--font-size-dropdown);
+  text-align: center;
+  display: inline-block;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.pill-item:hover {
+  background-color: #f1f5f9;
+  transform: scale(1.03);
+}
+
+/* ================================
+   ESTADOS
+   ================================ */
+.bg-success {
+  background-color: #22c55e !important;
+}
+
+.bg-danger {
+  background-color: #ef4444 !important;
+}
+
+.text-white {
+  color: #ffffff !important;
+}

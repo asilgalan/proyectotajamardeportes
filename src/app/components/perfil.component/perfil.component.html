@@ -1,29 +1,53 @@
-@if(perfil)
+@if (perfil) 
 {
-    <div>
-  <div>
-    <button (click)="mostrarDetalles()">Detalles</button>
-  </div>
-  <div>
-    <div>
-      <img :src=perfil.imagen>
+  <div class="custom-navbar p-4 rounded-4 shadow-sm">
+
+    <!-- BOTÓN DETALLES -->
+    <div class="mb-3 text-end">
+      <button class="nav-pill-item active-link" (click)="mostrarDetalles()">
+        Detalles
+      </button>
     </div>
-    <div>
-      <h2>{{perfil.nombre}}</h2>
-      <p>{{perfil.role}}</p>
+
+    <!-- INFO PERFIL -->
+    <div class="d-flex align-items-center gap-3 mb-3">
+
+      <!-- IMAGEN -->
+      <div class="user-icon-circle overflow-hidden">
+        <img
+          [src]="perfil.imagen"
+          alt="Imagen de perfil"
+          class="w-100 h-100 object-fit-cover"
+        />
+      </div>
+
+      <!-- TEXTO -->
+      <div>
+        <h2 class="mb-0" style="color: var(--text-main);">
+          {{ perfil.nombre }}
+        </h2>
+        <p class="mb-0" style="color: var(--accent-color); font-weight: 600;">
+          {{ perfil.role }}
+        </p>
+      </div>
     </div>
+
+    <!-- ESTADO -->
+    <div>
+      <span
+        class="pill-item d-inline-block"
+        [ngClass]="{
+          'bg-success text-white': perfil.estadoUsuario,
+          'bg-danger text-white': !perfil.estadoUsuario
+        }"
+      >
+        @if (perfil.estadoUsuario) {
+          Activo
+        } @else {
+          Inactivo
+        }
+      </span>
+    </div>
+
   </div>
-  <div>
-    <label>
-      @if(perfil.estadoUsuario)
-      {
-        Activo
-      }
-      @else 
-      {
-        Inactivo
-      }
-    </label>
-  </div>
-</div>
 }
