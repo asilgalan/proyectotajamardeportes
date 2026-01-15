@@ -1,6 +1,6 @@
 import { AuthService } from './../../auth/services/auth.service';
 import { Component, inject, OnInit } from '@angular/core';
-import Perfil from '../../models/Perfil';
+import Perfil from '../../models/perfil';
 import ServicePerfil from '../../services/perfil.service';
 
 @Component({

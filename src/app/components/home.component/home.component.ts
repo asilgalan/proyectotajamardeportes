@@ -2,7 +2,7 @@ import { Component, inject, OnChanges, OnInit, SimpleChanges } from '@angular/co
 import { ServiceEventos } from '../../services/evento.service';
 import { evento } from '../../models/evento';
 import { ActividadesService } from '../../services/actividades.service';
-import Perfil from '../../models/Perfil';
+import Perfil from '../../models/perfil';
 import ServicePerfil from '../../services/perfil.service';
 import { CalendarOptions } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
