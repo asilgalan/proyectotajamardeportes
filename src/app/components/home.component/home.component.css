@@ -1,268 +1,7 @@
-/* Importamos las variables para mantener la consistencia con el Navbar */
-:host {
-  --nav-bg-color: #dbeafe; 
-  --nav-border-color: #bfdbfe; 
-  --accent-color: #2563eb; 
-  --accent-hover: #1d4ed8;
-  --text-main: #1e3a8a;    
-  --white: #ffffff;
-  --card-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.1), 0 4px 6px -2px rgba(37, 99, 235, 0.05);
-}
-
-/* CONTENEDOR PRINCIPAL */
-.main-container {
-  /* Fondo suave para toda la página, igual que el navbar */
-  background-color: #f8fafc; 
-  min-height: 100vh;
-}
-
-.page-title {
-  color: var(--text-main);
-  font-weight: 800;
-  font-size: 2rem;
-  margin-bottom: 0;
-}
-
-/* SISTEMA DE GRID (RESPONSIVE) */
-.cards-grid {
-  display: grid;
-  /* Esto crea columnas automáticas. Mínimo 280px de ancho, si cabe más, se estira */
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 2rem;
-  padding-bottom: 2rem;
-}
-
-/* --- DISEÑO DE LA TARJETA (CARD) --- */
-.event-card {
-  background-color: var(--white);
-  border-radius: 20px; /* Bordes muy redondeados estilo Navbar */
-  border: 1px solid var(--nav-border-color);
-  box-shadow: var(--card-shadow);
-  transition: all 0.3s ease;
-  overflow: hidden; /* Para que nada se salga de los bordes redondeados */
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Efecto Hover: La tarjeta sube un poco y la sombra crece */
-.event-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 25px -5px rgba(37, 99, 235, 0.2), 0 10px 10px -5px rgba(37, 99, 235, 0.1);
-  border-color: var(--accent-color);
-}
-
-/* CABECERA DE FECHA (Parte superior azul) */
-.card-date-header {
-  background-color: var(--nav-bg-color); /* Fondo azul clarito */
-  padding: 1.5rem;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-bottom: 1px solid var(--nav-border-color);
-}
-
-.day-number {
-  font-size: 3rem;
-  font-weight: 800;
-  color: var(--accent-color); /* Azul eléctrico */
-  line-height: 1;
-}
-
-.month-year {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--text-main);
-  letter-spacing: 1px;
-  margin-top: 5px;
-}
-
-/* CUERPO DE LA TARJETA */
-.card-body {
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-}
-
-/* FILAS DE INFORMACIÓN (Hora y Profesor) */
-.info-row {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-/* Círculos de iconos */
-.icon-circle {
-  width: 45px;
-  height: 45px;
-  background-color: #eff6ff; /* Azul muy muy pálido */
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--accent-color);
-  font-size: 1.2rem;
-  transition: background-color 0.3s;
-}
-
-.event-card:hover .icon-circle {
-  background-color: var(--accent-color);
-  color: var(--white);
-}
-
-.info-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.label {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  color: #64748b; /* Gris texto secundario */
-  font-weight: 600;
-}
-
-.value {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--text-main);
-}
-
-/* FOOTER ID */
-.card-footer-id {
-  margin-top: auto;
-  padding-top: 1rem;
-  border-top: 1px dashed var(--nav-border-color);
-  text-align: right;
-  color: #94a3b8;
-}
-
-/* MANTENEMOS TUS VARIABLES IGUAL */
-:host {
-  --nav-bg-color: #dbeafe; 
-  --nav-border-color: #bfdbfe; 
-  --accent-color: #2563eb; 
-  --accent-hover: #1d4ed8;
-  --text-main: #1e3a8a;    
-  --white: #ffffff;
-}
-
-.main-container {
-  background-color: #f8fafc; 
-  min-height: 100vh;
-  /* Quitamos el padding global grande, lo gestionará el limiter */
-  padding: 2rem 1rem !important; 
-}
-
-/* --- NUEVO: LIMITADOR DE ANCHO CENTRAL --- */
-/* Esto es lo que hace que no ocupe todo el ancho y quede centrado */
-.content-limiter {
-  max-width: 1200px; 
-  margin: 0 auto;   /* Centra el bloque horizontalmente */
-}
-
-/* --- ESTILOS DE ACORDEÓN (Mantenidos casi igual) --- */
-details { display: block; }
-summary { list-style: none; cursor: pointer; outline: none; }
-summary::-webkit-details-marker { display: none; }
-
-.section-header {
-  background-color: var(--white);
-  border: 1px solid var(--nav-border-color);
-  transition: all 0.2s;
-}
-.section-header:hover { background-color: #f1f5f9; }
-
-/* Pequeño ajuste: cuando se abre, quitamos el borde redondeado inferior del header */
-details[open] .section-header {
-    border-bottom-left-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
-    border-bottom-color: transparent;
-}
-
-.header-secondary { background-color: #e2e8f0; border-color: #cbd5e1; }
-.section-title { font-size: 1.25rem; font-weight: 700; color: var(--text-main); }
-.icon-box { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
-.bg-accent { background-color: var(--accent-color); }
-.transition-icon { transition: transform 0.3s ease; font-size: 1.2rem; color: #64748b; }
-details[open] summary .transition-icon { transform: rotate(180deg); }
-
-
-/* --- NUEVO DISEÑO: FILA RECTANGULAR (.event-row) --- */
-
-.event-row {
-    display: flex;
-    background-color: var(--white);
-    border-radius: 12px; /* Bordes redondeados */
-    overflow: hidden;    /* Para que el badge izquierdo no se salga */
-    border: 1px solid var(--nav-border-color);
-    transition: all 0.2s ease;
-    /* Sombra suave para dar profundidad */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
-}
-
-.event-row:hover {
-    transform: translateY(-2px); /* Efecto ligero al pasar el mouse */
-    border-color: var(--accent-color);
-    box-shadow: 0 5px 15px rgba(37, 99, 235, 0.15) !important;
-}
-
-/* Badge de fecha a la izquierda (Azul) */
-.date-badge-left {
-    background-color: var(--accent-color);
-    color: var(--white);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    /* Ancho fijo para que todos queden alineados */
-    min-width: 90px; 
-    padding: 0.8rem;
-    line-height: 1;
-}
-
-.day-number {
-    font-size: 1.8rem;
-    font-weight: 800;
-}
-.month-name {
-    font-size: 0.8rem;
-    font-weight: 700;
-    letter-spacing: 1px;
-    margin-top: 4px;
-}
-
-/* Cuerpo de la fila (Derecha) */
-.row-body {
-    flex-grow: 1; /* Ocupa el resto del espacio */
-    padding: 1rem 1.5rem;
-}
-
-.text-accent { color: var(--accent-color) !important; }
-
-
-/* --- ESTILO PARA EVENTOS PASADOS (Gris) --- */
-.past-row {
-    filter: grayscale(100%);
-    opacity: 0.6;
-}
-/* El badge de los pasados lo ponemos gris oscuro en vez de azul */
-.past-row .date-badge-left {
-    background-color: #475569; 
-}
-
-.past-row:hover {
-    filter: grayscale(0%);
-    opacity: 1;
-}
-.past-row:hover .date-badge-left {
-     background-color: var(--accent-color);
-}
-
-/* ... TUS VARIABLES Y ESTILOS GENERALES SE MANTIENEN ... */
+/* ===================================
+   PROFESSIONAL DESIGN - HOME COMPONENT
+   Three-column layout with modern styling
+   =================================== */
 
 :host {
   --nav-bg-color: #dbeafe; 
@@ -271,233 +10,389 @@ details[open] summary .transition-icon { transform: rotate(180deg); }
   --accent-hover: #1d4ed8;
   --text-main: #1e3a8a;    
   --white: #ffffff;
+  --card-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
+  --card-hover-shadow: 0 8px 24px rgba(37, 99, 235, 0.15);
 }
 
+/* MAIN CONTAINER */
 .main-container {
-  background-color: #f8fafc; 
+  background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
   min-height: 100vh;
-  padding: 2rem 1rem !important; 
+  padding: 2rem 1.5rem !important;
 }
 
-.content-limiter {
-  max-width: 850px; 
-  margin: 0 auto;   
-}
-
-/* ... ESTILOS DE DETAILS/SUMMARY SE MANTIENEN IGUAL ... */
-details { display: block; }
-summary { list-style: none; cursor: pointer; outline: none; }
-summary::-webkit-details-marker { display: none; }
-.section-header { background-color: var(--white); border: 1px solid var(--nav-border-color); transition: all 0.2s; }
-.section-header:hover { background-color: #f1f5f9; }
-details[open] .section-header { border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important; border-bottom-color: transparent; }
-.header-secondary { background-color: #e2e8f0; border-color: #cbd5e1; }
-.section-title { font-size: 1.25rem; font-weight: 700; color: var(--text-main); }
-.icon-box { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
-.bg-accent { background-color: var(--accent-color); }
-.transition-icon { transition: transform 0.3s ease; font-size: 1.2rem; color: #64748b; }
-details[open] summary .transition-icon { transform: rotate(180deg); }
-
-
-/* --- ESTILOS DE LA FILA DEL EVENTO --- */
-
-.event-row {
-    display: flex;
-    background-color: var(--white);
-    border-radius: 12px;
-    overflow: hidden;
-    border: 1px solid var(--nav-border-color);
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
-}
-
-.event-row:hover {
-    transform: translateY(-2px);
-    border-color: var(--accent-color);
-    box-shadow: 0 5px 15px rgba(37, 99, 235, 0.15) !important;
-}
-
-.date-badge-left {
-    background-color: var(--accent-color);
-    /* CAMBIO AQUÍ: Color blanco forzado */
-    color: var(--white) !important;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-width: 90px; 
-    padding: 0.8rem;
-    line-height: 1;
-}
-
-.day-number {
-    font-size: 1.8rem;
-    font-weight: 800;
-    /* CAMBIO AQUÍ: Aseguramos blanco */
-    color: var(--white) !important;
-}
-.month-name {
-    font-size: 0.8rem;
-    font-weight: 700;
-    letter-spacing: 1px;
-    margin-top: 4px;
-    /* CAMBIO AQUÍ: Aseguramos blanco */
-    color: var(--white) !important;
-}
-
-.row-body {
-    flex-grow: 1;
-    padding: 0.8rem 1.5rem; /* Un poco menos de padding vertical para que el botón no lo haga muy alto */
-}
-
-.text-accent { color: var(--accent-color) !important; }
-
-/* --- NUEVO ESTILO PARA EL BOTÓN --- */
-.btn-outline-accent {
-    color: var(--accent-color);
-    border-color: var(--accent-color);
-    background-color: transparent;
-    transition: all 0.2s ease-in-out;
-}
-
-.btn-outline-accent:hover {
-    background-color: var(--accent-color);
-    color: var(--white);
-}
-
-
-/* --- ESTILO PARA EVENTOS PASADOS --- */
-.past-row {
-    filter: grayscale(100%);
-    opacity: 0.6;
-    transition: all 0.3s ease;
-}
-.past-row .date-badge-left {
-    background-color: #475569; 
-}
-
-/* Hacemos que el botón también se vea gris en los pasados por defecto */
-.past-row .btn-outline-accent {
-    color: #64748b;
-    border-color: #64748b;
-}
-
-/* Al pasar el mouse sobre un evento pasado, recupera el color */
-.past-row:hover {
-    filter: grayscale(0%);
-    opacity: 1;
-}
-.past-row:hover .date-badge-left {
-     background-color: var(--accent-color);
-}
-/* Y el botón también recupera su color azul al hover de la fila */
-.past-row:hover .btn-outline-accent {
-    color: var(--accent-color);
-    border-color: var(--accent-color);
-}
-/* Hover específico del botón dentro de una fila pasada */
-.past-row:hover .btn-outline-accent:hover {
-    background-color: var(--accent-color);
-}
-
-/* --- Two-column layout styles --- */
-.content-limiter {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.home-layout{
-  display: grid;
-  grid-template-columns: 420px 1fr;
-  gap: 28px;
-  align-items: start;
-}
-
-.left-pane{
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.right-pane{
-  min-height: 320px;
-}
-
-.activities-shell{
-  background: linear-gradient(180deg, #ffffff, #fbfdff);
-  border-radius: 14px;
-  padding: 18px;
-  box-shadow: 0 12px 30px rgba(2,6,23,0.06);
-  border: 1px solid rgba(15,23,42,0.03);
-}
-
-.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px;color:#475569}
-.empty-state h4{margin:0 0 8px;font-size:18px;color:#0f172a}
-.empty-state .muted{color:#94a3b8}
-
-@media (max-width: 980px){
-  .home-layout{grid-template-columns: 1fr;}
-  .content-limiter{padding:0 12px}
-}
-    color: var(--white);
+/* WELCOME SECTION */
+.welcome-section {
+  max-width: 1600px;
+  margin: 0 auto 2rem;
 }
 
 .welcome-header {
-  /* Un pequeño borde abajo sutil para separar, opcional */
-  border-bottom: 1px dashed var(--nav-border-color);
-  padding-bottom: 1.5rem;
+  background: linear-gradient(135deg, var(--white) 0%, #f1f5f9 100%);
+  padding: 1.25rem 1.75rem;
+  border-radius: 16px;
+  border: 1px solid var(--nav-border-color);
+  box-shadow: var(--card-shadow);
 }
 
 .welcome-title {
-  color: var(--text-main); /* Azul oscuro corporativo */
-  font-weight: 800;        /* Letra muy gordita */
-  font-size: 2.2rem;       /* Tamaño grande */
-  margin-bottom: 0.2rem;
+  color: var(--text-main);
+  font-weight: 700;
+  font-size: 1.75rem;
+  margin-bottom: 0.35rem;
   letter-spacing: -0.5px;
 }
 
 .user-highlight {
-  color: var(--accent-color); /* Tu azul eléctrico (Royal Blue) */
+  color: var(--accent-color);
+  background: linear-gradient(120deg, var(--accent-color), #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .welcome-subtitle {
-  color: #64748b; /* Gris suave */
-  font-size: 1.1rem;
+  color: #64748b;
+  font-size: 0.95rem;
   font-weight: 500;
   margin: 0;
 }
 
-/* Animación para el saludo (la manita) */
-.wave-emoji {
-  display: inline-block;
-  animation: wave-animation 2.5s infinite;
-  transform-origin: 70% 70%;
+/* TWO ROW PROFESSIONAL LAYOUT */
+.professional-layout {
+  max-width: 1600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-@keyframes wave-animation {
-  0% { transform: rotate( 0.0deg) }
-  10% { transform: rotate(14.0deg) }  
-  20% { transform: rotate(-8.0deg) }
-  30% { transform: rotate(14.0deg) }
-  40% { transform: rotate(-4.0deg) }
-  50% { transform: rotate(10.0deg) }
-  60% { transform: rotate( 0.0deg) }  
-  100% { transform: rotate( 0.0deg) }
+/* TOP ROW: Events + Activities (Side by Side) */
+.top-row {
+  display: grid;
+  grid-template-columns: 420px 650px;
+  gap: 1.25rem;
+  align-items: start;
+  justify-content: center;
+  margin: 0 auto;
 }
 
+/* BOTTOM ROW: Calendar (Full Width) */
+.calendar-row {
+  width: 100%;
+}
+
+/* CARD CONTAINER SHARED STYLES */
+.card-container {
+  background: var(--white);
+  border-radius: 16px;
+  border: 1px solid var(--nav-border-color);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.card-container:hover {
+  box-shadow: var(--card-hover-shadow);
+}
+
+.card-header {
+  background: linear-gradient(135deg, #f8fafc 0%, var(--nav-bg-color) 100%);
+  padding: 0.9rem 1.2rem;
+  border-bottom: 1px solid var(--nav-border-color);
+}
+
+.card-title {
+  color: var(--text-main);
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.icon-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+/* ========================
+   EVENTS COLUMN (LEFT)
+   ======================== */
+.events-column {
+  height: fit-content;
+}
+
+/* EVENT TABS */
+.event-tabs {
+  display: flex;
+  background: #f1f5f9;
+  padding: 0.5rem;
+  gap: 0.5rem;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  color: #64748b;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-btn:hover {
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--accent-color);
+}
+
+.tab-btn.active {
+  background: var(--accent-color);
+  color: var(--white);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+/* SCROLLABLE EVENTS AREA */
+.events-scroll-area {
+  max-height: 520px;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Custom Scrollbar */
+.events-scroll-area::-webkit-scrollbar {
+  width: 8px;
+}
+
+.events-scroll-area::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.events-scroll-area::-webkit-scrollbar-thumb {
+  background: var(--nav-border-color);
+  border-radius: 10px;
+}
+
+.events-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-color);
+}
+
+/* EVENT CARD DESIGN */
+.event-card {
+  display: flex;
+  background: var(--white);
+  border: 2px solid var(--nav-border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.event-card:hover {
+  transform: translateX(4px);
+  border-color: var(--accent-color);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+}
+
+.event-card.active {
+  border-color: var(--accent-color);
+  background: linear-gradient(135deg, #eff6ff 0%, var(--white) 100%);
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.2);
+}
+
+.event-date {
+  background: linear-gradient(135deg, var(--accent-color), #3b82f6);
+  color: var(--white);
+  min-width: 75px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 0.5rem;
+}
+
+.date-day {
+  font-size: 1.75rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--white);
+}
+
+.date-month {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-top: 4px;
+  opacity: 0.9;
+  color: var(--white);
+}
+
+.event-info {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.event-time {
+  color: var(--text-main);
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+}
+
+.event-id {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* PAST EVENTS STYLING */
+.event-card.past {
+  opacity: 0.6;
+  filter: grayscale(50%);
+}
+
+.event-card.past .event-date {
+  background: linear-gradient(135deg, #64748b, #475569);
+}
+
+.event-card.past:hover {
+  opacity: 1;
+  filter: grayscale(0%);
+}
+
+/* ========================
+   ACTIVITIES COLUMN (RIGHT TOP)
+   ======================== */
+.activities-column {
+  min-height: 480px;
+  height: fit-content;
+}
+
+.activities-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.activities-content {
+  padding: 1rem;
+  flex: 1;
+  overflow-y: auto;
+  max-height: 520px;
+}
+
+.activities-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.activities-content::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.activities-content::-webkit-scrollbar-thumb {
+  background: var(--nav-border-color);
+  border-radius: 10px;
+}
+
+.activities-content::-webkit-scrollbar-thumb:hover {
+  background: #22c55e;
+}
+
+/* ========================
+   CALENDAR ROW (BOTTOM FULL WIDTH)
+   ======================== */
+.calendar-row {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.calendar-content {
+  padding: 1rem;
+}
+
+/* ========================
+   EMPTY STATES
+   ======================== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  color: #64748b;
+}
+
+.empty-state i {
+  color: var(--accent-color);
+  opacity: 0.4;
+  margin-bottom: 1rem;
+}
+
+.empty-state h4 {
+  color: var(--text-main);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.empty-state .muted {
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+.empty-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem 1rem;
+  color: #94a3b8;
+  text-align: center;
+}
+
+.empty-message i {
+  opacity: 0.3;
+  color: var(--accent-color);
+}
+
+.empty-message p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* ========================
+   CALENDAR CUSTOMIZATION
+   ======================== */
 .calendar-wrapper {
-  font-family: inherit; /* Usa tu fuente global */
+  font-family: inherit;
 }
 
-/* Título del mes (ej: ENERO 2026) */
 :host ::ng-deep .fc-toolbar-title {
-  font-size: 1.5rem !important;
+  font-size: 1.1rem !important;
   color: var(--text-main);
   font-weight: 700;
   text-transform: capitalize;
 }
 
-/* Botones del calendario (Prev, Next, Today) */
 :host ::ng-deep .fc-button-primary {
   background-color: var(--white) !important;
   border-color: var(--nav-border-color) !important;
@@ -505,6 +400,8 @@ details[open] summary .transition-icon { transform: rotate(180deg); }
   font-weight: 600;
   text-transform: capitalize;
   transition: all 0.2s;
+  font-size: 0.8rem !important;
+  padding: 0.35rem 0.7rem !important;
 }
 
 :host ::ng-deep .fc-button-primary:hover,
@@ -520,32 +417,131 @@ details[open] summary .transition-icon { transform: rotate(180deg); }
   border-color: var(--accent-color) !important;
 }
 
-/* Encabezados de días (Lun, Mar...) */
 :host ::ng-deep .fc-col-header-cell-cushion {
   color: #64748b;
   text-transform: uppercase;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  padding-bottom: 10px;
+  padding: 0.5rem 0;
 }
 
-/* Día actual (fondo amarillo suave o azul suave) */
 :host ::ng-deep .fc-day-today {
-  background-color: #eff6ff !important; /* Azul muy suave */
+  background-color: #eff6ff !important;
 }
 
-/* Eventos dentro del calendario */
+:host ::ng-deep .fc-daygrid-day-number {
+  color: var(--text-main);
+  font-weight: 600;
+  padding: 0.35rem;
+  font-size: 0.9rem;
+}
+
 :host ::ng-deep .fc-event {
   border: none !important;
-  padding: 2px 4px;
-  font-size: 0.85rem;
+  padding: 2px 5px;
+  font-size: 0.75rem;
   border-radius: 4px;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  margin-bottom: 1px;
 }
 
-/* Quitar subrayado de los eventos */
 :host ::ng-deep .fc-event-main {
   color: white !important; 
-  font-weight: 500;
+  font-weight: 600;
+}
+
+:host ::ng-deep .fc-daygrid-event {
+  margin: 1px 2px;
+}
+
+:host ::ng-deep .fc {
+  font-size: 0.85rem;
+}
+
+:host ::ng-deep .fc .fc-view-harness {
+  height: 450px !important;
+}
+
+:host ::ng-deep .fc-daygrid-body {
+  font-size: 0.8rem;
+}
+
+/* ========================
+   UTILITIES
+   ======================== */
+.bg-accent {
+  background-color: var(--accent-color) !important;
+}
+
+.bg-success {
+  background-color: #22c55e !important;
+}
+
+.bg-warning {
+  background-color: #f59e0b !important;
+}
+
+.text-accent {
+  color: var(--accent-color) !important;
+}
+
+/* ========================
+   RESPONSIVE DESIGN
+   ======================== */
+@media (max-width: 1400px) {
+  .top-row {
+    grid-template-columns: 380px 1fr;
+  }
+}
+
+@media (max-width: 1200px) {
+  .top-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .events-column, .activities-column {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-container {
+    padding: 1rem !important;
+  }
+  
+  .welcome-header {
+    padding: 1.5rem;
+  }
+  
+  .welcome-title {
+    font-size: 1.8rem;
+  }
+  
+  .welcome-subtitle {
+    font-size: 0.95rem;
+  }
+  
+  .professional-layout {
+    gap: 1rem;
+  }
+  
+  .events-scroll-area,
+  .activities-content {
+    max-height: 450px;
+  }
+  
+  .card-header {
+    padding: 1rem;
+  }
+  
+  .card-title {
+    font-size: 1.1rem;
+  }
+  
+  .icon-box {
+    width: 32px;
+    height: 32px;
+    font-size: 0.95rem;
+  }
 }

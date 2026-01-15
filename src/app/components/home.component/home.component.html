@@ -1,111 +1,128 @@
 
-
 <div class="container-fluid main-container p-4">
 
-  <div class="home-layout content-limiter">
-
-    <aside class="left-pane">
-      <div class="welcome-header mb-4">
-        <h1 class="welcome-title">
-          Hola, <span class="user-highlight"> {{perfil.nombre}} !</span>
-        </h1>
-      </div>
-
-      <details class="section-wrapper mb-4" open>
-    <summary class="section-header d-flex align-items-center justify-content-between p-3 rounded">
-      <div class="d-flex align-items-center">
-        <div class="icon-box me-3 bg-accent text-white">
-          <i class="bi bi-calendar-check"></i>
-        </div>
-        <h2 class="section-title mb-0">Próximos Eventos</h2>
-      </div>
-      <i class="bi bi-chevron-down transition-icon"></i>
-    </summary>
-
-    <div class="section-content mt-2 d-flex flex-column gap-2">
-      <ng-container *ngFor="let event of eventos">
-        <div *ngIf="event.fechaEvento >= now" class="event-row shadow-sm">
-          <div class="date-badge-left">
-             <span class="day-number">{{ event.fechaEvento | date:'dd' }}</span>
-             <span class="month-name">{{ event.fechaEvento | date:'MMM' | uppercase }}</span>
-          </div>
-          
-          <div class="row-body d-flex align-items-center justify-content-between gap-3">
-             <div class="time-info d-flex align-items-center">
-                <i class="bi bi-clock-fill text-accent me-2 fs-5"></i>
-                <span class="fs-5 fw-bold text-dark">{{ event.fechaEvento | date:'HH:mm' }}h</span>
-             </div>
-             <button class="btn btn-sm btn-outline-accent rounded-pill px-3 fw-semibold" (click)="onclickEvento(event.idEvento)">
-               Ver actividades
-             </button>
-          </div>
-        </div>
-      </ng-container>
+  <!-- Welcome Header -->
+  <div class="welcome-section mb-4">
+    <div class="welcome-header">
+      <h1 class="welcome-title">
+        Hola, <span class="user-highlight">{{perfil.nombre}}</span>! 👋
+      </h1>
+      <p class="welcome-subtitle">Gestiona tus eventos y actividades</p>
     </div>
-  </details>
+  </div>
 
-      <details class="section-wrapper mb-5">
-    <summary class="section-header d-flex align-items-center justify-content-between p-3 rounded header-secondary">
-      <div class="d-flex align-items-center">
-        <div class="icon-box me-3 bg-secondary-subtle text-secondary">
-          <i class="bi bi-calendar-x"></i>
-        </div>
-        <h2 class="section-title text-secondary mb-0">Eventos Finalizados</h2>
-      </div>
-      <i class="bi bi-chevron-down transition-icon"></i>
-    </summary>
+  <!-- Two Column Layout (Top) + Calendar (Bottom) -->
+  <div class="professional-layout">
+    
+    <!-- TOP ROW: Events and Activities -->
+    <div class="top-row">
+      
+      <!-- LEFT: Events List -->
+      <aside class="events-column">
+        <div class="card-container">
+          <div class="card-header">
+            <div class="d-flex align-items-center">
+              <div class="icon-box me-3 bg-accent text-white">
+                <i class="bi bi-calendar-event"></i>
+              </div>
+              <h2 class="card-title mb-0">Eventos</h2>
+            </div>
+          </div>
 
-    <div class="section-content mt-2 d-flex flex-column gap-2">
-      <ng-container *ngFor="let event of eventos">
-        <div *ngIf="event.fechaEvento < now" class="event-row shadow-sm past-row">
-          <div class="date-badge-left">
-             <span class="day-number">{{ event.fechaEvento | date:'dd' }}</span>
-             <span class="month-name">{{ event.fechaEvento | date:'MMM' | uppercase }}</span>
+          <!-- Tabs for Upcoming/Past Events -->
+          <div class="event-tabs">
+            <button class="tab-btn active" onclick="this.classList.add('active'); this.nextElementSibling.classList.remove('active'); document.getElementById('upcoming').style.display='block'; document.getElementById('past').style.display='none';">
+              <i class="bi bi-calendar-check me-2"></i>Próximos
+            </button>
+            <button class="tab-btn" onclick="this.classList.add('active'); this.previousElementSibling.classList.remove('active'); document.getElementById('upcoming').style.display='none'; document.getElementById('past').style.display='block';">
+              <i class="bi bi-calendar-x me-2"></i>Finalizados
+            </button>
           </div>
-          
-          <div class="row-body d-flex align-items-center justify-content-between gap-3">
-             <div class="time-info d-flex align-items-center">
-                <i class="bi bi-clock-fill text-accent me-2 fs-5"></i>
-                <span class="fs-5 fw-bold text-dark">{{ event.fechaEvento | date:'HH:mm' }}h</span>
-             </div>
-             <button class="btn btn-sm btn-outline-accent rounded-pill px-3 fw-semibold" (click)="onclickEvento(event.idEvento)">
-               Ver actividades
-             </button>
+
+          <!-- Upcoming Events -->
+          <div id="upcoming" class="events-scroll-area">
+            <ng-container *ngFor="let event of eventos">
+              <div *ngIf="event.fechaEvento >= now" class="event-card" (click)="onclickEvento(event.idEvento)" [class.active]="idEvento === event.idEvento">
+                <div class="event-date">
+                  <span class="date-day">{{ event.fechaEvento | date:'dd' }}</span>
+                  <span class="date-month">{{ event.fechaEvento | date:'MMM' | uppercase }}</span>
+                </div>
+                <div class="event-info">
+                  <div class="event-time">
+                    <i class="bi bi-clock me-2"></i>
+                    {{ event.fechaEvento | date:'HH:mm' }}h
+                  </div>
+                  <div class="event-id">#{{event.idEvento}}</div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+
+          <!-- Past Events -->
+          <div id="past" class="events-scroll-area" style="display: none;">
+            <ng-container *ngFor="let event of eventos">
+              <div *ngIf="event.fechaEvento < now" class="event-card past" (click)="onclickEvento(event.idEvento)" [class.active]="idEvento === event.idEvento">
+                <div class="event-date">
+                  <span class="date-day">{{ event.fechaEvento | date:'dd' }}</span>
+                  <span class="date-month">{{ event.fechaEvento | date:'MMM' | uppercase }}</span>
+                </div>
+                <div class="event-info">
+                  <div class="event-time">
+                    <i class="bi bi-clock me-2"></i>
+                    {{ event.fechaEvento | date:'HH:mm' }}h
+                  </div>
+                  <div class="event-id">#{{event.idEvento}}</div>
+                </div>
+              </div>
+            </ng-container>
           </div>
         </div>
-      </ng-container>
+      </aside>
+
+      <!-- RIGHT: Activities -->
+      <section class="activities-column">
+        <div class="card-container activities-card">
+          <div class="card-header">
+            <div class="d-flex align-items-center">
+              <div class="icon-box me-3 bg-success text-white">
+                <i class="bi bi-list-check"></i>
+              </div>
+              <h2 class="card-title mb-0">Actividades</h2>
+            </div>
+          </div>
+          <div class="activities-content">
+            <ng-container *ngIf="idEvento != null; else placeholder">
+              <app-actividades [idEvento]="idEvento"></app-actividades>
+            </ng-container>
+            <ng-template #placeholder>
+              <div class="empty-state">
+                <i class="bi bi-hand-index fs-1 mb-3"></i>
+                <h4>Selecciona un evento</h4>
+                <p class="muted">Haz clic en un evento de la izquierda para ver sus actividades</p>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </section>
+
     </div>
-      </details>
 
-      <div class="calendar-section mt-5 text-center p-4 bg-white rounded shadow-sm border">
-         <h3 class="text-muted">Espacio para el Calendario</h3>
-      </div>
-    </aside>
-
-    <section class="right-pane">
-      <div class="activities-shell">
-        <ng-container *ngIf="idEvento != null; else placeholder">
-          <app-actividades [idEvento]="idEvento"></app-actividades>
-        </ng-container>
-        <ng-template #placeholder>
-          <div class="empty-state">
-            <h4>Selecciona un evento para ver sus actividades</h4>
-            <p class="muted">Haz clic en "Ver actividades" en cualquier evento para cargarlas aquí.</p>
+    <!-- BOTTOM ROW: Calendar (Full Width) -->
+    <div class="calendar-row">
+      <div class="card-container">
+        <div class="card-header">
+          <div class="d-flex align-items-center">
+            <div class="icon-box me-3 bg-warning text-white">
+              <i class="bi bi-calendar3"></i>
+            </div>
+            <h2 class="card-title mb-0">Calendario</h2>
           </div>
-        </ng-template>
+        </div>
+        <div class="calendar-content">
+          <full-calendar [options]="calendarOptions"></full-calendar>
+        </div>
       </div>
-    </section>
-
-  <div class="calendar-section mt-5 p-4 bg-white rounded shadow-sm border">
-     
-     <div class="d-flex align-items-center mb-4">
-        <i class="bi bi-calendar3 text-accent fs-3 me-2"></i>
-        <h3 class="text-main fw-bold mb-0">Calendario</h3>
-     </div>
-
-     <div class="calendar-wrapper">
-        <full-calendar [options]="calendarOptions"></full-calendar>
-     </div>
+    </div>
 
   </div>
 
