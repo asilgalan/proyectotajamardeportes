@@ -1,1 +1,82 @@
-<h1>Home</h1>
+<div class="container-fluid main-container p-4 content-limiter">
+
+  <details class="section-wrapper mb-4" open>
+    <summary class="section-header d-flex align-items-center justify-content-between p-3 rounded">
+      <div class="d-flex align-items-center">
+        <div class="icon-box me-3 bg-accent text-white">
+          <i class="bi bi-calendar-check"></i>
+        </div>
+        <h2 class="section-title mb-0">Próximos Eventos</h2>
+      </div>
+      <i class="bi bi-chevron-down transition-icon"></i>
+    </summary>
+
+    <div class="section-content mt-2 d-flex flex-column gap-2">
+      @for (event of eventos; track event.idEvento) {
+        @if (event.fechaEvento >= now) {
+          
+          <div class="event-row shadow-sm">
+            <div class="date-badge-left">
+               <span class="day-number">{{ event.fechaEvento | date:'dd' }}</span>
+               <span class="month-name">{{ event.fechaEvento | date:'MMM' | uppercase }}</span>
+            </div>
+            
+            <div class="row-body d-flex align-items-center justify-content-between gap-3">
+               <div class="time-info d-flex align-items-center">
+                  <i class="bi bi-clock-fill text-accent me-2 fs-5"></i>
+                  <span class="fs-5 fw-bold text-dark">{{ event.fechaEvento | date:'HH:mm' }}h</span>
+               </div>
+               <button class="btn btn-sm btn-outline-accent rounded-pill px-3 fw-semibold">
+                 Ver actividades
+               </button>
+            </div>
+          </div>
+
+        }
+      }
+    </div>
+  </details>
+
+
+  <details class="section-wrapper mb-5">
+    <summary class="section-header d-flex align-items-center justify-content-between p-3 rounded header-secondary">
+      <div class="d-flex align-items-center">
+        <div class="icon-box me-3 bg-secondary-subtle text-secondary">
+          <i class="bi bi-calendar-x"></i>
+        </div>
+        <h2 class="section-title text-secondary mb-0">Eventos Finalizados</h2>
+      </div>
+      <i class="bi bi-chevron-down transition-icon"></i>
+    </summary>
+
+    <div class="section-content mt-2 d-flex flex-column gap-2">
+      @for (event of eventos; track event.idEvento) {
+        @if (event.fechaEvento < now) {
+          
+          <div class="event-row shadow-sm past-row">
+            <div class="date-badge-left">
+               <span class="day-number">{{ event.fechaEvento | date:'dd' }}</span>
+               <span class="month-name">{{ event.fechaEvento | date:'MMM' | uppercase }}</span>
+            </div>
+            
+            <div class="row-body d-flex align-items-center justify-content-between gap-3">
+               <div class="time-info d-flex align-items-center">
+                  <i class="bi bi-clock-fill text-accent me-2 fs-5"></i>
+                  <span class="fs-5 fw-bold text-dark">{{ event.fechaEvento | date:'HH:mm' }}h</span>
+               </div>
+               <button class="btn btn-sm btn-outline-accent rounded-pill px-3 fw-semibold">
+                 Ver actividades
+               </button>
+            </div>
+          </div>
+
+        }
+      }
+    </div>
+  </details>
+
+  <div class="calendar-section mt-5 text-center p-5 bg-white rounded shadow-sm border">
+     <h3 class="text-muted">Espacio para el Calendario</h3>
+  </div>
+
+</div>
