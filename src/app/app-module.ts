@@ -5,28 +5,26 @@ import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptors, withInterceptorsFromDi } from '@angular/common/http';
 import { LoginComponent } from './auth/components/loginComponent/loginComponent';
-import { ReactiveFormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ReactiveFormsModule,FormGroup,FormControl } from '@angular/forms';
+import { RouterLink, RouterModule,  } from '@angular/router';
 import { authInterceptor } from './auth/interceptors/auth.interceptor';
-import { PerfilComponent } from './components/perfil.component/perfil.component';
-import ServicePerfil from './services/service.perfil';
-import { PagosComponent } from './components/pagos.component/pagos.component';
+import { CommonModule } from '@angular/common';
 
-@NgModule
-({
-  declarations: 
-  [
-    App,
-    PerfilComponent,
-    PagosComponent
+import { PerfilComponent } from './components/perfil.component/perfil.component';
+import { NavbarComponent } from './components/navbar.component/navbar.component';
+import { HomeComponent } from './components/home.component/home.component';
+
+import { EquipoComponent } from './components/equipo/equipo.component';
+
+@NgModule({
+  declarations: [
+    App,LoginComponent,PerfilComponent, NavbarComponent, HomeComponent, EquipoComponent
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule,LoginComponent
-
+    AppRoutingModule,ReactiveFormsModule,CommonModule,RouterModule
   ],
   providers: [
-
     provideBrowserGlobalErrorListeners(),
     provideHttpClient(withInterceptors([authInterceptor])),
     ServicePerfil

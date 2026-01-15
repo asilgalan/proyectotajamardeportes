@@ -1,6 +1,7 @@
 import { HttpHandlerFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { AuthService } from '../services/auth.service';
+import { Router } from '@angular/router';
 
 
 export function authInterceptor(
@@ -8,8 +9,10 @@ export function authInterceptor(
   next: HttpHandlerFn
 ) {
   const token = inject(AuthService).token();
-if (token) {
-    console.log(":)))))))))))))");
+  const route=inject(Router);
+    if (!token) {
+    route.navigate(['']);
+ 
   }
   const newReq = req.clone({
 
