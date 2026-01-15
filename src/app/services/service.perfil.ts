@@ -13,13 +13,7 @@ export default class ServicePerfil
     {
         let url = environment.apiUrl;
         let endPoint = "/UsuariosDeportes/Perfil";
-<<<<<<<< HEAD:src/app/services/service.perfil.ts
-========
-
-        let header = new HttpHeaders();
-
         
->>>>>>>> origin/development:src/app/services/perfil.service.ts
         let promise = new Promise((resolve) =>
         {
             this._http.get(url+endPoint).subscribe(response =>

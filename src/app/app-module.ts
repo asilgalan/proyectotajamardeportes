@@ -27,7 +27,7 @@ import { EquipoComponent } from './components/equipo/equipo.component';
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideHttpClient(withInterceptors([authInterceptor])),
-    ServicePerfil
+   
   ],
   bootstrap: [App]
 })
