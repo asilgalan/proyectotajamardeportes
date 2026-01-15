@@ -1,6 +1,12 @@
-<div class="container-fluid main-container p-4 content-limiter">
 
-  <details class="section-wrapper mb-4" open>
+
+
+<div class="container-fluid main-container p-4">
+
+  <div class="home-layout content-limiter">
+
+    <aside class="left-pane">
+      <details class="section-wrapper mb-4" open>
     <summary class="section-header d-flex align-items-center justify-content-between p-3 rounded">
       <div class="d-flex align-items-center">
         <div class="icon-box me-3 bg-accent text-white">
@@ -12,33 +18,28 @@
     </summary>
 
     <div class="section-content mt-2 d-flex flex-column gap-2">
-      @for (event of eventos; track event.idEvento) {
-        @if (event.fechaEvento >= now) {
-          
-          <div class="event-row shadow-sm">
-            <div class="date-badge-left">
-               <span class="day-number">{{ event.fechaEvento | date:'dd' }}</span>
-               <span class="month-name">{{ event.fechaEvento | date:'MMM' | uppercase }}</span>
-            </div>
-            
-            <div class="row-body d-flex align-items-center justify-content-between gap-3">
-               <div class="time-info d-flex align-items-center">
-                  <i class="bi bi-clock-fill text-accent me-2 fs-5"></i>
-                  <span class="fs-5 fw-bold text-dark">{{ event.fechaEvento | date:'HH:mm' }}h</span>
-               </div>
-               <button class="btn btn-sm btn-outline-accent rounded-pill px-3 fw-semibold">
-                 Ver actividades
-               </button>
-            </div>
+      <ng-container *ngFor="let event of eventos">
+        <div *ngIf="event.fechaEvento >= now" class="event-row shadow-sm">
+          <div class="date-badge-left">
+             <span class="day-number">{{ event.fechaEvento | date:'dd' }}</span>
+             <span class="month-name">{{ event.fechaEvento | date:'MMM' | uppercase }}</span>
           </div>
-
-        }
-      }
+          
+          <div class="row-body d-flex align-items-center justify-content-between gap-3">
+             <div class="time-info d-flex align-items-center">
+                <i class="bi bi-clock-fill text-accent me-2 fs-5"></i>
+                <span class="fs-5 fw-bold text-dark">{{ event.fechaEvento | date:'HH:mm' }}h</span>
+             </div>
+             <button class="btn btn-sm btn-outline-accent rounded-pill px-3 fw-semibold" (click)="onclickEvento(event.idEvento)">
+               Ver actividades
+             </button>
+          </div>
+        </div>
+      </ng-container>
     </div>
   </details>
 
-
-  <details class="section-wrapper mb-5">
+      <details class="section-wrapper mb-5">
     <summary class="section-header d-flex align-items-center justify-content-between p-3 rounded header-secondary">
       <div class="d-flex align-items-center">
         <div class="icon-box me-3 bg-secondary-subtle text-secondary">
@@ -50,33 +51,46 @@
     </summary>
 
     <div class="section-content mt-2 d-flex flex-column gap-2">
-      @for (event of eventos; track event.idEvento) {
-        @if (event.fechaEvento < now) {
-          
-          <div class="event-row shadow-sm past-row">
-            <div class="date-badge-left">
-               <span class="day-number">{{ event.fechaEvento | date:'dd' }}</span>
-               <span class="month-name">{{ event.fechaEvento | date:'MMM' | uppercase }}</span>
-            </div>
-            
-            <div class="row-body d-flex align-items-center justify-content-between gap-3">
-               <div class="time-info d-flex align-items-center">
-                  <i class="bi bi-clock-fill text-accent me-2 fs-5"></i>
-                  <span class="fs-5 fw-bold text-dark">{{ event.fechaEvento | date:'HH:mm' }}h</span>
-               </div>
-               <button class="btn btn-sm btn-outline-accent rounded-pill px-3 fw-semibold">
-                 Ver actividades
-               </button>
-            </div>
+      <ng-container *ngFor="let event of eventos">
+        <div *ngIf="event.fechaEvento < now" class="event-row shadow-sm past-row">
+          <div class="date-badge-left">
+             <span class="day-number">{{ event.fechaEvento | date:'dd' }}</span>
+             <span class="month-name">{{ event.fechaEvento | date:'MMM' | uppercase }}</span>
           </div>
-
-        }
-      }
+          
+          <div class="row-body d-flex align-items-center justify-content-between gap-3">
+             <div class="time-info d-flex align-items-center">
+                <i class="bi bi-clock-fill text-accent me-2 fs-5"></i>
+                <span class="fs-5 fw-bold text-dark">{{ event.fechaEvento | date:'HH:mm' }}h</span>
+             </div>
+             <button class="btn btn-sm btn-outline-accent rounded-pill px-3 fw-semibold" (click)="onclickEvento(event.idEvento)">
+               Ver actividades
+             </button>
+          </div>
+        </div>
+      </ng-container>
     </div>
-  </details>
+      </details>
 
-  <div class="calendar-section mt-5 text-center p-5 bg-white rounded shadow-sm border">
-     <h3 class="text-muted">Espacio para el Calendario</h3>
+      <div class="calendar-section mt-5 text-center p-4 bg-white rounded shadow-sm border">
+         <h3 class="text-muted">Espacio para el Calendario</h3>
+      </div>
+    </aside>
+
+    <section class="right-pane">
+      <div class="activities-shell">
+        <ng-container *ngIf="idEvento != null; else placeholder">
+          <app-actividades [idEvento]="idEvento"></app-actividades>
+        </ng-container>
+        <ng-template #placeholder>
+          <div class="empty-state">
+            <h4>Selecciona un evento para ver sus actividades</h4>
+            <p class="muted">Haz clic en "Ver actividades" en cualquier evento para cargarlas aquí.</p>
+          </div>
+        </ng-template>
+      </div>
+    </section>
+
   </div>
 
 </div>

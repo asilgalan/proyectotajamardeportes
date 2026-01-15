@@ -1,0 +1,32 @@
+<section class="actividades-page">
+	<header class="actividades-header">
+		<div class="header-text">
+			<h1>Actividades</h1>
+			<p class="subtitle">Explora y únete a las actividades disponibles</p>
+		</div>
+	
+	</header>
+
+	<main class="actividades-main">
+		<div class="cards-grid">
+            @for (actividad of actividades(); track $index) {
+                
+			<article class="card">
+				<div class="card-img" aria-hidden></div>
+				<div class="card-body">
+					<h3 class="card-title">{{actividad.nombre}}</h3>
+					<p class="card-meta">{{actividad.idActividad}}</p>
+					@if(actividad.nombre== "fútbol") {
+					<p class="card-desc">{{actividad.minimoJugadores}}</p>
+                    }
+				</div>
+				<div class="card-actions">
+					<button class="btn outline">Detalles</button>
+					<button class="btn" (click)="UniserActividad(actividad.idActividad)">Unirse</button>
+				</div>
+			</article>
+
+        }
+		</div>
+	</main>
+</section>

@@ -15,15 +15,20 @@ import { NavbarComponent } from './components/navbar.component/navbar.component'
 import { HomeComponent } from './components/home.component/home.component';
 
 import { EquipoComponent } from './components/equipo/equipo.component';
+import { A } from '@angular/cdk/keycodes';
+import { ActividadesComponent } from './components/actividades/actividades.component';
+
 
 
 @NgModule({
   declarations: [
-    App,LoginComponent,PerfilComponent, NavbarComponent, HomeComponent, EquipoComponent
+    App,LoginComponent,PerfilComponent, NavbarComponent, HomeComponent, EquipoComponent,ActividadesComponent
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule,ReactiveFormsModule,CommonModule,RouterModule
+    AppRoutingModule,
+    ReactiveFormsModule,
+    CommonModule,RouterModule, RouterLink
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),
