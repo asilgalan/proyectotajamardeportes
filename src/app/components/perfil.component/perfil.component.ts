@@ -14,18 +14,23 @@ export class PerfilComponent implements OnInit
 {
   public perfil!:Perfil
 
-  constructor(private _service:ServicePerfil) { }
+  public eventos:Array<number> = new Array<number>
+  public actividadesEvento!:Array<number>
+
+  constructor(private _service:ServicePerfil) {}
 
   ngOnInit(): void 
   {
     this._service.getPerfil().then(response =>
     {
       this.perfil = response;
-    }) 
-  }
 
-   mostrarDetalles(): void 
-   {
+      //hay que sacar los eventos por usuario
+    })
+  }
+  
+  mostrarDetalles(): void 
+  {
       Swal.fire
       ({
         title: 'Detalles del Usuario',
@@ -61,5 +66,10 @@ export class PerfilComponent implements OnInit
           title: 'swal-title'
         }
       });
+  }
+
+  seleccionarEventos(evento:number): void
+  {
+    //hay que sacar las actividades por usuario
   }
 }
