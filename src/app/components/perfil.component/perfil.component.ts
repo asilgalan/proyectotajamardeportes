@@ -68,7 +68,7 @@ export class PerfilComponent implements OnInit
       });
   }
 
-  seleccionarEventos(evento:number): void
+  seleccionarEvento(evento:number): void
   {
     //hay que sacar las actividades por usuario
   }
