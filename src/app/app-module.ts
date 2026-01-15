@@ -28,7 +28,8 @@ import { EquipoComponent } from './components/equipo/equipo.component';
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideHttpClient(withInterceptors([authInterceptor]))
+    provideHttpClient(withInterceptors([authInterceptor])),
+   
   ],
   bootstrap: [App]
 })

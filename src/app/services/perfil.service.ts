@@ -9,14 +9,10 @@ export default class ServicePerfil
 {
     constructor(private _http:HttpClient) {}
 
-    getPerfil(token:any):Promise<any>
+    getPerfil():Promise<any>
     {
         let url = environment.apiUrl;
         let endPoint = "/UsuariosDeportes/Perfil";
-
-        let header = new HttpHeaders();
-
-        
         let promise = new Promise((resolve) =>
         {
             this._http.get(url+endPoint).subscribe(response =>

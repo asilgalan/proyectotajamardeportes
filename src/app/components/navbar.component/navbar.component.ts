@@ -19,7 +19,7 @@ export class NavbarComponent {
 
   ngOnInit(): void {
     let token = localStorage.getItem('token');
-    this._service.getPerfil(token).then(response => {
+    this._service.getPerfil().then(response => {
       this.perfil = response;
     })
   }
