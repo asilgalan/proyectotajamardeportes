@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import Perfil from '../../models/Perfil';
+import Perfil from '../../models/perfil';
 import ServicePerfil from '../../services/perfil.service';
 import Swal from 'sweetalert2';
 

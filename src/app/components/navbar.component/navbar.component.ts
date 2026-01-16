@@ -1,5 +1,7 @@
 import { AuthService } from './../../auth/services/auth.service';
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, OnInit } from '@angular/core';
+import Perfil from '../../models/perfil';
+import ServicePerfil from '../../services/perfil.service';
 
 @Component({
   selector: 'app-navbar',
