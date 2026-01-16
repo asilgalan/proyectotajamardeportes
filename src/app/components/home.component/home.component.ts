@@ -22,6 +22,10 @@ export class HomeComponent implements OnInit ,OnChanges{
   idEvento: number | null = null;
   public perfil!:Perfil;
 
+  // Modal para añadir evento
+  public showModalAddEvento = false;
+  public fechaSeleccionada: string | null = null;
+
   private actividadesService = inject(ActividadesService);
 
   calendarOptions: CalendarOptions = {
@@ -36,25 +40,27 @@ export class HomeComponent implements OnInit ,OnChanges{
     themeSystem: 'bootstrap5',
     events: [],
     eventColor: '#2563eb',
-    displayEventTime: false
+    displayEventTime: false,
+    dateClick: this.onDateClick.bind(this)
   };
 
-  constructor(private _service: ServiceEventos, private _servicePerfil: ServicePerfil){
+  constructor(private _service: ServiceEventos, private _servicePerfil: ServicePerfil){ }
 
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['idEvento'] && !changes['idEvento'].isFirstChange()) {
+      const val = changes['idEvento'].currentValue as number;
+      if (val != null) this.actividadesService.getActividadesByIdEnvento(val);
+    }
   }
- ngOnChanges(changes: SimpleChanges): void {
-        if (changes['idEvento'] && !changes['idEvento'].isFirstChange()) {
-          const val = changes['idEvento'].currentValue as number;
-          if (val != null) this.actividadesService.getActividadesByIdEnvento(val);
-        }
-      }
-
 
   ngOnInit(): void {
-    this._service.getEventosCursoEscolar().subscribe(response => {
-      console.log("Leyendo eventos");
+   
+    this.getEventoCurosEscolar();
+  }
+  getEventoCurosEscolar(){
+     this._service.getEventosCursoEscolar().subscribe(response => {
       this.eventos = response;
-
       const eventosCalendario = this.eventos.map(evento => {
         return {
           title: `Evento`,
@@ -62,19 +68,37 @@ export class HomeComponent implements OnInit ,OnChanges{
           color: (evento.fechaEvento < this.now) ? '#64748b' : '#2563eb'
         };
       });
-
       this.calendarOptions = { ...this.calendarOptions, events: eventosCalendario };
     })
-
     this._servicePerfil.getPerfil().then(response => {
       this.perfil = response;
     })
   }
+    
 
   onclickEvento(idEvento:number){
     this.idEvento=idEvento;
-     console.log(this.idEvento);
-  this.actividadesService.getActividadesByIdEnvento(this.idEvento).subscribe();
+    this.actividadesService.getActividadesByIdEnvento(this.idEvento).subscribe();
 
+  }
+
+  onDateClick(arg: any) {
+
+    this.fechaSeleccionada = arg.dateStr;
+    this.showModalAddEvento = true;
+  }
+
+  cerrarModalAddEvento() {
+    this.showModalAddEvento = false;
+    this.fechaSeleccionada = null;
+  }
+
+  confirmarAddEvento() {
+  
+
+    this._service.createEvento(this.fechaSeleccionada!).subscribe();
+  this.getEventoCurosEscolar();
+
+    this.cerrarModalAddEvento();
   }
 }

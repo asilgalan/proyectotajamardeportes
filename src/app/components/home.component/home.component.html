@@ -1,3 +1,29 @@
+<!-- Modal para añadir evento -->
+<div *ngIf="showModalAddEvento" class="modal-overlay" (click)="cerrarModalAddEvento()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-icon" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">
+        <i class="bi bi-calendar-plus"></i>
+      </div>
+      <button class="modal-close" (click)="cerrarModalAddEvento()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <h2>¿Quieres añadir un evento?</h2>
+      <p>Fecha seleccionada: <b>{{fechaSeleccionada}}</b></p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-modal-cancel" (click)="cerrarModalAddEvento()">
+        Cancelar
+      </button>
+      <button class="btn-modal-confirm" (click)="confirmarAddEvento()">
+        <i class="bi bi-calendar-plus"></i>
+        Añadir evento
+      </button>
+    </div>
+  </div>
+</div>
 
 <div class="container-fluid main-container p-4">
 

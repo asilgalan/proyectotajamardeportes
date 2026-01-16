@@ -1,10 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
+import Perfil from './models/Perfil';
 import { LoginComponent } from './auth/components/loginComponent/loginComponent';
 import { PerfilComponent } from './components/perfil.component/perfil.component';
 import { HomeComponent } from './components/home.component/home.component';
-import { authGuard } from './auth/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -13,13 +12,12 @@ export const routes: Routes = [
   },
   {
     path: 'perfil', 
-    component: PerfilComponent,
-    canActivate: [authGuard]
+    component: PerfilComponent
   },
+  
     {
     path: 'home', 
-    component: HomeComponent,
-    canActivate: [authGuard]
+    component: HomeComponent
   }
 ];
 

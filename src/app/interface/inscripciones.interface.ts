@@ -1,5 +1,5 @@
 export interface InscripcionesResponse {
-    idInscripcion:     number;
+    idInscripcion?:     number;
     idUsuario:         number;
     idEventoActividad: number;
     quiereSerCapitan:  boolean;

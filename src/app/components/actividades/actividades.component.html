@@ -8,7 +8,7 @@
 
 	<main class="actividades-main">
 		<div class="cards-grid">
-            @for (actividad of actividadEvento(); track $index) {
+            @for (actividad of actividades(); track $index) {
 			<article class="activity-card">
 				<div class="card-header">
 					<div class="sport-icon">
@@ -31,9 +31,9 @@
 							<i class="bi bi-calendar-event"></i>
 							<span>{{actividad.fechaEvento | date: 'dd MMM yyyy'}}</span>
 						</div>
-						@if(actividad.nombreActividad == "fútbol") {
+						@if(actividad.nombreActividad.toLowerCase() === "futbol") {
 						<div class="info-item">
-							<i class="bi bi-people-fill"></i>
+							<i class="bi bi-people-fill"></i>		
 							<span>Mín. {{actividad.minimoJugadores}} jugadores</span>
 						</div>
 						}
@@ -45,17 +45,58 @@
 						<i class="bi bi-info-circle"></i>
 						<span>Detalles</span>
 					</button>
-
-					@if(isFutureEvent(actividad.fechaEvento)) {
-					<button class="btn-primary" (click)="UniserActividad(actividad.idActividad)">
-						<i class="bi bi-plus-circle-fill"></i>
-						<span>Unirse</span>
+					@if(estaInscritoEnEstaActividad(actividad.idEventoActividad)) {
+				
+					
+					<button class="btn-desapuntar" (click)="abrirModalDesapuntar(actividad.idEventoActividad)">
+						<i class="bi bi-x-circle"></i>
+						<span>Desapuntarse</span>
 					</button>
+					@if(showModalDesapuntar()) {
+					<div class="modal-overlay" (click)="cerrarModalDesapuntar()">
+						<div class="modal-container" (click)="$event.stopPropagation()">
+							<div class="modal-header">
+								<div class="modal-icon" style="background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);">
+									<i class="bi bi-x-circle"></i>
+								</div>
+								<button class="modal-close" (click)="cerrarModalDesapuntar()">
+									<i class="bi bi-x-lg"></i>
+								</button>
+							</div>
+							<div class="modal-body">
+								<h2>¿Seguro que quieres desapuntarte?</h2>
+								<p>Esta acción cancelará tu inscripción en la actividad.</p>
+							</div>
+							<div class="modal-footer">
+								<button class="btn-modal-cancel" (click)="cerrarModalDesapuntar()">
+									Cancelar
+								</button>
+								<button class="btn-modal-confirm btn-modal-danger" (click)="confirmarDesapuntar()">
+									<i class="bi bi-x-circle"></i>
+									Desapuntarme
+								</button>
+							</div>
+						</div>
+					</div>
+					}
+					} @else if(estaInscritoEnAlgunaActividad()) {
+						<!-- Está inscrito en OTRA actividad del evento -->
+						<button class="btn-otra-actividad" disabled title="Ya estás inscrito en otra actividad de este evento">
+							<i class="bi bi-lock-fill"></i>
+							<span>No disponible</span>
+						</button>
+					} @else if(isFutureEvent(actividad.fechaEvento)) {
+						<!-- Evento futuro y no está inscrito en ninguna -->
+						<button class="btn-primary" (click)="abrirModalUnirse(actividad.idEventoActividad)">
+							<i class="bi bi-plus-circle-fill"></i>
+							<span>Unirse</span>
+						</button>
 					} @else {
-					<button class="btn-primary" disabled style="opacity: 0.5; cursor: not-allowed;">
-						<i class="bi bi-check-circle-fill"></i>
-						<span>Finalizada</span>
-					</button>
+						<!-- Evento ya pasó -->
+						<button class="btn-primary" disabled style="opacity: 0.5; cursor: not-allowed;">
+							<i class="bi bi-check-circle-fill"></i>
+							<span>Finalizada</span>
+						</button>
 					}
 				</div>
 			</article>
@@ -63,3 +104,49 @@
 		</div>
 	</main>
 </section>
+
+<!-- Modal de Confirmación -->
+@if(showModal()) {
+<div class="modal-overlay" (click)="cerrarModal()">
+	<div class="modal-container" (click)="$event.stopPropagation()">
+		<div class="modal-header">
+			<div class="modal-icon">
+				<i class="bi bi-person-plus-fill"></i>
+			</div>
+			<button class="modal-close" (click)="cerrarModal()">
+				<i class="bi bi-x-lg"></i>
+			</button>
+		</div>
+		
+		<div class="modal-body">
+			<h2>Confirmar inscripción</h2>
+			<p>Estás a punto de unirte a esta actividad</p>
+			
+			<div class="capitan-option">
+				<label class="checkbox-container">
+					<input 
+						type="checkbox" 
+						[checked]="quiereSerCapitan()"
+						(change)="toggleCapitan()"
+					/>
+					<span class="checkmark"></span>
+					<div class="checkbox-content">
+						<span class="checkbox-title">¿Quieres ser capitán?</span>
+						<span class="checkbox-subtitle">Lidera y organiza a tu equipo</span>
+					</div>
+				</label>
+			</div>
+		</div>
+		
+		<div class="modal-footer">
+			<button class="btn-modal-cancel" (click)="cerrarModal()">
+				Cancelar
+			</button>
+			<button class="btn-modal-confirm" (click)="confirmarInscripcion()">
+				<i class="bi bi-check2"></i>
+				Confirmar
+			</button>
+		</div>
+	</div>
+</div>
+}
