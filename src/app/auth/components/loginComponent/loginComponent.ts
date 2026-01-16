@@ -9,7 +9,7 @@ import { Router, RouterLink } from '@angular/router';
   templateUrl: './loginComponent.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
 
 
 private fb=inject(FormBuilder)
@@ -22,6 +22,12 @@ loginForm=this.fb.group({
   userName:['',[Validators.required]],
   password:['', [Validators.required, Validators.minLength(5)]] 
 })
+
+ngOnInit() {
+  if (this.authService.token() && this.authService.currentUser()) {
+    this.router.navigate(['/home']);
+  }
+}
 
 onSubmit(){
   if(this.loginForm.invalid){

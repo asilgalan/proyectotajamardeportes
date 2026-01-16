@@ -14,11 +14,15 @@ export default class ServicePerfil
         let url = environment.apiUrl;
         let endPoint = "/UsuariosDeportes/Perfil";
 
-        let promise = new Promise((resolve) =>
+        let promise = new Promise((resolve, reject) =>
         {
-            this._http.get(url+endPoint).subscribe(response =>
-            {
-                resolve(response);
+            this._http.get(url+endPoint).subscribe({
+                next: (response) => {
+                    resolve(response);
+                },
+                error: (error) => {
+                    reject(error);
+                }
             })
         })
 

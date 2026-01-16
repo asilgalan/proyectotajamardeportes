@@ -1,9 +1,10 @@
 <div>
-    @if (auth.token()) {
+    @if (auth.token() && auth.currentUser()) {
     <app-navbar></app-navbar>
-
     }
 
+    @if (!auth.isLoading()) {
     <router-outlet></router-outlet>
+    }
     
 </div>

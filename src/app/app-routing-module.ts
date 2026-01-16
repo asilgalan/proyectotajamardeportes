@@ -4,6 +4,7 @@ import Perfil from './models/Perfil';
 import { LoginComponent } from './auth/components/loginComponent/loginComponent';
 import { PerfilComponent } from './components/perfil.component/perfil.component';
 import { HomeComponent } from './components/home.component/home.component';
+import { authGuard } from './auth/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -12,11 +13,13 @@ export const routes: Routes = [
   },
   {
     path: 'perfil', 
-    component: PerfilComponent
+    component: PerfilComponent,
+    canActivate: [authGuard]
   },
     {
     path: 'home', 
-    component: HomeComponent
+    component: HomeComponent,
+    canActivate: [authGuard]
   }
 ];
 
