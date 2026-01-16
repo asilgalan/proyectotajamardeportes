@@ -2,6 +2,7 @@ import { Component, inject, Input, OnInit, OnChanges, SimpleChanges, signal } fr
 import { ActividadesService } from '../../services/actividades.service';
 import { ActividadesResponse, ActividadEventoResponse } from '../../interface/actividades.interface';
 import { tap } from 'rxjs';
+import { InscripcionesService } from '../../services/inscripciones.service';
 
 @Component({
   selector: 'app-actividades',
@@ -14,6 +15,7 @@ export class ActividadesComponent implements OnInit,OnChanges {
 
   
   private actividadesService=inject(ActividadesService);
+  private inscripcionService=inject(InscripcionesService);
   public actividades=signal<ActividadesResponse[]>([]);
   public actividadEvento=signal<ActividadEventoResponse[] | []>([]);
   
@@ -61,8 +63,8 @@ export class ActividadesComponent implements OnInit,OnChanges {
     this.actividadesService.DeleteActividadesById(id).subscribe();
   }
 
-    UniserActividad(idActividad:number){
-    console.log("Te has unido a la actividad");
+   UniserActividad(idActividad:number){
+   this.inscripcionService.createInscripcion(this.idEvento).subscribe();
   }
   
   showDetails(actividad: number) {

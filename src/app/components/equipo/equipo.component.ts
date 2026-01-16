@@ -11,7 +11,4 @@ export class EquipoComponent {
 
 
   private equiposervice=inject(EquipoService);
-
-
-
 }
