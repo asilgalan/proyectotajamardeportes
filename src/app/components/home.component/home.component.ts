@@ -2,12 +2,13 @@ import { Component, inject, OnChanges, OnInit, SimpleChanges } from '@angular/co
 import { ServiceEventos } from '../../services/evento.service';
 import { evento } from '../../models/evento';
 import { ActividadesService } from '../../services/actividades.service';
-import Perfil from '../../models/perfil';
+
 import ServicePerfil from '../../services/perfil.service';
 import { CalendarOptions } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import esLocale from '@fullcalendar/core/locales/es';
+import Perfil from '../../models/Perfil';
 
 @Component({
   selector: 'app-home',

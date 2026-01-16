@@ -1,7 +1,5 @@
 import { AuthService } from './../../auth/services/auth.service';
-import { Component, inject, computed, OnInit } from '@angular/core';
-import Perfil from '../../models/perfil';
-import ServicePerfil from '../../services/perfil.service';
+import { Component, inject, computed } from '@angular/core';
 
 @Component({
   selector: 'app-navbar',
@@ -11,7 +9,7 @@ import ServicePerfil from '../../services/perfil.service';
 })
 export class NavbarComponent {
   public authService = inject(AuthService);
-
+  
   public perfil = computed(() => this.authService.currentUser());
 
   logout() {

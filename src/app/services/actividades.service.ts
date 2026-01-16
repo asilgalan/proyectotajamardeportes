@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, tap } from 'rxjs';
-import type { ActividadesResponse } from '../interface/actividades.interface';
+import type { ActividadesResponse, ActividadEventoResponse } from '../interface/actividades.interface';
 import { environment } from '../../environments/environment.development';
 
 @Injectable({
@@ -44,8 +44,8 @@ export class ActividadesService {
         );
     }
 
-    getActividadesByIdEnvento(id:number):Observable<ActividadesResponse[]>{
-        return this.http.get<ActividadesResponse[]>(`${this.apiUrl}/Actividades/ActividadesEvento/${id}`).pipe(
+    getActividadesByIdEnvento(id:number):Observable<ActividadEventoResponse[]>{
+        return this.http.get<ActividadEventoResponse[]>(`${this.apiUrl}/Actividades/ActividadesEvento/${id}`).pipe(
             tap(response => console.log(response))
         );
     }

@@ -1,6 +1,6 @@
 import { Component, inject, Input, OnInit, OnChanges, SimpleChanges, signal } from '@angular/core';
 import { ActividadesService } from '../../services/actividades.service';
-import { ActividadesResponse } from '../../interface/actividades.interface';
+import { ActividadesResponse, ActividadEventoResponse } from '../../interface/actividades.interface';
 import { tap } from 'rxjs';
 
 @Component({
@@ -15,6 +15,7 @@ export class ActividadesComponent implements OnInit,OnChanges {
   
   private actividadesService=inject(ActividadesService);
   public actividades=signal<ActividadesResponse[]>([]);
+  public actividadEvento=signal<ActividadEventoResponse[] | []>([]);
   
   @Input() idEvento!:number;
   
@@ -40,7 +41,7 @@ export class ActividadesComponent implements OnInit,OnChanges {
   getActividadesByIdEnvento(id:number){
     this.actividadesService.getActividadesByIdEnvento(this.idEvento)
     .pipe(
-      tap(actividades => this.actividades.set(actividades))
+      tap(actividades => this.actividadEvento.set(actividades))
     )
     .subscribe();
   }
@@ -62,5 +63,16 @@ export class ActividadesComponent implements OnInit,OnChanges {
 
     UniserActividad(idActividad:number){
     console.log("Te has unido a la actividad");
+  }
+  
+  showDetails(actividad: number) {
+    console.log("Ver detalles de:", actividad);
+   
+  }
+  
+  isFutureEvent(fechaEvento: Date): boolean {
+    const eventoDate = new Date(fechaEvento);
+    const currentDate = new Date();
+    return eventoDate > currentDate;
   }
 }

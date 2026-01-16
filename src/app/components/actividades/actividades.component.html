@@ -1,31 +1,64 @@
 <section class="actividades-page">
 	<header class="actividades-header">
 		<div class="header-text">
-			<h1>Actividades</h1>
+			<h1>Actividades Deportivas</h1>
 			<p class="subtitle">Explora y únete a las actividades disponibles</p>
 		</div>
-	
 	</header>
 
 	<main class="actividades-main">
 		<div class="cards-grid">
-            @for (actividad of actividades(); track $index) {
-                
-			<article class="card">
-				<div class="card-img" aria-hidden></div>
-				<div class="card-body">
-					<h3 class="card-title">{{actividad.nombre}}</h3>
-					<p class="card-meta">{{actividad.idActividad}}</p>
-					@if(actividad.nombre== "fútbol") {
-					<p class="card-desc">{{actividad.minimoJugadores}}</p>
-                    }
+            @for (actividad of actividadEvento(); track $index) {
+			<article class="activity-card">
+				<div class="card-header">
+					<div class="sport-icon">
+						<i class="bi bi-trophy-fill"></i>
+					</div>
+					<div class="card-badge">
+						@if(isFutureEvent(actividad.fechaEvento)) {
+							<span class="badge active">Disponible</span>
+						} @else {
+							<span class="badge past">Finalizada</span>
+						}
+					</div>
 				</div>
-				<div class="card-actions">
-					<button class="btn outline">Detalles</button>
-					<button class="btn" (click)="UniserActividad(actividad.idActividad)">Unirse</button>
+
+				<div class="card-content">
+					<h3 class="activity-title">{{actividad.nombreActividad}}</h3>
+					
+					<div class="activity-info">
+						<div class="info-item">
+							<i class="bi bi-calendar-event"></i>
+							<span>{{actividad.fechaEvento | date: 'dd MMM yyyy'}}</span>
+						</div>
+						@if(actividad.nombreActividad == "fútbol") {
+						<div class="info-item">
+							<i class="bi bi-people-fill"></i>
+							<span>Mín. {{actividad.minimoJugadores}} jugadores</span>
+						</div>
+						}
+					</div>
+				</div>
+
+				<div class="card-footer">
+					<button class="btn-secondary" (click)="showDetails(actividad.idActividad)">
+						<i class="bi bi-info-circle"></i>
+						<span>Detalles</span>
+					</button>
+
+					@if(isFutureEvent(actividad.fechaEvento)) {
+					<button class="btn-primary" (click)="UniserActividad(actividad.idActividad)">
+						<i class="bi bi-plus-circle-fill"></i>
+						<span>Unirse</span>
+					</button>
+					} @else {
+					<button class="btn-primary" disabled style="opacity: 0.5; cursor: not-allowed;">
+						<i class="bi bi-check-circle-fill"></i>
+						<span>Finalizada</span>
+					</button>
+					}
 				</div>
 			</article>
-
         }
 		</div>
 	</main>
