@@ -70,7 +70,7 @@ export class HomeComponent implements OnInit ,OnChanges{
         const esPasado = evento.fechaEvento < this.now;
         const titulo = esPasado ? 'Evento pasado' : 'Evento futuro';
         const colorFondo = esPasado ? '#64748b' : '#2563eb';
-        const colorTexto = esPasado ? '#94a3b8' : '#ffffff';
+        const colorTexto = esPasado ? '#94a3b8' : '#2563eb';
 
         return {
           id: evento.idEvento.toString(),
