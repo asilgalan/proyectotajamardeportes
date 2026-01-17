@@ -606,8 +606,19 @@
 }
 
 :host ::ng-deep .fc-event-main {
-  color: white !important; 
   font-weight: 600;
+}
+
+/* Eventos futuros - texto blanco */
+:host ::ng-deep .evento-futuro .fc-event-main,
+:host ::ng-deep .evento-futuro .fc-event-title {
+  color: #2563eb !important;
+}
+
+/* Eventos pasados - texto gris claro */
+:host ::ng-deep .evento-pasado .fc-event-main,
+:host ::ng-deep .evento-pasado .fc-event-title {
+  color: #94a3b8 !important;
 }
 
 :host ::ng-deep .fc-daygrid-event {

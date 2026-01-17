@@ -13,6 +13,12 @@
       <h2>¿Quieres añadir un evento?</h2>
       <p>Fecha seleccionada: <b>{{fechaSeleccionada}}</b></p>
     </div>
+  @if(this.fechaSeleccionada! < now){
+    <div class="modal-warning">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      <span>No se puede añadir este evento.</span>
+    </div>
+    }
     <div class="modal-footer">
       <button class="btn-modal-cancel" (click)="cerrarModalAddEvento()">
         Cancelar
@@ -20,6 +26,40 @@
       <button class="btn-modal-confirm" (click)="confirmarAddEvento()">
         <i class="bi bi-calendar-plus"></i>
         Añadir evento
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para cancelar evento -->
+<div *ngIf="showModalCancelEvento" class="modal-overlay" (click)="cerrarModalCancelEvento()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-icon" style="background: linear-gradient(135deg, #ef4444 0%, #f59e42 100%);">
+        <i class="bi bi-calendar-x"></i>
+      </div>
+      <button class="modal-close" (click)="cerrarModalCancelEvento()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <h2>¿Cancelar este evento?</h2>
+      <p>Evento #{{eventoSeleccionado?.idEvento}}<br>
+         Fecha: <b>{{eventoSeleccionado?.fechaEvento | date:'fullDate'}}</b></p>
+    </div>
+    @if(eventoSeleccionado?.fechaEvento < now){
+    <div class="modal-warning">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      <span>No se puede cancelar un evento que ya ha pasado.</span>
+    </div>
+    }
+    <div class="modal-footer">
+      <button class="btn-modal-cancel" (click)="cerrarModalCancelEvento()">
+        No cancelar
+      </button>
+      <button class="btn-modal-confirm" (click)="confirmarCancelEvento()">
+        <i class="bi bi-calendar-x"></i>
+        Cancelar evento
       </button>
     </div>
   </div>
