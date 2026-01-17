@@ -1,35 +1,62 @@
 <!-- PERFIL -->
-<div class="custom-navbar p-4 rounded-4 shadow-sm" *ngIf="perfil">
-
-  <!-- BOTÓN DETALLES -->
-  <div class="mb-3 text-end">
-    <button class="nav-pill-item active-link" (click)="mostrarDetalles()">
-      Detalles
-    </button>
-  </div>
+<div class="custom-navbar p-4 rounded-4 shadow-sm mt-4 mb-4" *ngIf="perfil" >
 
   <!-- INFO PERFIL -->
   <div class="d-flex align-items-center gap-3 mb-3">
 
-    <!-- IMAGEN -->
-    <div class="user-icon-circle overflow-hidden">
-      <img
-        [src]="perfil.imagen"
-        alt="Imagen de perfil"
-        class="w-100 h-100 object-fit-cover"
-      />
-    </div>
+    <!-- IMAGEN PERFIL -->
+<div class="avatar-wrapper">
+  <div class="user-icon-circle avatar-ring">
+    <img
+      [src]="perfil.imagen"
+      alt="Imagen de perfil"
+    />
+  </div>
+
+  <!-- ESTADO MINI -->
+  <span
+    class="avatar-status"
+    [ngClass]="{
+      'status-active': perfil.estadoUsuario,
+      'status-inactive': !perfil.estadoUsuario
+    }"
+  ></span>
+</div>
+
 
     <!-- TEXTO -->
     <div>
       <h2 class="mb-0" style="color: var(--text-main);">
-        {{ perfil.nombre }}
+        {{ perfil.nombre + ' ' + perfil.apellidos }}
       </h2>
       <p class="mb-0" style="color: var(--accent-color); font-weight: 600;">
         {{ perfil.role }}
       </p>
     </div>
   </div>
+
+ <!-- EMAIL Y CURSO -->
+<div class="profile-info-grid mt-4 mb-4">
+
+  <!-- EMAIL -->
+  <div class="info-card">
+    <div class="info-icon">📧</div>
+    <div class="info-text">
+      <span class="info-label">Email</span>
+      <span class="info-value">{{ perfil.email }}</span>
+    </div>
+  </div>
+
+  <!-- CURSO -->
+  <div class="info-card">
+    <div class="info-icon">🎓</div>
+    <div class="info-text">
+      <span class="info-label">Curso</span>
+      <span class="info-value">{{ perfil.curso }}</span>
+    </div>
+  </div>
+
+</div>
 
   <!-- ESTADO -->
   <div class="mb-4">
@@ -45,22 +72,34 @@
   </div>
 </div>
 
-<!-- EVENTOS -->
 <div class="custom-navbar p-4 rounded-4 shadow-sm mt-3" *ngIf="eventos && eventos.length > 0">
   <h3 style="color: var(--text-main); margin-bottom: 1rem;">Eventos Inscritos</h3>
 
   <div class="d-flex flex-column gap-2">
-    <div
-      class="pill-item d-flex justify-content-between align-items-center"
-      *ngFor="let evento of eventos"
-      (click)="seleccionarEvento(evento)"
-    >
-      <span>{{ evento }}</span>
-      <span class="text-muted" style="font-size: 0.9rem;">fecha</span>
+
+    <div *ngFor="let evento of eventos" class="event-card-wrapper">
+
+      <!-- TARJETA EVENTO -->
+      <div class="event-card" (click)="seleccionarEvento(evento)">
+        <span class="event-title">evento</span>
+        <span class="event-date">
+          <span class="event-date-icon">📅</span>
+          <span>fecha</span>
+        </span>
+      </div>
+
+      <!-- ACTIVIDADES (aparece al seleccionar evento) -->
+      <div class="activities-content" *ngIf="idEvento === evento">
+        <app-actividades [idEvento]="idEvento"></app-actividades>
+      </div>
+
     </div>
+    
   </div>
 </div>
 
-<div *ngIf="eventos && eventos.length === 0" class="custom-navbar p-4 rounded-4 shadow-sm mt-3 text-muted">
+<div *ngIf="eventos && eventos.length === 0" class="custom-navbar p-4 rounded-4 shadow-sm mt-3 text-muted text-center">
   No estás inscrito a ningún evento.
 </div>
+
+

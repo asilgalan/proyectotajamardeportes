@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import Perfil from '../../models/Perfil';
+import Perfil from '../../models/perfil';
 import ServicePerfil from '../../services/perfil.service';
 import Swal from 'sweetalert2';
 
@@ -19,7 +19,18 @@ export class PerfilComponent implements OnInit
   public eventos:Array<number> = new Array<number>
   public actividadesEvento!:Array<number>
 
-  constructor(private _service:ServicePerfil) {}
+  //ejemplo
+  idEvento: number | null = null;
+
+  constructor(private _service:ServicePerfil) 
+  {
+    //prueba eventos
+    this.eventos.push(1)
+    this.eventos.push(2)
+    this.eventos.push(3)
+
+    this.idEvento = 1;
+  }
 
   ngOnInit(): void 
   {
@@ -30,48 +41,18 @@ export class PerfilComponent implements OnInit
       //hay que sacar los eventos por usuario
     })
   }
-  
-  mostrarDetalles(): void 
+
+  seleccionarEvento(evento: any) 
   {
-      Swal.fire
-      ({
-        title: 'Detalles del Usuario',
-        html: `
-          <div class="swal-profile">
-
-            <div class="swal-row">
-              <span class="swal-label">Nombre: </span>
-              <span class="swal-value">${this.perfil.nombre}</span>
-            </div>
-
-            <div class="swal-row">
-              <span class="swal-label">Apellidos: </span>
-              <span class="swal-value">${this.perfil.apellidos}</span>
-            </div>
-
-            <div class="swal-row">
-              <span class="swal-label">Email: </span>
-              <span class="swal-value">${this.perfil.email}</span>
-            </div>
-
-            <div class="swal-row">
-              <span class="swal-label">Curso actual: </span>
-              <span class="swal-value">${this.perfil.curso}</span>
-            </div>
-          </div>
-        `,
-        showCloseButton: true,
-        showConfirmButton: false,
-        buttonsStyling: false,
-        customClass: {
-          popup: 'swal-popup custom-navbar',
-          title: 'swal-title'
-        }
-      });
+    // Si ya estaba seleccionado, lo colapsamos
+    if (this.idEvento == evento) 
+    {
+      this.idEvento = null;
+    } 
+    else 
+    {
+      this.idEvento = evento;
+    }
   }
 
-  seleccionarEvento(evento:number): void
-  {
-    //hay que sacar las actividades por usuario
-  }
 }
