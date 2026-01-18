@@ -68,8 +68,6 @@ export class PerfilComponent implements OnInit
           this.nombreActividad = response[i].nombreActividad;
           this.quiereSerCapitan = response[i].quiereSerCapitan;
           this.fechaInscripcion = response[i].fechaInscripcion;
-
-          console.log(this.idEventoSeleccionado);
         }
       }
     });
