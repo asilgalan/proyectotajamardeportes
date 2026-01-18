@@ -1,1 +1,65 @@
-<p>equipo.component works!</p>
+<div class="main-container">
+
+    <header class="page-header mb-4">
+        <div class="header-icon-box">
+            <i class="bi bi-people-fill"></i>
+        </div>
+        <div class="header-content">
+            <h1 class="page-title">
+                Equipos de <span class="highlight-text">{{nombreActividad}}</span>
+            </h1>
+            <p class="page-subtitle">Visualiza los equipos registrados en esta actividad</p>
+        </div>
+    </header>
+
+    @if (equipos) {
+        <div class="teams-grid">
+            @for (equipo of equipos; track equipo.idEquipo) {
+                <article class="team-card">
+                    <div class="card-top">
+                        <div class="team-avatar">
+                            <i class="bi bi-shield-fill"></i>
+                        </div>
+                        <h2 class="team-name">{{equipo.nombreEquipo}}</h2>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="info-row">
+                            <div class="info-icon"><i class="bi bi-person-lines-fill"></i></div>
+                            <div class="info-data">
+                                <span class="label">Mín. Jugadores</span>
+                                <span class="value">{{equipo.minimoJugadores}}</span>
+                            </div>
+                        </div>
+
+                        <div class="info-row">
+                            <div class="info-icon"><i class="bi bi-palette-fill"></i></div>
+                            <div class="info-data">
+                                <span class="label">Color</span>
+                                <span class="value">{{mapaColores[equipo.idColor] || 'Sin asignar'}}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <div class="meta-tag" title="ID Evento Actividad">
+                            <i class="bi bi-calendar-event"></i> Evt: {{fechaEvento | date: 'dd MMM yyyy'}}
+                        </div>
+                        <div class="meta-tag" title="ID Curso">
+                            <i class="bi bi-mortarboard"></i> Cur: {{equipo.idCurso}}
+                        </div>
+                    </div>
+                </article>
+            }
+        </div>
+    } @else {
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="bi bi-shield-slash"></i>
+            </div>
+            <h3>No hay equipos formados</h3>
+            <p>Aún no se han registrado equipos para esta actividad.</p>
+        </div>
+    }
+
+</div>

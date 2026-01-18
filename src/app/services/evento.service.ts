@@ -31,5 +31,12 @@ export class ServiceEventos {
             let request = "/Eventos/"+idEvento;
             return this._http.delete<evento>(this.urlEventos + request).pipe(
                 tap(response => console.log('Evento eliminado:', response))    
-            )}
+        )}
+
+        getEventoPorId(idEvento: number): Observable<evento> {
+    
+        let request = "/Eventos/" + idEvento;
+
+        return this._http.get<evento>(this.urlEventos + request);
+    }
     }
