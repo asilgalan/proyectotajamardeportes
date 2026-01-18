@@ -27,4 +27,23 @@ export default class ServicePerfil
 
         return promise;
     }
+
+    getEventosYActividades():Promise<any>
+    {
+        let url = environment.apiUrl;
+        let endPoint = "/UsuariosDeportes/ActividadesUser";
+
+        let promise = new Promise((resolve, reject) =>{
+            this._http.get(url+endPoint).subscribe({
+                next: (response) => {
+                    resolve(response);
+                },
+                error: (error) => {
+                    reject(error);
+                }
+            })
+        })
+
+        return promise;
+    }
 }
