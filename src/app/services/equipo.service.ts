@@ -1,90 +1,76 @@
-import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 import { Observable, tap } from 'rxjs';
-import { EquipoResponse } from '../interface/equipo.interface';
+import { Equipo } from '../models/equipo';
+import { UsuariosEquipo } from '../models/usuariosEquipo';
 
-@Injectable({
-    providedIn: 'root'
-})
+@Injectable({providedIn: 'root'})
 export class EquipoService {
 
-    private http=inject(HttpClient);
-    private apiurl=environment.apiUrl
-
-    
-    getEquipos():Observable<EquipoResponse[]>{
-
-        return this.http.get<EquipoResponse[]>(`${this.apiurl}/Equipos`)
-        .pipe(
-
-            tap(response => console.log(response)
-            
-        ))
-    }
-
-    getEquipoPorId(id:number):Observable<EquipoResponse>{
-
-        return this.http.get<EquipoResponse>(`${this.apiurl}/Equipos/${id}`)
-        .pipe(  
-            tap(response => console.log(response)
-        ))
-    }
-
-    deleteEquipoById(id:number):Observable<any>{
-
-        return this.http.delete<any>(`${this.apiurl}/Equipos/${id}`)
-        .pipe(  
-            tap(response => console.log(response)
-        ))
-    }
-
-    createEquipo(equipo:EquipoResponse):Observable<EquipoResponse>{
-        return this.http.post<EquipoResponse>(`${this.apiurl}/Equipos/create`,equipo)
-        .pipe(  
-            tap(response => console.log(response)
-        ))
-
+    private urlEventos = environment.apiUrl;
+    constructor(private _http: HttpClient){
 
     }
-    updateEquipo(equipo:EquipoResponse):Observable<EquipoResponse>{
-        return this.http.put<EquipoResponse>(`${this.apiurl}/Equipos/update/${equipo.idEquipo}`,equipo)
-        .pipe(  
-            tap(response => console.log(response)
-        ))
+
+    getEquipos(): Observable<Array<Equipo>> {
+        let request = "/Equipos";
+        return this._http.get<Array<Equipo>>(this.urlEventos + request);
     }
 
-    updateEquipacionDelEquipo(idEquipo:number, idColor:number):Observable<EquipoResponse>{
-        return this.http.put<EquipoResponse>(`${this.apiurl}/Equipos/UpdateEquipacionEquipo/${idEquipo}/${idColor}`,{})
-        .pipe(  
-            tap(response => console.log(response)
-        ))
+    getEquiposJugadores(): Observable<Array<Equipo>> {
+        let request = "/Equipos/EquipoJugadores";
+        return this._http.get<Array<Equipo>>(this.urlEventos + request);
     }
-    getEquiposPorActividadEvento(idEventoActividad:number,idEvento:number):Observable<EquipoResponse[]>{
-        return this.http.get<EquipoResponse[]>(`${this.apiurl}/Equipos/EquiposActividadEvento/${idEventoActividad}/${idEvento}`)
-        .pipe(  
-            tap(response => console.log(response)
-        ))
+
+    getEquipoPorId(id: number): Observable<Array<Equipo>> {
+        let request = "/Equipos/" + id;
+        return this._http.get<Array<Equipo>>(this.urlEventos + request);
     }
-    getEquiposPorEvento(idEvento:number):Observable<EquipoResponse[]>{
-        return this.http.get<EquipoResponse[]>(`${this.apiurl}/Equipos/EquiposEvento/${idEvento}`)
-        .pipe(  
-            tap(response => console.log(response)
-        ))
+
+    deleteEquipoPorId(id: number): Observable<any> {
+        let request = "/Equipos/" + id;
+        return this._http.delete(this.urlEventos + request);
+    }
+
+    createEquipo(equipo: Equipo): Observable<any> {
+        let equipoJson = JSON.stringify(equipo);
+        let header = new HttpHeaders();
+        header = header.set("Content-Type", "application/json");
+        let request = "/Equipos/create";
+        return this._http.post(this.urlEventos + request, equipoJson, {headers: header});
+    }
+
+    updateEquipo(equipo: Equipo): Observable<any> {
+        let equipoJson = JSON.stringify(equipo);
+        let header = new HttpHeaders();
+        header = header.set("Content-Type", "application/json");
+        let request = "/Equipos/update";
+        return this._http.put(this.urlEventos + request, equipoJson, {headers: header});
     }
     
-    getUsuariosPorEquipo(idEquipo:number):Observable<EquipoResponse[]>{
-        return this.http.get<EquipoResponse[]>(`${this.apiurl}/Equipos/UsuariosEquipo/${idEquipo}`)
-        .pipe(  
-            tap(response => console.log(response)
-        ))
+    updateEquipacionDelEquipo(idEquipo: number, idColor: number): Observable<any> {
+        let request = "/Equipos/UpdateEquipacionEquipo/" + idEquipo + "/" + idColor;
+        return this._http.put(this.urlEventos + request, {});
     }
 
-    getEquiposPorCurso(idCurso:number):Observable<EquipoResponse[]>{
-        return this.http.get<EquipoResponse[]>(`${this.apiurl}/Equipos/EquiposCurso/${idCurso}`)
-        .pipe(  
-            tap(response => console.log(response)
-        ))
+    getEquiposPorActividadEvento(idActividad: number, idEvento: number): Observable<Array<Equipo>> {
+        let request = "/Equipos/EquiposActividadEvento/"+ idActividad + "/" + idEvento;
+        return this._http.get<Array<Equipo>>(this.urlEventos + request);
     }
-
+    
+    getEquiposPorEvento(idEvento: number): Observable<Array<Equipo>> {
+        let request = "/Equipos/EquiposEvento/" + idEvento;
+        return this._http.get<Array<Equipo>>(this.urlEventos + request);
+    }
+    
+    getUsuariosPorEquipo(idEquipo: number): Observable<Array<UsuariosEquipo>> {
+        let request ="/Equipos/UsuariosEquipo/" + idEquipo;
+        return this._http.get<Array<UsuariosEquipo>>(this.urlEventos + request);
+    }
+    
+    getEquiposPorCurso(idEvento: number, idCurso: number): Observable<Array<Equipo>> {
+        let request ="/Equipos/EquiposCurso/" + idEvento + "?idcurso=" + idCurso;
+        return this._http.get<Array<Equipo>>(this.urlEventos + request);
+    }
 }
