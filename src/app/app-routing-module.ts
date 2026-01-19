@@ -4,6 +4,7 @@ import Perfil from './models/perfil';
 import { LoginComponent } from './auth/components/loginComponent/loginComponent';
 import { PerfilComponent } from './components/perfil.component/perfil.component';
 import { HomeComponent } from './components/home.component/home.component';
+import { MaterialesComponent } from './components/materiales.component/materiales.component';
 
 export const routes: Routes = [
   {
@@ -18,6 +19,10 @@ export const routes: Routes = [
     {
     path: 'home', 
     component: HomeComponent
+  },
+  {
+    path: 'materiales', 
+    component: MaterialesComponent
   }
 ];
 

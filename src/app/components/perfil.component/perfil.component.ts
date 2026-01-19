@@ -18,7 +18,7 @@ export class PerfilComponent implements OnInit
   public perfil!:Perfil
 
   public eventos:Array<evento> = new Array<evento>
-  idEventoSeleccionado: number | null = null;
+  public idEventoSeleccionado: number | null = null;
 
   public nombreActividad!:string;
   public quiereSerCapitan!:boolean;

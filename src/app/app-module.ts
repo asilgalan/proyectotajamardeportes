@@ -18,12 +18,13 @@ import { HomeComponent } from './components/home.component/home.component';
 import { EquipoComponent } from './components/equipo/equipo.component';
 import { A } from '@angular/cdk/keycodes';
 import { ActividadesComponent } from './components/actividades/actividades.component';
+import { MaterialesComponent } from './components/materiales.component/materiales.component';
 
 
 
 @NgModule({
   declarations: [
-    App,LoginComponent,PerfilComponent, NavbarComponent, HomeComponent, EquipoComponent,ActividadesComponent
+    App,LoginComponent,PerfilComponent, NavbarComponent, HomeComponent, EquipoComponent,ActividadesComponent, MaterialesComponent
   ],
   imports: [
     BrowserModule,

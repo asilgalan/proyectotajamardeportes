@@ -1,0 +1,29 @@
+<div class="material-card">
+  <div class="material-header">
+    <h1 class="material-title">
+      Materiales para eventos
+    </h1>
+    <p class="material-subtitle">
+      Informa de algo que vayas a proporcionar o solicitar.
+    </p>
+  </div>
+
+  <div class="material-list">
+    <!-- Recorremos eventos -->
+    <div *ngFor="let evento of eventos" class="event-card" (click)="seleccionarEvento(evento.idEvento)">
+      <div class="event-date">
+        <span class="material-date-icon">📅</span>
+        {{ evento.fechaEvento }}
+      </div>
+
+      <!-- Tarjetas de actividades del evento seleccionado -->
+      <div *ngIf="idEventoSeleccionado === evento.idEvento" class="activity-list">
+        <div *ngFor="let actividad of actividadesEvento" class="activity-card" (click)="seleccionarActividad(evento.idEvento, actividad.idActividad)">
+          <h4 class="activity-title">🎯 {{ actividad.nombreActividad }}</h4>
+          <button>Proporcionar</button>
+          <button>Solicitar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
