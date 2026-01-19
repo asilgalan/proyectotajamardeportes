@@ -23,9 +23,9 @@ export class EquipoService {
         return this._http.get<Array<Equipo>>(this.urlEventos + request);
     }
 
-    getEquipoPorId(id: number): Observable<Array<Equipo>> {
+    getEquipoPorId(id: number): Observable<Equipo> {
         let request = "/Equipos/" + id;
-        return this._http.get<Array<Equipo>>(this.urlEventos + request);
+        return this._http.get<Equipo>(this.urlEventos + request);
     }
 
     deleteEquipoPorId(id: number): Observable<any> {
