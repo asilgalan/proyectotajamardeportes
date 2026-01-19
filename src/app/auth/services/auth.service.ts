@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { AuthResponse } from '../interface/auth.interface';
 import { Router } from '@angular/router';
-import Perfil from '../../models/Perfil';
+import Perfil from '../../models/perfil';
 import ServicePerfil from '../../services/perfil.service';
 
 

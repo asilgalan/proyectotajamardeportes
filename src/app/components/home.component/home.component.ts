@@ -8,7 +8,7 @@ import { CalendarOptions } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import esLocale from '@fullcalendar/core/locales/es';
-import Perfil from '../../models/Perfil';
+import Perfil from '../../models/perfil';
 
 @Component({
   selector: 'app-home',
