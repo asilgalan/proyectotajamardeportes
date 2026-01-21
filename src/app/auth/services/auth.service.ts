@@ -31,6 +31,7 @@ export class AuthService {
         this.logout();
       }
     });
+    
         const token=this._token();
         if(token){
             this.isAuthenticated=true;
@@ -64,14 +65,13 @@ export class AuthService {
     }
 
     login(userName: string, password: string):Observable<AuthResponse>{
-
        return this.http.post<AuthResponse>(`${this.apiurl}/Auth/LoginEventos`,{userName,password})
         .pipe(
             tap(response => {
                 localStorage.setItem('token', response.response);
                 this._token.set(response.response);
                 this.isAuthenticated = true;
-            
+        
                 this.loadUserProfile();
                 console.log(response);
             })

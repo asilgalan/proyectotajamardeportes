@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import Perfil from './models/perfil';
 import { LoginComponent } from './auth/components/loginComponent/loginComponent';
 import { PerfilComponent } from './components/perfil.component/perfil.component';
 import { HomeComponent } from './components/home.component/home.component';
+import { EquipoComponent } from './components/equipo/equipo.component';
 import { MaterialesComponent } from './components/materiales.component/materiales.component';
 
 export const routes: Routes = [
@@ -16,9 +16,13 @@ export const routes: Routes = [
     component: PerfilComponent
   },
   
-    {
+  {
     path: 'home', 
     component: HomeComponent
+  },
+  {
+    path: 'equipos/:idactividad/:idevento', 
+    component: EquipoComponent
   },
   {
     path: 'materiales', 

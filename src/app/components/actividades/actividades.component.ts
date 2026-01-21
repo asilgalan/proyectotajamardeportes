@@ -8,6 +8,7 @@ import { AuthService } from '../../auth/services/auth.service';
 import { InscripcionesResponse } from '../../interface/inscripciones.interface';
 import { UsuarioDeporteService } from '../../services/usuarioDeporte.service';
 import { UsuarioDeporteResponse } from '../../interface/usuariodeporte.interface';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -36,6 +37,7 @@ export class ActividadesComponent implements OnInit,OnChanges {
   public showModalDesapuntar = signal<boolean>(false);
   private inscripcionSeleccionada = signal<{idInscripcion: number, idEventoActividad: number} | null>(null);
 
+  constructor(private _router: Router){}
    
   
   @Input() idEvento!:number;
@@ -191,5 +193,7 @@ export class ActividadesComponent implements OnInit,OnChanges {
     this.actividadesService.DeleteActividadesById(id).subscribe();
   }
 
-
+  verEquipos(idActividad: number, idEvento: number): void {
+    this._router.navigate(["/equipos/" + idActividad + "/" + idEvento]);
+  }
 }
