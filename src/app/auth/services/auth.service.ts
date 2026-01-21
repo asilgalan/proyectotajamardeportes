@@ -21,6 +21,7 @@ export class AuthService {
     private perfilService=inject(ServicePerfil);
 
   private _token= signal<string | null>(localStorage.getItem('token'));
+  private _admin=signal<string |null>(localStorage.getItem('role'));
   private _currentUser = signal<Perfil | null>(null);
   private _isLoading = signal<boolean>(false);
 
@@ -51,6 +52,9 @@ export class AuthService {
       token = computed(() => this._token());
       currentUser = computed(() => this._currentUser());
       isLoading = computed(() => this._isLoading());
+      isAdmin = computed(() => {
+        return this._admin() === 'ADMINISTRADOR' || this._admin() === 'ORGANIZADOR';
+      });
 
     private async loadUserProfile() {
         try {
@@ -69,6 +73,8 @@ export class AuthService {
         .pipe(
             tap(response => {
                 localStorage.setItem('token', response.response);
+                localStorage.setItem('role', response.role);
+                this._admin.set(response.role);
                 this._token.set(response.response);
                 this.isAuthenticated = true;
         

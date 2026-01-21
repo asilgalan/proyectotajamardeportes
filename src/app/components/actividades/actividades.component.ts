@@ -1,7 +1,8 @@
 import { Component, inject, Input, OnInit, OnChanges, SimpleChanges, signal } from '@angular/core';
 import { ActividadesService } from '../../services/actividades.service';
 import { ActividadesResponse, ActividadEventoResponse } from '../../interface/actividades.interface';
-import { tap } from 'rxjs';
+import { ActividadEvento, ActividadEventoCreate } from '../../interface/actividadEvento.interface';
+import { tap, switchMap, forkJoin } from 'rxjs';
 import { InscripcionesService } from '../../services/inscripciones.service';
 import { A } from '@angular/cdk/keycodes';
 import { AuthService } from '../../auth/services/auth.service';
@@ -9,6 +10,9 @@ import { InscripcionesResponse } from '../../interface/inscripciones.interface';
 import { UsuarioDeporteService } from '../../services/usuarioDeporte.service';
 import { UsuarioDeporteResponse } from '../../interface/usuariodeporte.interface';
 import { Router } from '@angular/router';
+import { ActividadEventoService } from '../../services/actividadEvento.service';
+import { ServiceEventos } from '../../services/evento.service';
+import { evento } from '../../models/evento';
 
 
 @Component({
@@ -23,9 +27,10 @@ export class ActividadesComponent implements OnInit,OnChanges {
   
   private actividadesService=inject(ActividadesService);
   private inscripcionService=inject(InscripcionesService);
-  private authService=inject(AuthService);
+  public authService=inject(AuthService);
   private usuariodeporteService=inject(UsuarioDeporteService);
-  private InscripcionesResponse=signal<InscripcionesResponse | null>(null);
+  private actividadEventoService=inject(ActividadEventoService);
+  private eventosService=inject(ServiceEventos);
   public actividades=signal<(ActividadEventoResponse & { estaInscrito: UsuarioDeporteResponse[] })[]>([]);
   public actividadEvento=signal<ActividadEventoResponse[] | []>([]);
   
@@ -36,6 +41,51 @@ export class ActividadesComponent implements OnInit,OnChanges {
 
   public showModalDesapuntar = signal<boolean>(false);
   private inscripcionSeleccionada = signal<{idInscripcion: number, idEventoActividad: number} | null>(null);
+
+  // Modal Crear Actividad
+  public showModalCrearActividad = signal<boolean>(false);
+  public tabActivo = signal<'existente' | 'copiar' | 'nueva'>('existente');
+  public actividadesBase = signal<ActividadesResponse[]>([]);
+  public eventosDisponibles = signal<evento[]>([]);
+  public actividadesDeEvento = signal<ActividadEventoResponse[]>([]);
+  public eventoSeleccionadoParaCopiar = signal<number | null>(null);
+  public actividadesSeleccionadasParaCopiar = signal<number[]>([]);
+  
+  // Formulario crear actividad
+  public actividadSeleccionadaId = signal<number | null>(null);
+  public posicionNueva = signal<number>(1);
+  public profesorIdNuevo = signal<number>(1);
+  
+  // Formulario nueva actividad desde cero
+  public nombreNuevaActividad = signal<string>('');
+  public minimoJugadoresNueva = signal<number>(2);
+
+  // Computed para detectar si es actividad de equipo
+  esActividadConMinJugadores(): boolean {
+    const nombre = this.nombreNuevaActividad().toLowerCase();
+    return nombre.includes('futbol') || nombre.includes('fútbol') || 
+           nombre.includes('baloncesto') || nombre.includes('basket');
+  }
+
+  // Validación para crear nueva actividad
+  puedeCrearNuevaActividad(): boolean {
+    const nombre = this.nombreNuevaActividad().trim();
+    if (!nombre) return false;
+    
+    // Si es actividad de equipo, el mínimo jugadores es obligatorio y debe ser > 0
+    if (this.esActividadConMinJugadores()) {
+      const minJugadores = this.minimoJugadoresNueva();
+      return minJugadores != null && minJugadores > 0;
+    }
+    
+    return true;
+  }
+
+  // Modal Editar Actividad
+  public showModalEditar = signal<boolean>(false);
+  public actividadParaEditar = signal<ActividadEventoResponse | null>(null);
+  public posicionEditar = signal<number>(1);
+  public profesorIdEditar = signal<number>(1);
 
   constructor(private _router: Router){}
    
@@ -160,6 +210,223 @@ export class ActividadesComponent implements OnInit,OnChanges {
   showDetails(actividad: number) {
     console.log("Ver detalles de:", actividad);
    
+  }
+
+  // ========== MODAL CREAR ACTIVIDAD ==========
+  abrirModalCrearActividad() {
+    this.showModalCrearActividad.set(true);
+    this.tabActivo.set('existente');
+    this.cargarActividadesBase();
+    this.cargarEventosDisponibles();
+  }
+
+  cerrarModalCrearActividad() {
+    this.showModalCrearActividad.set(false);
+    this.resetFormularioCrear();
+  }
+
+  resetFormularioCrear() {
+    this.actividadSeleccionadaId.set(null);
+    this.posicionNueva.set(1);
+    this.profesorIdNuevo.set(1);
+    this.nombreNuevaActividad.set('');
+    this.minimoJugadoresNueva.set(2);
+    this.eventoSeleccionadoParaCopiar.set(null);
+    this.actividadesDeEvento.set([]);
+    this.actividadesSeleccionadasParaCopiar.set([]);
+  }
+
+  cambiarTab(tab: 'existente' | 'copiar' | 'nueva') {
+    this.tabActivo.set(tab);
+  }
+
+  cargarActividadesBase() {
+    this.actividadesService.getActividades().subscribe(actividades => {
+      this.actividadesBase.set(actividades);
+    });
+  }
+
+  cargarEventosDisponibles() {
+    this.eventosService.getEventosCursoEscolar().subscribe(eventos => {
+      // Filtrar para no mostrar el evento actual
+      const otrosEventos = eventos.filter(e => e.idEvento !== this.idEvento);
+      this.eventosDisponibles.set(otrosEventos);
+    });
+  }
+
+  onEventoSeleccionadoChange(eventoId: number) {
+    this.eventoSeleccionadoParaCopiar.set(eventoId);
+    this.actividadesSeleccionadasParaCopiar.set([]); // Reset la selección
+    if (eventoId) {
+      this.actividadesService.getActividadesByIdEnvento(eventoId).subscribe(actividades => {
+        this.actividadesDeEvento.set(actividades);
+      });
+    } else {
+      this.actividadesDeEvento.set([]);
+    }
+  }
+
+  // Crear actividad desde existente
+  confirmarCrearDesdeExistente() {
+    const actividadId = this.actividadSeleccionadaId();
+    if (!actividadId) return;
+
+    const nuevaActividadEvento: ActividadEventoCreate = {
+      idEvento: this.idEvento,
+      idActividad: actividadId
+    };
+
+    console.log('Enviando ActividadEvento:', nuevaActividadEvento);
+
+    this.actividadEventoService.createActividadEvento(nuevaActividadEvento).subscribe({
+      next: () => {
+        this.cerrarModalCrearActividad();
+        this.getActividadesByIdEnvento(this.idEvento);
+      },
+      error: (err) => {
+        console.error('Error al crear actividad:', err);
+        alert('Error al crear la actividad. Revisa la consola.');
+      }
+    });
+  }
+
+  // Copiar actividades de otro evento usando el select múltiple
+  confirmarCopiarActividad() {
+    const idsActividades = this.actividadesSeleccionadasParaCopiar();
+    if (idsActividades.length === 0) return;
+
+    // Crear todas las peticiones
+    const peticiones = idsActividades.map(idActividad => {
+      const nuevaActividadEvento: ActividadEventoCreate = {
+        idEvento: this.idEvento,
+        idActividad: idActividad
+      };
+      console.log('Copiando ActividadEvento:', nuevaActividadEvento);
+      return this.actividadEventoService.createActividadEvento(nuevaActividadEvento);
+    });
+
+    // Ejecutar todas en paralelo
+    forkJoin(peticiones).subscribe({
+      next: () => {
+        this.cerrarModalCrearActividad();
+        this.getActividadesByIdEnvento(this.idEvento);
+      },
+      error: (err) => {
+        console.error('Error al copiar actividades:', err);
+        alert('Error al copiar las actividades. Revisa la consola.');
+      }
+    });
+  }
+
+  // Copiar actividad de otro evento (método legacy con botones mini)
+  copiarActividadDeOtroEvento(actividad: ActividadEventoResponse) {
+    const nuevaActividadEvento: ActividadEventoCreate = {
+      idEvento: this.idEvento,
+      idActividad: actividad.idActividad
+    };
+
+    console.log('Copiando ActividadEvento:', nuevaActividadEvento);
+
+    this.actividadEventoService.createActividadEvento(nuevaActividadEvento).subscribe({
+      next: () => {
+        this.cerrarModalCrearActividad();
+        this.getActividadesByIdEnvento(this.idEvento);
+      },
+      error: (err) => {
+        console.error('Error al copiar actividad:', err);
+        alert('Error al copiar la actividad. Revisa la consola.');
+      }
+    });
+  }
+
+  // Crear actividad completamente nueva
+  confirmarCrearNueva() {
+    const nombre = this.nombreNuevaActividad();
+    const minJugadores = this.minimoJugadoresNueva();
+    
+    if (!nombre.trim()) return;
+
+    // Primero crear la actividad base
+    const nuevaActividad: ActividadesResponse = {
+      idActividad: 0,
+      nombre: nombre,
+      minimoJugadores: minJugadores
+    };
+
+    console.log('Creando actividad base:', nuevaActividad);
+
+    // Usar switchMap para encadenar las peticiones (inner join de observables)
+    this.actividadesService.createActividades(nuevaActividad).pipe(
+      switchMap((actividadCreada) => {
+        console.log('Actividad base creada:', actividadCreada);
+        const nuevaActividadEvento: ActividadEventoCreate = {
+          idEvento: this.idEvento,
+          idActividad: actividadCreada.idActividad
+        };
+        console.log('Asociando al evento:', nuevaActividadEvento);
+        return this.actividadEventoService.createActividadEvento(nuevaActividadEvento);
+      })
+    ).subscribe({
+      next: () => {
+        console.log('Actividad asociada al evento correctamente');
+        this.cerrarModalCrearActividad();
+        this.getActividadesByIdEnvento(this.idEvento);
+      },
+      error: (err) => {
+        console.error('Error en el proceso:', err);
+        alert('Error al crear la actividad. Revisa la consola.');
+        // Aún así cerramos y recargamos por si la primera parte funcionó
+        this.cerrarModalCrearActividad();
+        this.getActividadesByIdEnvento(this.idEvento);
+      }
+    });
+  }
+
+  // ========== MODAL EDITAR ACTIVIDAD ==========
+  abrirModalEditar(actividad: ActividadEventoResponse) {
+    this.actividadParaEditar.set(actividad);
+    this.posicionEditar.set(actividad.posicion);
+    this.profesorIdEditar.set(actividad.idProfesor);
+    this.showModalEditar.set(true);
+  }
+
+  cerrarModalEditar() {
+    this.showModalEditar.set(false);
+    this.actividadParaEditar.set(null);
+  }
+
+  confirmarEditar() {
+    const actividad = this.actividadParaEditar();
+    if (!actividad) return;
+
+    const actividadActualizada: ActividadEvento = {
+      idEventoActividad: actividad.idEventoActividad,
+      idEvento: actividad.idEvento,
+      idActividad: actividad.idActividad
+    };
+
+    this.actividadEventoService.updateActividadEvento(actividadActualizada).subscribe({
+      next: () => {
+        this.cerrarModalEditar();
+        this.getActividadesByIdEnvento(this.idEvento);
+      },
+      error: (err) => console.error('Error al actualizar actividad:', err)
+    });
+  }
+
+  eliminarActividadDelEvento() {
+    const actividad = this.actividadParaEditar();
+    if (!actividad) return;
+
+    if (confirm('¿Estás seguro de que quieres eliminar esta actividad del evento?')) {
+      this.actividadEventoService.deleteActividadEvento(actividad.idEventoActividad).subscribe({
+        next: () => {
+          this.cerrarModalEditar();
+          this.getActividadesByIdEnvento(this.idEvento);
+        },
+        error: (err) => console.error('Error al eliminar actividad:', err)
+      });
+    }
   }
   
   isFutureEvent(fechaEvento: Date): boolean {

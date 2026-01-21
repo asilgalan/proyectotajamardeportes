@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { ActividadEvento, ActividadEventoCreate } from '../interface/actividadEvento.interface';
 
 @Injectable({
     providedIn: 'root'
@@ -12,41 +13,40 @@ export class ActividadEventoService {
     private http=inject(HttpClient)
 
 
-    getActividadesEvento():Observable<any>{
+    getActividadesEvento():Observable<ActividadEvento[]>{
 
-        return this.http.get<any>(`${this.apiUrl}/ActividadesEvento`)
+        return this.http.get<ActividadEvento[]>(`${this.apiUrl}/ActividadesEvento`)
         .pipe(
             tap(response => console.log('ActividadesEvento :', response))
         );
     }
 
-    getActividadEventoById(id:number):Observable<any>{
+    getActividadEventoById(id:number):Observable<ActividadEvento>{
 
-        return this.http.get<any>(`${this.apiUrl}/ActividadesEvento/${id}`)
+        return this.http.get<ActividadEvento>(`${this.apiUrl}/ActividadesEvento/${id}`)
         .pipe(
             tap(response => console.log(`ActividadEvento ${id}:`, response))
         );
     }
-    deleteActividadEvento(id:number):Observable<any>{
+    deleteActividadEvento(id:number):Observable<ActividadEvento>{
 
-        return this.http.delete<any>(`${this.apiUrl}/ActividadesEvento/${id}`)
+        return this.http.delete<ActividadEvento>(`${this.apiUrl}/ActividadesEvento/${id}`)
         .pipe(
             tap(response => console.log(`ActividadEvento ${id} eliminada:`, response))
         );
     }
-    createActividadEvento(actividadEvento:any):Observable<any>{
-
-        return this.http.post<any>(`${this.apiUrl}/ActividadesEvento/create`, actividadEvento)
+    createActividadEvento(actividadEvento: ActividadEventoCreate):Observable<ActividadEvento>{
+        return this.http.post<ActividadEvento>(`${this.apiUrl}/ActividadesEvento/create?idevento=${actividadEvento.idEvento}&idactividad=${actividadEvento.idActividad}`, {})
         .pipe(
             tap(response => console.log('ActividadEvento creada :', response))
         );
     }
 
-    updateActividadEvento(id:number, actividadEvento:any):Observable<any>{
+    updateActividadEvento( actividadEvento:ActividadEvento):Observable<ActividadEvento>{
 
-        return this.http.put<any>(`${this.apiUrl}/ActividadesEvento/update/${id}`, actividadEvento)
+        return this.http.put<ActividadEvento>(`${this.apiUrl}/ActividadesEvento/update/`, actividadEvento)
         .pipe(
-            tap(response => console.log(`ActividadEvento ${id} actualizada:`, response))
+            tap(response => console.log(`ActividadEvento actualizada:`, response))
         );
     }
 

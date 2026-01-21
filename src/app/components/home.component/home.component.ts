@@ -2,6 +2,11 @@ import { Component, inject, OnChanges, OnInit, SimpleChanges, signal } from '@an
 import { ServiceEventos } from '../../services/evento.service';
 import { evento } from '../../models/evento';
 import { ActividadesService } from '../../services/actividades.service';
+import { ActividadEventoService } from '../../services/actividadEvento.service';
+import { InscripcionesService } from '../../services/inscripciones.service';
+import { EquipoService } from '../../services/equipo.service';
+import { MiembroEquiposService } from '../../services/miembroEquipos.service';
+import { forkJoin, of, switchMap } from 'rxjs';
 
 import ServicePerfil from '../../services/perfil.service';
 import { CalendarOptions } from '@fullcalendar/core';
@@ -9,6 +14,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import esLocale from '@fullcalendar/core/locales/es';
 import Perfil from '../../models/Perfil';
+import { AuthService } from '../../auth/services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -21,6 +27,7 @@ export class HomeComponent implements OnInit ,OnChanges{
   now: string = new Date().toISOString();
   idEvento: number | null = null;
   public perfil!:Perfil;
+   authservices=inject(AuthService);
 
   public showModalAddEvento = false;
   public fechaSeleccionada: string | null = null;
@@ -29,6 +36,10 @@ export class HomeComponent implements OnInit ,OnChanges{
   public eventoSeleccionado: any = null;
   nombre=signal<string >('');
   private actividadesService = inject(ActividadesService);
+  private actividadEventoService = inject(ActividadEventoService);
+  private inscripcionesService = inject(InscripcionesService);
+  private equipoService = inject(EquipoService);
+  private miembroEquiposService = inject(MiembroEquiposService);
 
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
@@ -98,11 +109,46 @@ export class HomeComponent implements OnInit ,OnChanges{
 
   onDateClick(arg: any) {
 
+    if(!this.authservices.isAdmin()){
+      return;
+    }
     this.fechaSeleccionada = arg.dateStr;
 
-    
-
+  
     this.showModalAddEvento = true;
+  }
+
+  abrirModalCrearEvento() {
+    if(!this.authservices.isAdmin()){
+      return;
+    }
+    const hoy = new Date();
+    this.fechaSeleccionada = hoy.toISOString();
+    this.showModalAddEvento = true;
+  }
+
+
+  get fechaSeleccionadaLocal(): string {
+    if (!this.fechaSeleccionada) return '';
+
+    const date = new Date(this.fechaSeleccionada);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+
+
+  onFechaChange(value: string) {
+    if (value) {
+   
+      const date = new Date(value);
+      this.fechaSeleccionada = date.toISOString();
+    } else {
+      this.fechaSeleccionada = null;
+    }
   }
 
   cerrarModalAddEvento() {
@@ -125,6 +171,9 @@ export class HomeComponent implements OnInit ,OnChanges{
   }
 
   onEventClick(arg: any) {
+    if(!this.authservices.isAdmin()){
+      return;
+    }
     const idEvento = parseInt(arg.event.id);
     const evento = this.eventos.find(ev => ev.idEvento === idEvento);
     if (evento) {
@@ -136,9 +185,81 @@ export class HomeComponent implements OnInit ,OnChanges{
   confirmarCancelEvento() {
     if (!this.eventoSeleccionado || this.eventoSeleccionado.fechaEvento < this.now) return;
     
-    this._service.deleteEventoById(this.eventoSeleccionado.idEvento).subscribe(()=>{
-      this.getEventoCurosEscolar();
-      this.cerrarModalCancelEvento();
+    const idEvento = this.eventoSeleccionado.idEvento;
+   
+    this.actividadesService.getActividadesByIdEnvento(idEvento).pipe(
+      switchMap(actividades => {
+        if (actividades.length === 0) {
+          return this._service.deleteEventoById(idEvento);
+        }
+        
+        const idsEventoActividad = actividades.map(act => act.idEventoActividad);
+        
+        //  Obtener equipos del evento y borrar miembros
+        return this.equipoService.getEquiposPorEvento(idEvento).pipe(
+          switchMap(equipos => {
+            if (equipos.length === 0) {
+              return of(null);
+            }
+            // Obtener todos los miembros de todos los equipos
+            const getMiembrosRequests = equipos.map(eq => 
+              this.equipoService.getUsuariosPorEquipo(eq.idEquipo)
+            );
+            return forkJoin(getMiembrosRequests).pipe(
+              switchMap(miembrosArrays => {
+                const todosMiembros = miembrosArrays.flat();
+                if (todosMiembros.length === 0) {
+                  return of(null);
+                }
+                // Borrar todos los miembros
+                const deleteMiembros = todosMiembros.map((m: any) => 
+                  this.miembroEquiposService.deleteMiembroEquiposPorId(m.idMiembroEquipo)
+                );
+                return forkJoin(deleteMiembros);
+              }),
+             // Borrar equipos
+              switchMap(() => {
+                const deleteEquipos = equipos.map(eq => 
+                  this.equipoService.deleteEquipoPorId(eq.idEquipo)
+                );
+                return forkJoin(deleteEquipos);
+              })
+            );
+          }),
+          // Borrar inscripciones
+          switchMap(() => this.inscripcionesService.getInscripciones()),
+          switchMap((todasInscripciones: any) => {
+            const inscripcionesEvento = todasInscripciones.filter((insc: any) => 
+              idsEventoActividad.includes(insc.idEventoActividad)
+            );
+            if (inscripcionesEvento.length > 0) {
+              const deleteInscripciones = inscripcionesEvento.map((insc: any) => 
+                this.inscripcionesService.deleteInscripcionById(insc.idInscripcion)
+              );
+              return forkJoin(deleteInscripciones);
+            }
+            return of(null);
+          }),
+          // Borrar ActividadEvento
+          switchMap(() => {
+            const deleteActividades = actividades.map(act => 
+              this.actividadEventoService.deleteActividadEvento(act.idEventoActividad)
+            );
+            return forkJoin(deleteActividades);
+          }),
+          //Borrar evento
+          switchMap(() => this._service.deleteEventoById(idEvento))
+        );
+      })
+    ).subscribe({
+      next: () => {
+        this.getEventoCurosEscolar();
+        this.cerrarModalCancelEvento();
+      },
+      error: (err) => {
+        console.error('Error al eliminar evento:', err);
+        alert('Error al eliminar el evento. Revisa la consola.');
+      }
     });
   }
 }

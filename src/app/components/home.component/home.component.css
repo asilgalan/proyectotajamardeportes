@@ -177,6 +177,11 @@
 .welcome-section {
   max-width: 1600px;
   margin: 0 auto 2rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
 }
 
 .welcome-header {
@@ -185,6 +190,8 @@
   border-radius: 16px;
   border: 1px solid var(--nav-border-color);
   box-shadow: var(--card-shadow);
+  flex: 1;
+  order: 1;
 }
 
 .welcome-title {
@@ -208,6 +215,85 @@
   font-size: 0.95rem;
   font-weight: 500;
   margin: 0;
+}
+
+/* Button to create event */
+.btn-crear-evento {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  margin-bottom: 1rem;
+  width: fit-content;
+}
+
+/* Date picker styles in modal */
+.date-picker-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.date-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+}
+
+.date-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: var(--text-main);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.date-input:focus {
+  outline: none;
+  border-color: #6366f1;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.date-input:hover {
+  border-color: #cbd5e1;
+}
+
+.btn-modal-confirm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.btn-crear-evento:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+}
+
+.btn-crear-evento:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
+}
+
+.btn-crear-evento i {
+  font-size: 1.1rem;
 }
 
 /* TWO ROW PROFESSIONAL LAYOUT */
@@ -678,6 +764,17 @@
 @media (max-width: 768px) {
   .main-container {
     padding: 1rem !important;
+  }
+
+  .welcome-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-crear-evento {
+    justify-content: center;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.95rem;
   }
   
   .welcome-header {

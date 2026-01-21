@@ -10,20 +10,32 @@
       </button>
     </div>
     <div class="modal-body">
-      <h2>¿Quieres añadir un evento?</h2>
-      <p>Fecha seleccionada: <b>{{fechaSeleccionada}}</b></p>
+      <h2>Crear nuevo evento</h2>
+      <p class="mb-3">Selecciona la fecha y hora del evento:</p>
+      <div class="date-picker-container">
+        <label for="fechaEvento" class="date-label">
+          <i class="bi bi-calendar3 me-2"></i>Fecha y hora
+        </label>
+        <input 
+          type="datetime-local" 
+          id="fechaEvento"
+          class="date-input"
+          [ngModel]="fechaSeleccionadaLocal"
+          (ngModelChange)="onFechaChange($event)"
+        />
+      </div>
     </div>
   @if(this.fechaSeleccionada! < now){
     <div class="modal-warning">
       <i class="bi bi-exclamation-triangle-fill me-2"></i>
-      <span>No se puede añadir este evento.</span>
+      <span>No se puede añadir un evento en el pasado.</span>
     </div>
     }
     <div class="modal-footer">
       <button class="btn-modal-cancel" (click)="cerrarModalAddEvento()">
         Cancelar
       </button>
-      <button class="btn-modal-confirm" (click)="confirmarAddEvento()">
+      <button class="btn-modal-confirm" (click)="confirmarAddEvento()" [disabled]="!fechaSeleccionada || fechaSeleccionada < now">
         <i class="bi bi-calendar-plus"></i>
         Añadir evento
       </button>
@@ -75,11 +87,18 @@
       </h1>
       <p class="welcome-subtitle">Gestiona tus eventos y actividades</p>
     </div>
+  
+  
   </div>
 
   <!-- Two Column Layout (Top) + Calendar (Bottom) -->
   <div class="professional-layout">
-    
+       @if(authservices.isAdmin()){
+     <button class="btn-crear-evento" (click)="abrirModalCrearEvento()">
+      <i class="bi bi-plus-circle me-2"></i>
+      Crear Evento
+    </button>
+     }
     <!-- TOP ROW: Events and Activities -->
     <div class="top-row">
       
