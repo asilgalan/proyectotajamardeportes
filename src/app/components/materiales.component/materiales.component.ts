@@ -3,6 +3,10 @@ import { ServiceEventos } from '../../services/evento.service';
 import { evento } from '../../models/evento';
 import { actividadEvento } from '../../models/actividadEvento';
 import { ActividadesService } from '../../services/actividades.service';
+import Swal from 'sweetalert2';
+import Material from '../../models/material';
+import ServicePerfil from '../../services/perfil.service';
+import ServiceMateriales from '../../services/materiales.service';
 
 @Component
 ({
@@ -15,11 +19,17 @@ export class MaterialesComponent implements OnInit
 {
   public eventos: Array<evento> = new Array<evento>();
   public actividadesEvento: Array<actividadEvento> = new Array<actividadEvento>();
+  public materialesActividad: Array<Material> = new Array<Material>();
+
+  public idEventoActividadSeleccionado: number = 1;
 
   public idEventoSeleccionado: number | null = null;
+  public idActividadSeleccionada: number | null = null;
 
   constructor(private _serviceEventos: ServiceEventos,
-              private _serviceActividades: ActividadesService) {}
+              private _serviceActividades: ActividadesService,
+              private _servicePerfil: ServicePerfil,
+              private _serviceMateriales: ServiceMateriales) {}
 
   ngOnInit(): void
   {
@@ -45,8 +55,171 @@ export class MaterialesComponent implements OnInit
     });
   }
 
-  seleccionarActividad(idEvento:number, idActividad:number): void
+  seleccionarActividad(idEvento:number, idActividad:number, event: Event): void
   {
-    
+    event.stopPropagation();
+
+    if (this.idActividadSeleccionada === idActividad) 
+    {
+    this.idActividadSeleccionada = null;
+    this.materialesActividad = [];
+    } 
+    else 
+    {
+      this.idActividadSeleccionada = idActividad;
+
+      //sacar el idEventoActividad
+      this._serviceMateriales.getMaterialesActividad(this.idEventoActividadSeleccionado).then(response =>
+      {
+        this.materialesActividad = response;
+        console.log(response)
+      });
+    }
   }
+
+  aceptarMaterial(material:Material, event:Event): void
+  {
+    event.stopPropagation();
+
+    let idUsuario:number;
+    let idMaterial:number = material.idMaterial;
+
+    this._servicePerfil.getPerfil().then(response =>
+    {
+      idUsuario = response.idUsuario;
+
+      this._serviceMateriales.putMaterialAceptado(idMaterial, idUsuario).then(response =>
+      {
+        console.log("material aceptado");
+
+        this._serviceMateriales.getMaterialesActividad(this.idEventoActividadSeleccionado).then(response =>
+        {
+          this.materialesActividad = response;
+          console.log(response)
+        });
+      })
+    });
+  }
+
+  proporcionarMaterial(idEvento: number, idActividad: number, event: Event): void 
+  {
+    event.stopPropagation();
+
+    Swal.fire
+    ({
+      title: 'Proporcionar material',
+      html: `
+        <p>¿Qué material quieres proporcionar?</p>
+        <input id="materialInput" class="swal2-input" />
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'Aceptar',
+      cancelButtonText: 'Cancelar',
+      preConfirm: () => 
+      {
+        const valor = (document.getElementById('materialInput') as HTMLInputElement).value;
+
+        if (!valor) 
+        {
+          Swal.showValidationMessage('Debes indicar un material');
+        }
+
+        return valor;
+      }
+    }).then(result =>
+    {
+      if (result.isConfirmed) 
+      {
+        let idEventoActividad:number = 0;
+        let idUsuario:number;
+        let idMaterial:number;
+
+        this._servicePerfil.getPerfil().then(response =>
+        {
+          idUsuario = response.idUsuario;
+
+          //sacar el idEventoActividad
+
+          const material = new Material(0, idEventoActividad, idUsuario, result.value, true, new Date().toISOString().split('T')[0], -1);
+
+          this._serviceMateriales.postMaterial(material).then(response =>
+          {
+            console.log("material propuesto");
+
+            this._serviceMateriales.getMaterialesActividad(idEventoActividad).then(response =>
+            {
+              for (let material of response)
+              {
+                if (material.idUsuario == idUsuario)
+                {
+                  idMaterial = material.idMaterial;
+
+                  this._serviceMateriales.putMaterialAceptado(idMaterial, idUsuario).then(response =>
+                  {
+                    console.log("material aceptado");
+
+                    //falta recargar la lista de materiales volviendo a llamarla
+                    // poner los nombres de aceptado por... y solicitado por ...
+                  })
+                }
+              }
+            })
+          })
+        });
+      }
+    });
+  }
+
+  solicitarMaterial(idEvento: number, idActividad: number, event: Event): void 
+  {
+    event.stopPropagation();
+
+    Swal.fire
+    ({
+      title: 'Solicitar material',
+      html: `
+        <p>¿Qué material quieres solicitar?</p>
+        <input id="materialInput" class="swal2-input" />
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'Aceptar',
+      cancelButtonText: 'Cancelar',
+      preConfirm: () => 
+      {
+        const valor = (document.getElementById('materialInput') as HTMLInputElement).value;
+
+        if (!valor) 
+        {
+          Swal.showValidationMessage('Debes indicar un material');
+        }
+
+        return valor;
+      }
+    }).then(result => 
+    {
+      if (result.isConfirmed) 
+      {
+        let idEventoActividad:number = 1;
+        let idUsuario:number;
+
+        this._servicePerfil.getPerfil().then(response =>
+        {
+          idUsuario = response.idUsuario;
+
+          //sacar el idEventoActividad
+
+          const material = new Material(0, idEventoActividad, idUsuario, result.value, true, new Date().toISOString().split('T')[0], -1);
+
+          this._serviceMateriales.postMaterial(material).then(response =>
+          {
+            console.log("material propuesto");
+
+            //falta recargar la lista de materiales volviendo a llamarla
+          })
+        });
+      }
+    });
+}
+
+
 }

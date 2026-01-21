@@ -1,27 +1,63 @@
 <div class="material-card">
-  <div class="material-header">
-    <h1 class="material-title">
-      Materiales para eventos
+ <div class="material-header-enhanced">
+    <h1 class="material-title-enhanced">
+      Materiales
     </h1>
-    <p class="material-subtitle">
-      Informa de algo que vayas a proporcionar o solicitar.
+    <p class="material-subtitle-enhanced">
+      Informa sobre los materiales que necesites o acepta alguno que haya solicitado un compañero.
     </p>
   </div>
-
   <div class="material-list">
     <!-- Recorremos eventos -->
     <div *ngFor="let evento of eventos" class="event-card" (click)="seleccionarEvento(evento.idEvento)">
       <div class="event-date">
         <span class="material-date-icon">📅</span>
-        {{ evento.fechaEvento }}
+        {{ evento.fechaEvento | date:'dd' }} /
+        {{ evento.fechaEvento | date:'MM' }} /
+        {{ evento.fechaEvento | date:'yyyy' }}
       </div>
 
       <!-- Tarjetas de actividades del evento seleccionado -->
       <div *ngIf="idEventoSeleccionado === evento.idEvento" class="activity-list">
-        <div *ngFor="let actividad of actividadesEvento" class="activity-card" (click)="seleccionarActividad(evento.idEvento, actividad.idActividad)">
+        <div *ngFor="let actividad of actividadesEvento" class="activity-card" (click)="seleccionarActividad(evento.idEvento, actividad.idActividad, $event)">
+
           <h4 class="activity-title">🎯 {{ actividad.nombreActividad }}</h4>
-          <button>Proporcionar</button>
-          <button>Solicitar</button>
+          <div class="activity-buttons">
+          <button class="btn-proporcionar"
+                  (click)="proporcionarMaterial(evento.idEvento, actividad.idActividad, $event)">
+            Proporcionar
+          </button>
+
+          <button class="btn-solicitar"
+                  (click)="solicitarMaterial(evento.idEvento, actividad.idActividad, $event)">
+            Solicitar
+          </button>
+</div>
+
+
+          <!-- CHAT DE MATERIALES -->
+          <div
+          *ngIf="idActividadSeleccionada === actividad.idActividad"
+          class="material-chat">
+
+          <div
+            *ngFor="let material of materialesActividad"
+            class="material-message"
+            [ngClass]="{
+              'material-rojo': material.idUsuarioAportacion === -1,
+              'material-verde': material.idUsuarioAportacion !== -1
+            }">
+
+            <span>{{ material.nombreMaterial }}</span>
+
+            <button
+              *ngIf="material.idUsuarioAportacion === -1"
+              (click)="aceptarMaterial(material, $event)">
+              Aceptar
+            </button>
+
+          </div>
+          </div>
         </div>
       </div>
     </div>
