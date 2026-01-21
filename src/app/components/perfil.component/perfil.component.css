@@ -26,21 +26,8 @@
 
 
 /* ================================
-   BOTÓN "DETALLES"
+   NAVEGACIÓN PERFIL
    ================================ */
-.nav-pill-item {
-  color: var(--text-main) !important;
-  font-weight: 700;
-  font-size: var(--font-size-nav-links);
-  border-radius: 50px;
-  padding: 0.6rem 1.5rem !important;
-  transition: all 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-  border: none;
-  cursor: pointer;
-  background: transparent;
-}
 
 .nav-pill-item:hover {
   background-color: rgba(37, 99, 235, 0.1);
@@ -79,6 +66,57 @@
   height: 100%;
   object-fit: cover;
 }
+
+/* ================================
+   AVATAR CON PERSONALIDAD
+   ================================ */
+.avatar-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* ARO EXTERIOR */
+.avatar-ring {
+  padding: 0;
+  background: none;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+
+
+/* HOVER */
+.avatar-ring:hover {
+  transform: scale(1.05) rotate(1deg);
+}
+
+/* Asegura el fondo blanco interior */
+.avatar-ring .user-icon-circle {
+  background-color: var(--white);
+}
+
+/* ================================
+   BADGE ESTADO
+   ================================ */
+.avatar-status {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 3px solid var(--white);
+}
+
+/* COLORES */
+.status-active {
+  background-color: #22c55e;
+}
+
+.status-inactive {
+  background-color: #ef4444;
+}
+
 
 /* ================================
    TEXTO PERFIL
@@ -128,3 +166,153 @@
 .text-white {
   color: #ffffff !important;
 }
+
+/* ================================
+   GRID INFO PERFIL
+   ================================ */
+.profile-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+/* ================================
+   TARJETAS INFO (EMAIL / CURSO)
+   ================================ */
+.info-card {
+  background-color: var(--white);
+  border: 1px solid var(--nav-border-color);
+  border-radius: 1rem;
+  padding: 1rem 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.info-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(37, 99, 235, 0.15);
+}
+
+/* ICONO */
+.info-icon {
+  background-color: rgba(37, 99, 235, 0.12);
+  color: var(--accent-color);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+}
+
+/* TEXTO */
+.info-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-label {
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.info-value {
+  font-size: 1rem;
+  color: var(--text-main);
+  font-weight: 700;
+  word-break: break-all;
+}
+
+/* ================================
+   TARJETAS EVENTOS
+   ================================ */
+.event-card-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.event-card {
+  background-color: var(--white);
+  border: 1px solid var(--nav-border-color);
+  border-radius: 1rem;
+  padding: 0.8rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.event-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
+  background-color: rgba(37, 99, 235, 0.05);
+}
+
+.event-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15);
+}
+
+.event-title {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.event-date {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.event-date-icon {
+  font-size: 1rem;
+  color: var(--accent-color);
+}
+
+/* Card de actividad */
+.activity-card {
+  background-color: #f8f9fa; /* fondo claro */
+  border: 1px solid #17a2b8; /* borde azul */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 1rem;
+  border-radius: 1rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.activity-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* Título */
+.activity-title {
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin-bottom: 0.75rem;
+  color: #0d6efd; /* azul */
+}
+
+/* Información de cada línea */
+.activity-info {
+  font-size: 0.95rem;
+  color: #495057;
+}
+
+/* Icono de cada línea */
+.activity-icon {
+  font-size: 1.1rem;
+}
+
+
+
+
+

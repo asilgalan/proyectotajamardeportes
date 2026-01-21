@@ -556,3 +556,26 @@
 		flex-direction: column-reverse;
 	}
 }
+
+/* Botón Ver Equipos (Dentro del contenido de la card) */
+.btn-view-teams {
+    width: 100%;
+    margin-top: 8px; /* Separación del item de arriba */
+    padding: 8px 12px;
+    background-color: #ffffff;
+    border: 1px dashed var(--primary); /* Borde discontinuo para diferenciarlo de acciones principales */
+    border-radius: 6px;
+    color: var(--primary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-view-teams i {
+    font-size: 0.95rem;
+}
