@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 import Material from '../../models/material';
 import ServicePerfil from '../../services/perfil.service';
 import ServiceMateriales from '../../services/materiales.service';
+import { ActividadEventoService } from '../../services/actividadEvento.service';
 
 @Component
 ({
@@ -26,10 +27,14 @@ export class MaterialesComponent implements OnInit
   public idEventoSeleccionado: number | null = null;
   public idActividadSeleccionada: number | null = null;
 
+  public nombreUsuarioSolicitar!: string;
+  public nombreUsuarioProporcionar!: string;
+
   constructor(private _serviceEventos: ServiceEventos,
               private _serviceActividades: ActividadesService,
               private _servicePerfil: ServicePerfil,
-              private _serviceMateriales: ServiceMateriales) {}
+              private _serviceMateriales: ServiceMateriales,
+              private _serviceEventoActividad: ActividadEventoService) {}
 
   ngOnInit(): void
   {
@@ -68,11 +73,15 @@ export class MaterialesComponent implements OnInit
     {
       this.idActividadSeleccionada = idActividad;
 
-      //sacar el idEventoActividad
-      this._serviceMateriales.getMaterialesActividad(this.idEventoActividadSeleccionado).then(response =>
+      this._serviceEventoActividad.getActividadesEventoByEventoidByActividadid(idEvento, idActividad).subscribe((response) =>
       {
-        this.materialesActividad = response;
-        console.log(response)
+        this.idEventoActividadSeleccionado = response.idEventoActividad;
+
+        this._serviceMateriales.getMaterialesActividad(this.idEventoActividadSeleccionado).then(response =>
+        {
+          this.materialesActividad = response;
+          console.log(response)
+        });
       });
     }
   }
@@ -132,39 +141,35 @@ export class MaterialesComponent implements OnInit
       {
         let idEventoActividad:number = 0;
         let idUsuario:number;
-        let idMaterial:number;
 
         this._servicePerfil.getPerfil().then(response =>
         {
           idUsuario = response.idUsuario;
+          this.nombreUsuarioProporcionar = response.nombre + ' ' + response.apellidos;
 
-          //sacar el idEventoActividad
-
-          const material = new Material(0, idEventoActividad, idUsuario, result.value, true, new Date().toISOString().split('T')[0], -1);
-
-          this._serviceMateriales.postMaterial(material).then(response =>
+          this._serviceEventoActividad.getActividadesEventoByEventoidByActividadid(idEvento, idActividad).subscribe((response) =>
           {
-            console.log("material propuesto");
+            idEventoActividad = response.idEventoActividad;
 
-            this._serviceMateriales.getMaterialesActividad(idEventoActividad).then(response =>
+            const material = new Material(0, idEventoActividad, idUsuario, result.value, true, new Date().toISOString(), 0);
+  
+            this._serviceMateriales.postMaterial(material).then(response => 
             {
-              for (let material of response)
+              console.log("material propuesto");
+              const idMaterial = response.idMaterial;
+
+              this._serviceMateriales.putMaterialAceptado(idMaterial, idUsuario).then(() => 
               {
-                if (material.idUsuario == idUsuario)
-                {
-                  idMaterial = material.idMaterial;
-
-                  this._serviceMateriales.putMaterialAceptado(idMaterial, idUsuario).then(response =>
+                  console.log("material aceptado");
+                  this._serviceMateriales.getMaterialesActividad(idEventoActividad).then(response => 
                   {
-                    console.log("material aceptado");
+                    this.materialesActividad = response;
+                  });
 
-                    //falta recargar la lista de materiales volviendo a llamarla
-                    // poner los nombres de aceptado por... y solicitado por ...
-                  })
-                }
-              }
-            })
-          })
+                  //poner los nombres de aceptado por... y solicitado por ...
+              });
+           });
+          });
         });
       }
     });
@@ -205,17 +210,28 @@ export class MaterialesComponent implements OnInit
         this._servicePerfil.getPerfil().then(response =>
         {
           idUsuario = response.idUsuario;
+          this.nombreUsuarioSolicitar = response.nombre + ' ' + response.apellidos;
 
-          //sacar el idEventoActividad
-
-          const material = new Material(0, idEventoActividad, idUsuario, result.value, true, new Date().toISOString().split('T')[0], -1);
-
-          this._serviceMateriales.postMaterial(material).then(response =>
+          this._serviceEventoActividad.getActividadesEventoByEventoidByActividadid(idEvento, idActividad).subscribe((response) =>
           {
-            console.log("material propuesto");
+            idEventoActividad = response.idEventoActividad;
 
-            //falta recargar la lista de materiales volviendo a llamarla
-          })
+            const material = new Material(0, idEventoActividad, idUsuario, result.value, true, new Date().toISOString(), 0);
+            console.log(material);
+
+            this._serviceMateriales.postMaterial(material).then(response =>
+            {
+              console.log("material propuesto");
+  
+              this._serviceMateriales.getMaterialesActividad(idEventoActividad).then(response => 
+              {
+                this.materialesActividad = response;
+              });
+
+              //poner los nombres de aceptado por... y solicitado por ...
+            })
+          });
+
         });
       }
     });

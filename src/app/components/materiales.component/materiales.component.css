@@ -314,3 +314,29 @@
   background-color: rgba(255,255,255,0.5);
 }
 
+.material-username {
+  font-size: 0.75rem; /* tamaño pequeño como WhatsApp */
+  color: #555; /* gris oscuro */
+  margin-bottom: 2px;
+  font-weight: 500;
+}
+
+.material-message-container {
+  margin-bottom: 8px; /* espacio entre materiales */
+}
+
+.material-username {
+  font-size: 0.75rem;
+  color: #555;
+  margin-bottom: 2px; /* espacio entre nombre y burbuja */
+}
+
+.material-message {
+  padding: 8px 12px;
+  border-radius: 16px;
+  display: inline-block;
+  max-width: 70%;
+}
+
+
+

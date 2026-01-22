@@ -32,32 +32,38 @@
                   (click)="solicitarMaterial(evento.idEvento, actividad.idActividad, $event)">
             Solicitar
           </button>
-</div>
-
-
-          <!-- CHAT DE MATERIALES -->
-          <div
+        </div>
+         <!-- CHAT DE MATERIALES -->
+        <div
           *ngIf="idActividadSeleccionada === actividad.idActividad"
           class="material-chat">
 
           <div
             *ngFor="let material of materialesActividad"
-            class="material-message"
-            [ngClass]="{
-              'material-rojo': material.idUsuarioAportacion === -1,
-              'material-verde': material.idUsuarioAportacion !== -1
-            }">
+            class="material-message-container">
 
-            <span>{{ material.nombreMaterial }}</span>
+            <!-- Nombre del usuario, encima de la burbuja -->
+            <div class="material-username">
+              {{ material.idUsuarioAportacion === -1 ? "Solicitado por "+this.nombreUsuarioSolicitar : "Proporcionado por "+this.nombreUsuarioProporcionar }}
+            </div>
 
-            <button
-              *ngIf="material.idUsuarioAportacion === -1"
-              (click)="aceptarMaterial(material, $event)">
-              Aceptar
-            </button>
+            <!-- Burbuja del material -->
+            <div
+              class="material-message"
+              [ngClass]="{
+                'material-rojo': material.idUsuarioAportacion === -1,
+                'material-verde': material.idUsuarioAportacion !== -1
+              }">
+              <span>{{ material.nombreMaterial }}</span>
 
+              <button
+                *ngIf="material.idUsuarioAportacion === -1"
+                (click)="aceptarMaterial(material, $event)">
+                Aceptar
+              </button>
+            </div>
           </div>
-          </div>
+        </div>
         </div>
       </div>
     </div>
