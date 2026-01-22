@@ -28,9 +28,9 @@ export class ActividadEventoService {
             tap(response => console.log(`ActividadEvento ${id}:`, response))
         );
     }
-    deleteActividadEvento(id:number):Observable<ActividadEvento>{
+    deleteActividadEvento(id:number):Observable<any>{
 
-        return this.http.delete<ActividadEvento>(`${this.apiUrl}/ActividadesEvento/${id}`)
+        return this.http.delete<any>(`${this.apiUrl}/ActividadesEvento/${id}`)
         .pipe(
             tap(response => console.log(`ActividadEvento ${id} eliminada:`, response))
         );

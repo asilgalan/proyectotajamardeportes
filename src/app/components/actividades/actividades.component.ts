@@ -2,7 +2,7 @@ import { Component, inject, Input, OnInit, OnChanges, SimpleChanges, signal } fr
 import { ActividadesService } from '../../services/actividades.service';
 import { ActividadesResponse, ActividadEventoResponse } from '../../interface/actividades.interface';
 import { ActividadEvento, ActividadEventoCreate } from '../../interface/actividadEvento.interface';
-import { tap, switchMap, forkJoin } from 'rxjs';
+import { tap, switchMap, forkJoin, of, EMPTY } from 'rxjs';
 import { InscripcionesService } from '../../services/inscripciones.service';
 import { A } from '@angular/cdk/keycodes';
 import { AuthService } from '../../auth/services/auth.service';
@@ -13,6 +13,8 @@ import { Router } from '@angular/router';
 import { ActividadEventoService } from '../../services/actividadEvento.service';
 import { ServiceEventos } from '../../services/evento.service';
 import { evento } from '../../models/evento';
+import { EquipoService } from '../../services/equipo.service';
+import { MiembroEquiposService } from '../../services/miembroEquipos.service';
 
 
 @Component({
@@ -24,25 +26,23 @@ import { evento } from '../../models/evento';
 export class ActividadesComponent implements OnInit,OnChanges {
 
 
-  
+
   private actividadesService=inject(ActividadesService);
   private inscripcionService=inject(InscripcionesService);
   public authService=inject(AuthService);
   private usuariodeporteService=inject(UsuarioDeporteService);
   private actividadEventoService=inject(ActividadEventoService);
   private eventosService=inject(ServiceEventos);
+  private equipoService=inject(EquipoService);
+  private miembroEquiposService=inject(MiembroEquiposService);
   public actividades=signal<(ActividadEventoResponse & { estaInscrito: UsuarioDeporteResponse[] })[]>([]);
   public actividadEvento=signal<ActividadEventoResponse[] | []>([]);
-  
-
   public showModal = signal<boolean>(false);
   public quiereSerCapitan = signal<boolean>(false);
   private actividadSeleccionada = signal<{idEventoActividad: number} | null>(null);
-
   public showModalDesapuntar = signal<boolean>(false);
   private inscripcionSeleccionada = signal<{idInscripcion: number, idEventoActividad: number} | null>(null);
 
-  // Modal Crear Actividad
   public showModalCrearActividad = signal<boolean>(false);
   public tabActivo = signal<'existente' | 'copiar' | 'nueva'>('existente');
   public actividadesBase = signal<ActividadesResponse[]>([]);
@@ -51,28 +51,25 @@ export class ActividadesComponent implements OnInit,OnChanges {
   public eventoSeleccionadoParaCopiar = signal<number | null>(null);
   public actividadesSeleccionadasParaCopiar = signal<number[]>([]);
   
-  // Formulario crear actividad
+
   public actividadSeleccionadaId = signal<number | null>(null);
   public posicionNueva = signal<number>(1);
   public profesorIdNuevo = signal<number>(1);
   
-  // Formulario nueva actividad desde cero
   public nombreNuevaActividad = signal<string>('');
   public minimoJugadoresNueva = signal<number>(2);
 
-  // Computed para detectar si es actividad de equipo
+ 
   esActividadConMinJugadores(): boolean {
     const nombre = this.nombreNuevaActividad().toLowerCase();
     return nombre.includes('futbol') || nombre.includes('fútbol') || 
            nombre.includes('baloncesto') || nombre.includes('basket');
   }
 
-  // Validación para crear nueva actividad
+ 
   puedeCrearNuevaActividad(): boolean {
     const nombre = this.nombreNuevaActividad().trim();
     if (!nombre) return false;
-    
-    // Si es actividad de equipo, el mínimo jugadores es obligatorio y debe ser > 0
     if (this.esActividadConMinJugadores()) {
       const minJugadores = this.minimoJugadoresNueva();
       return minJugadores != null && minJugadores > 0;
@@ -86,6 +83,15 @@ export class ActividadesComponent implements OnInit,OnChanges {
   public actividadParaEditar = signal<ActividadEventoResponse | null>(null);
   public posicionEditar = signal<number>(1);
   public profesorIdEditar = signal<number>(1);
+  public nombreEditar = signal<string>('');
+  public minimoJugadoresEditar = signal<number>(2);
+
+  // Modal Eliminar Actividad
+  public showModalEliminar = signal<boolean>(false);
+  
+  // Modal Error
+  public showModalError = signal<boolean>(false);
+  public mensajeError = signal<string>('');
 
   constructor(private _router: Router){}
    
@@ -97,9 +103,9 @@ export class ActividadesComponent implements OnInit,OnChanges {
           const val = changes['idEvento'].currentValue as number;
           if (val != null) this.getActividadesByIdEnvento(val);
         }
-      }
+     }
 
-    ngOnInit(): void {
+  ngOnInit(): void {
       this.getActividadesByIdEnvento(this.idEvento);
   }
   getActividades(){
@@ -212,7 +218,6 @@ export class ActividadesComponent implements OnInit,OnChanges {
    
   }
 
-  // ========== MODAL CREAR ACTIVIDAD ==========
   abrirModalCrearActividad() {
     this.showModalCrearActividad.set(true);
     this.tabActivo.set('existente');
@@ -248,7 +253,7 @@ export class ActividadesComponent implements OnInit,OnChanges {
 
   cargarEventosDisponibles() {
     this.eventosService.getEventosCursoEscolar().subscribe(eventos => {
-      // Filtrar para no mostrar el evento actual
+     
       const otrosEventos = eventos.filter(e => e.idEvento !== this.idEvento);
       this.eventosDisponibles.set(otrosEventos);
     });
@@ -256,7 +261,7 @@ export class ActividadesComponent implements OnInit,OnChanges {
 
   onEventoSeleccionadoChange(eventoId: number) {
     this.eventoSeleccionadoParaCopiar.set(eventoId);
-    this.actividadesSeleccionadasParaCopiar.set([]); // Reset la selección
+    this.actividadesSeleccionadasParaCopiar.set([]);
     if (eventoId) {
       this.actividadesService.getActividadesByIdEnvento(eventoId).subscribe(actividades => {
         this.actividadesDeEvento.set(actividades);
@@ -266,10 +271,21 @@ export class ActividadesComponent implements OnInit,OnChanges {
     }
   }
 
-  // Crear actividad desde existente
+
   confirmarCrearDesdeExistente() {
     const actividadId = this.actividadSeleccionadaId();
     if (!actividadId) return;
+
+    // Obtener el nombre de la actividad seleccionada
+    const actividadSeleccionada = this.actividadesBase().find(a => a.idActividad === actividadId);
+    if (!actividadSeleccionada) return;
+
+    // Validar que no exista ya en el evento
+    if (this.existeActividadConNombre(actividadSeleccionada.nombre)) {
+      this.mensajeError.set(`La actividad "${actividadSeleccionada.nombre}" ya existe en este evento.`);
+      this.showModalError.set(true);
+      return;
+    }
 
     const nuevaActividadEvento: ActividadEventoCreate = {
       idEvento: this.idEvento,
@@ -285,17 +301,35 @@ export class ActividadesComponent implements OnInit,OnChanges {
       },
       error: (err) => {
         console.error('Error al crear actividad:', err);
-        alert('Error al crear la actividad. Revisa la consola.');
+  
       }
     });
   }
 
-  // Copiar actividades de otro evento usando el select múltiple
+
   confirmarCopiarActividad() {
     const idsActividades = this.actividadesSeleccionadasParaCopiar();
     if (idsActividades.length === 0) return;
 
-    // Crear todas las peticiones
+    // Validar que ninguna actividad exista ya en el evento
+    const actividadesDeEvento = this.actividadesDeEvento();
+    const duplicadas: string[] = [];
+    
+    idsActividades.forEach(idActividad => {
+      const actividad = actividadesDeEvento.find(a => a.idActividad === idActividad);
+      if (actividad && this.existeActividadConNombre(actividad.nombreActividad)) {
+        duplicadas.push(actividad.nombreActividad);
+      }
+    });
+
+    if (duplicadas.length > 0) {
+      this.mensajeError.set(
+        `Las siguientes actividades ya existen en este evento:\n${duplicadas.join(', ')}`
+      );
+      this.showModalError.set(true);
+      return;
+    }
+
     const peticiones = idsActividades.map(idActividad => {
       const nuevaActividadEvento: ActividadEventoCreate = {
         idEvento: this.idEvento,
@@ -305,7 +339,6 @@ export class ActividadesComponent implements OnInit,OnChanges {
       return this.actividadEventoService.createActividadEvento(nuevaActividadEvento);
     });
 
-    // Ejecutar todas en paralelo
     forkJoin(peticiones).subscribe({
       next: () => {
         this.cerrarModalCrearActividad();
@@ -313,12 +346,12 @@ export class ActividadesComponent implements OnInit,OnChanges {
       },
       error: (err) => {
         console.error('Error al copiar actividades:', err);
-        alert('Error al copiar las actividades. Revisa la consola.');
+  
       }
     });
   }
 
-  // Copiar actividad de otro evento (método legacy con botones mini)
+
   copiarActividadDeOtroEvento(actividad: ActividadEventoResponse) {
     const nuevaActividadEvento: ActividadEventoCreate = {
       idEvento: this.idEvento,
@@ -334,28 +367,32 @@ export class ActividadesComponent implements OnInit,OnChanges {
       },
       error: (err) => {
         console.error('Error al copiar actividad:', err);
-        alert('Error al copiar la actividad. Revisa la consola.');
+
       }
     });
   }
 
-  // Crear actividad completamente nueva
+
   confirmarCrearNueva() {
     const nombre = this.nombreNuevaActividad();
     const minJugadores = this.minimoJugadoresNueva();
     
     if (!nombre.trim()) return;
 
-    // Primero crear la actividad base
+    // Validar que no exista ya en el evento
+    if (this.existeActividadConNombre(nombre)) {
+      this.mensajeError.set(`La actividad "${nombre}" ya existe en este evento.`);
+      this.showModalError.set(true);
+      return;
+    }
+
     const nuevaActividad: ActividadesResponse = {
       idActividad: 0,
       nombre: nombre,
       minimoJugadores: minJugadores
     };
 
-    console.log('Creando actividad base:', nuevaActividad);
 
-    // Usar switchMap para encadenar las peticiones (inner join de observables)
     this.actividadesService.createActividades(nuevaActividad).pipe(
       switchMap((actividadCreada) => {
         console.log('Actividad base creada:', actividadCreada);
@@ -374,19 +411,19 @@ export class ActividadesComponent implements OnInit,OnChanges {
       },
       error: (err) => {
         console.error('Error en el proceso:', err);
-        alert('Error al crear la actividad. Revisa la consola.');
-        // Aún así cerramos y recargamos por si la primera parte funcionó
         this.cerrarModalCrearActividad();
         this.getActividadesByIdEnvento(this.idEvento);
       }
     });
   }
 
-  // ========== MODAL EDITAR ACTIVIDAD ==========
+ 
   abrirModalEditar(actividad: ActividadEventoResponse) {
     this.actividadParaEditar.set(actividad);
     this.posicionEditar.set(actividad.posicion);
     this.profesorIdEditar.set(actividad.idProfesor);
+    this.nombreEditar.set(actividad.nombreActividad);
+    this.minimoJugadoresEditar.set(actividad.minimoJugadores || 2);
     this.showModalEditar.set(true);
   }
 
@@ -395,17 +432,43 @@ export class ActividadesComponent implements OnInit,OnChanges {
     this.actividadParaEditar.set(null);
   }
 
+  esActividadDeEquipoEditar(): boolean {
+    const nombre = this.nombreEditar().toLowerCase();
+    return nombre.includes('futbol') || nombre.includes('fútbol') || 
+           nombre.includes('baloncesto') || nombre.includes('basket');
+  }
+
+  puedeGuardarEdicion(): boolean {
+    const nombre = this.nombreEditar().trim();
+    if (!nombre) return false;
+    
+    if (this.esActividadDeEquipoEditar()) {
+      const minJugadores = this.minimoJugadoresEditar();
+      return minJugadores != null && minJugadores > 0;
+    }
+    
+    return true;
+  }
+
   confirmarEditar() {
     const actividad = this.actividadParaEditar();
-    if (!actividad) return;
+    if (!actividad || !this.puedeGuardarEdicion()) return;
 
-    const actividadActualizada: ActividadEvento = {
-      idEventoActividad: actividad.idEventoActividad,
-      idEvento: actividad.idEvento,
-      idActividad: actividad.idActividad
+    // Validar que no exista otra actividad con el mismo nombre
+    if (this.existeActividadConNombre(this.nombreEditar(), actividad.idActividad)) {
+      this.mensajeError.set(`Ya existe otra actividad con el nombre "${this.nombreEditar()}" en este evento.`);
+      this.showModalError.set(true);
+      return;
+    }
+
+    // Primero actualizar la actividad base
+    const actividadBase: ActividadesResponse = {
+      idActividad: actividad.idActividad,
+      nombre: this.nombreEditar(),
+      minimoJugadores: this.minimoJugadoresEditar()
     };
 
-    this.actividadEventoService.updateActividadEvento(actividadActualizada).subscribe({
+    this.actividadesService.updateActividades(actividadBase).subscribe({
       next: () => {
         this.cerrarModalEditar();
         this.getActividadesByIdEnvento(this.idEvento);
@@ -415,18 +478,169 @@ export class ActividadesComponent implements OnInit,OnChanges {
   }
 
   eliminarActividadDelEvento() {
+    this.showModalEliminar.set(true);
+  }
+
+  cerrarModalEliminar() {
+    this.showModalEliminar.set(false);
+  }
+
+  cerrarModalError() {
+    this.showModalError.set(false);
+    this.mensajeError.set('');
+  }
+
+  confirmarEliminar() {
     const actividad = this.actividadParaEditar();
     if (!actividad) return;
 
-    if (confirm('¿Estás seguro de que quieres eliminar esta actividad del evento?')) {
-      this.actividadEventoService.deleteActividadEvento(actividad.idEventoActividad).subscribe({
-        next: () => {
-          this.cerrarModalEditar();
-          this.getActividadesByIdEnvento(this.idEvento);
-        },
-        error: (err) => console.error('Error al eliminar actividad:', err)
-      });
+    const esActividadEquipo = this.esActividadDeEquipo(actividad.nombreActividad);
+
+    if (esActividadEquipo) {
+      
+      this.equipoService.getEquiposPorActividadEvento(actividad.idActividad, actividad.idEvento)
+        .pipe(
+          switchMap(equipos => {
+            if (equipos.length === 0) {
+         
+              return of(null);
+            }
+            
+           
+            const deleteMiembros$ = equipos.map(equipo => 
+              this.miembroEquiposService.getMiembroEquipos().pipe(
+                switchMap(miembros => {
+                  const miembrosDelEquipo = miembros.filter(m => m.idEquipo === equipo.idEquipo);
+                  if (miembrosDelEquipo.length === 0) {
+                  
+                    return of('sin-miembros');
+                  }
+                 
+                  return forkJoin(
+                    miembrosDelEquipo.map(m => this.miembroEquiposService.deleteMiembroEquiposPorId(m.idMiembroEquipo))
+                  );
+                })
+              )
+            );
+            
+           
+            return forkJoin(deleteMiembros$).pipe(
+              switchMap(() => {
+                
+                return forkJoin(
+                  equipos.map(equipo => this.equipoService.deleteEquipoPorId(equipo.idEquipo))
+                );
+              })
+            );
+          }),
+          switchMap(() => {
+          
+            return this.actividadEventoService.deleteActividadEvento(actividad.idEventoActividad);
+          })
+        )
+        .subscribe({
+          next: () => {
+            this.cerrarModalEliminar();
+            this.cerrarModalEditar();
+            this.getActividadesByIdEnvento(this.idEvento);
+          },
+          error: (err) => this.manejarErrorEliminacion(err)
+        });
+    } else {
+     
+      this.inscripcionService.getInscripciones()
+        .pipe(
+          switchMap((inscripciones: any) => {
+            const inscripcionesActividad = (inscripciones as any[]).filter(
+              i => i.idEventoActividad === actividad.idEventoActividad
+            );
+            
+            if (inscripcionesActividad.length === 0) {
+          
+              return of(null);
+            }
+            
+           
+            return forkJoin(
+              inscripcionesActividad.map(i => 
+                this.inscripcionService.deleteInscripcionById(i.idInscripcion)
+              )
+            );
+          }),
+          switchMap(() => {
+          
+            return this.actividadEventoService.deleteActividadEvento(actividad.idEventoActividad);
+          })
+        )
+        .subscribe({
+          next: () => {
+            this.cerrarModalEliminar();
+            this.cerrarModalEditar();
+            this.getActividadesByIdEnvento(this.idEvento);
+          },
+          error: (err) => this.manejarErrorEliminacion(err)
+        });
     }
+  }
+
+  esActividadDeEquipo(nombreActividad: string): boolean {
+    const nombre = nombreActividad.toLowerCase();
+    return nombre.includes('futbol') || nombre.includes('fútbol') || 
+           nombre.includes('baloncesto') || nombre.includes('basket');
+  }
+
+  normalizarNombreActividad(nombre: string): string {
+    let normalizado = nombre.toLowerCase().trim();
+    
+    // Normalizar sinónimos de fútbol
+    if (normalizado.includes('futbol') || normalizado.includes('fútbol')) {
+      normalizado = 'futbol';
+    }
+    
+    // Normalizar sinónimos de baloncesto
+    if (normalizado.includes('basket') || normalizado.includes('baloncesto')) {
+      normalizado = 'baloncesto';
+    }
+    
+    // Quitar acentos
+    normalizado = normalizado.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    
+    return normalizado;
+  }
+
+  existeActividadConNombre(nombre: string, idActividadExcluir?: number): boolean {
+    const nombreNormalizado = this.normalizarNombreActividad(nombre);
+    
+    return this.actividades().some(act => {
+     
+      if (idActividadExcluir && act.idActividad === idActividadExcluir) {
+        return false;
+      }
+      
+      const nombreActividadNormalizado = this.normalizarNombreActividad(act.nombreActividad);
+      return nombreActividadNormalizado === nombreNormalizado;
+    });
+  }
+
+  manejarErrorEliminacion(err: any) {
+    console.error('Error al eliminar actividad:', err);
+    this.cerrarModalEliminar();
+    
+    let mensaje = 'No se pudo eliminar la actividad del evento.\n\n';
+    
+    if (err.status === 500) {
+      mensaje += ' Error del servidor al intentar eliminar.\n\n';
+   
+    } else if (err.status === 404) {
+      mensaje += 'La actividad no existe o ya fue eliminada.';
+    } else if (err.status === 403) {
+      mensaje += 'No tienes permisos para eliminar esta actividad.';
+    } else {
+      mensaje += 'Error desconocido del servidor. Intenta de nuevo más tarde.';
+    }
+    
+    this.mensajeError.set(mensaje);
+    this.showModalError.set(true);
   }
   
   isFutureEvent(fechaEvento: Date): boolean {

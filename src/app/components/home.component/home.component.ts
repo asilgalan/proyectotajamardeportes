@@ -6,7 +6,10 @@ import { ActividadEventoService } from '../../services/actividadEvento.service';
 import { InscripcionesService } from '../../services/inscripciones.service';
 import { EquipoService } from '../../services/equipo.service';
 import { MiembroEquiposService } from '../../services/miembroEquipos.service';
-import { forkJoin, of, switchMap } from 'rxjs';
+import ServicePrecioActividad from '../../services/precioActividad.service';
+import { ProfesorEventoService } from '../../services/ProfesoresEvento.service';
+import { ProfesorEvento } from '../../interface/profesoreEvento.interface';
+import { forkJoin, of, switchMap, from } from 'rxjs';
 
 import ServicePerfil from '../../services/perfil.service';
 import { CalendarOptions } from '@fullcalendar/core';
@@ -31,15 +34,29 @@ export class HomeComponent implements OnInit ,OnChanges{
 
   public showModalAddEvento = false;
   public fechaSeleccionada: string | null = null;
+  public idProfesorNuevoEvento: number | null = null; 
 
   public showModalCancelEvento = false;
   public eventoSeleccionado: any = null;
+  public showModalEditarEvento = false;
+  public showModalEliminarEvento = false;
+  public showModalError = false;
+  public mensajeError = '';
   nombre=signal<string >('');
+  
+  // Campos para editar evento
+  public fechaEditar: string = '';
+  public idProfesorEditar: number | null = null;
+  public profesoresActivos: ProfesorEvento[] = [];
+  public profesorActualEvento: number | null = null; // Para saber qué profesor tenía originalmente
+  
   private actividadesService = inject(ActividadesService);
   private actividadEventoService = inject(ActividadEventoService);
   private inscripcionesService = inject(InscripcionesService);
   private equipoService = inject(EquipoService);
   private miembroEquiposService = inject(MiembroEquiposService);
+  private precioActividadService = inject(ServicePrecioActividad);
+  private profesorEventoService = inject(ProfesorEventoService);
 
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
@@ -98,6 +115,22 @@ export class HomeComponent implements OnInit ,OnChanges{
     this._servicePerfil.getPerfil().then(response => {
       this.perfil = response;
     })
+    
+  
+    this.cargarProfesores();
+  }
+  
+  cargarProfesores() {
+ 
+    this.profesorEventoService.getProfesoresActivos().subscribe({
+      next: (profesores) => {
+  
+        this.profesoresActivos = profesores;
+      },
+      error: (err) => {
+        console.error('❌ Error al cargar profesores:', err);
+      }
+    });
   }
     
 
@@ -154,6 +187,7 @@ export class HomeComponent implements OnInit ,OnChanges{
   cerrarModalAddEvento() {
     this.showModalAddEvento = false;
     this.fechaSeleccionada = null;
+    this.idProfesorNuevoEvento = null;
   }
 
   cerrarModalCancelEvento() {
@@ -161,12 +195,116 @@ export class HomeComponent implements OnInit ,OnChanges{
     this.eventoSeleccionado = null;
   }
 
+  abrirModalEditarEvento(event: Event, evento: evento) {
+    event.stopPropagation();
+    this.eventoSeleccionado = evento;
+    this.fechaEditar = evento.fechaEvento.split('T')[0]; 
+    this.idProfesorEditar = evento.idProfesor || null;
+    this.profesorActualEvento = evento.idProfesor || null; 
+    this.showModalEditarEvento = true;
+  }
+
+  cerrarModalEditarEvento() {
+    this.showModalEditarEvento = false;
+    this.eventoSeleccionado = null;
+    this.fechaEditar = '';
+    this.idProfesorEditar = null;
+    this.profesorActualEvento = null;
+  }
+
+  guardarCambiosEvento() {
+    if (!this.eventoSeleccionado || !this.fechaEditar) return;
+
+    const eventoActualizado = new evento(
+      this.eventoSeleccionado.idEvento,
+      this.fechaEditar,
+      this.idProfesorEditar || 0
+    );
+
+
+    this._service.updateEvento(eventoActualizado).pipe(
+      switchMap(() => {
+
+        const profesorCambio = this.idProfesorEditar !== this.profesorActualEvento;
+        
+        if (!profesorCambio) {
+        
+          return of('sin-cambio-profesor');
+        }
+
+   
+        if (this.profesorActualEvento && this.profesorActualEvento > 0) {
+        
+          return this.profesorEventoService.deleteProfesorEventoById(this.eventoSeleccionado.idEvento).pipe(
+            switchMap(() => {
+             
+              if (this.idProfesorEditar && this.idProfesorEditar > 0) {
+              
+                return this.profesorEventoService.createProfesorEvento(this.eventoSeleccionado.idEvento, this.idProfesorEditar);
+              }
+              return of('profesor-eliminado');
+            })
+          );
+        } else {
+        
+          if (this.idProfesorEditar && this.idProfesorEditar > 0) {
+        
+            return this.profesorEventoService.createProfesorEvento(this.eventoSeleccionado.idEvento, this.idProfesorEditar);
+          }
+          return of('sin-profesor');
+        }
+      })
+    ).subscribe({
+      next: () => {
+ 
+        this.cerrarModalEditarEvento();
+        this.getEventoCurosEscolar();
+      },
+      error: (err) => {
+     
+        this.mensajeError = 'No se pudo actualizar el evento';
+        this.showModalError = true;
+      }
+    });
+  }
+
+  abrirModalEliminarEvento() {
+    this.showModalEliminarEvento = true;
+  }
+
+  cerrarModalEliminarEvento() {
+    this.showModalEliminarEvento = false;
+  }
+
+  cerrarModalError() {
+    this.showModalError = false;
+    this.mensajeError = '';
+  }
+
   confirmarAddEvento() {
     if (!this.fechaSeleccionada || this.fechaSeleccionada < this.now) return;
     
-    this._service.createEvento(this.fechaSeleccionada).subscribe(()=>{
-      this.getEventoCurosEscolar();
-      this.cerrarModalAddEvento();
+    this._service.createEvento(this.fechaSeleccionada).pipe(
+      switchMap((eventoCreado) => {
+      
+        // Si se seleccionó un profesor, crear la asociación
+        if (this.idProfesorNuevoEvento && this.idProfesorNuevoEvento > 0) {
+         
+          return this.profesorEventoService.createProfesorEvento(eventoCreado.idEvento, this.idProfesorNuevoEvento);
+        }
+        return of('sin-profesor');
+      })
+    ).subscribe({
+      next: () => {
+    
+        this.getEventoCurosEscolar();
+        this.cerrarModalAddEvento();
+      },
+      error: (err) => {
+      
+        this.mensajeError = 'No se pudo crear el evento.\n\nIntenta nuevamente.';
+        this.showModalError = true;
+      }
     });
   }
 
@@ -178,8 +316,160 @@ export class HomeComponent implements OnInit ,OnChanges{
     const evento = this.eventos.find(ev => ev.idEvento === idEvento);
     if (evento) {
       this.eventoSeleccionado = evento;
-      this.showModalCancelEvento = true;
+      this.fechaEditar = evento.fechaEvento.split('T')[0];
+      this.idProfesorEditar = evento.idProfesor || null;
+      this.profesorActualEvento = evento.idProfesor || null; 
+      this.showModalEditarEvento = true;
     }
+  }
+
+  confirmarEliminarEvento() {
+    const idEvento = this.eventoSeleccionado?.idEvento;
+    if (!idEvento) return;
+
+  
+
+   
+    this.equipoService.getEquiposPorEvento(idEvento)
+      .pipe(
+        switchMap(equipos => {
+      
+          if (equipos.length === 0) {
+            return of('sin-equipos');
+          }
+
+        
+          const deleteMiembros$ = equipos.map(equipo =>
+            this.miembroEquiposService.getMiembroEquipos().pipe(
+              switchMap(miembros => {
+                const miembrosDelEquipo = miembros.filter(m => m.idEquipo === equipo.idEquipo);
+            
+                if (miembrosDelEquipo.length === 0) return of('sin-miembros');
+                return forkJoin(
+                  miembrosDelEquipo.map(m => this.miembroEquiposService.deleteMiembroEquiposPorId(m.idMiembroEquipo))
+                );
+              })
+            )
+          );
+
+          return forkJoin(deleteMiembros$).pipe(
+            switchMap((resultMiembros) => {
+            
+              // Eliminar todos los equipos
+              return forkJoin(
+                equipos.map(equipo => this.equipoService.deleteEquipoPorId(equipo.idEquipo))
+              );
+            })
+          );
+        }),
+        switchMap((resultEquipos) => {
+        
+          // Luego eliminar todas las inscripciones del evento
+          return this.inscripcionesService.getInscripciones();
+        }),
+        switchMap((inscripciones: any) => {
+          // Obtener actividades del evento para filtrar inscripciones
+          return this.actividadesService.getActividadesByIdEnvento(idEvento).pipe(
+            switchMap(actividades => {
+             
+              const idsEventoActividad = actividades.map(act => act.idEventoActividad);
+              const inscripcionesDelEvento = (inscripciones as any[]).filter(
+                i => idsEventoActividad.includes(i.idEventoActividad)
+              );
+
+          
+              if (inscripcionesDelEvento.length === 0) {
+                return of({ actividades, inscripcionesEliminadas: 'sin-inscripciones' });
+              }
+
+              return forkJoin(
+                inscripcionesDelEvento.map(i =>
+                  this.inscripcionesService.deleteInscripcionById(i.idInscripcion)
+                )
+              ).pipe(
+                switchMap((resultInscripciones) => {
+                
+                  return of({ actividades, inscripcionesEliminadas: true });
+                })
+              );
+            })
+          );
+        }),
+        // Eliminar todas las relaciones ActividadEvento
+        switchMap((result: any) => {
+          const actividades = result.actividades;
+         
+          
+          if (actividades.length === 0) {
+           
+            return of('sin-actividades');
+          }
+
+          // Eliminar una por una para ver cuál falla
+          const deleteOneByOne = (index: number): any => {
+            if (index >= actividades.length) {
+            
+              return of('completado');
+            }
+
+            const act = actividades[index];
+           
+            
+            // Primero eliminar los PrecioActividad asociados
+            return from(this.precioActividadService.getPrecioActividad()).pipe(
+              switchMap(precios => {
+                const preciosDeEstaActividad = (precios as any[]).filter(
+                  p => p.idEventoActividad === act.idEventoActividad
+                );
+             
+                
+                if (preciosDeEstaActividad.length === 0) {
+                  return of('sin-precios');
+                }
+                
+                // Eliminar todos los precios
+                const deletePrecios$ = preciosDeEstaActividad.map(p => 
+                  from(this.precioActividadService.deletePrecioActividad(p.idPrecioActividad))
+                );
+                return forkJoin(deletePrecios$);
+              }),
+              switchMap(() => {
+               
+                // Ahora sí eliminar el ActividadEvento
+                return this.actividadEventoService.deleteActividadEvento(act.idEventoActividad);
+              }),
+              switchMap(() => {
+               
+                return deleteOneByOne(index + 1);
+              })
+            );
+          };
+
+          return deleteOneByOne(0);
+        }),
+        // Finalmente eliminar el evento
+        switchMap(() => {
+          
+          return this._service.deleteEventoById(idEvento);
+        })
+      )
+      .subscribe({
+        next: () => {
+         
+          this.cerrarModalEliminarEvento();
+          this.cerrarModalEditarEvento();
+          this.getEventoCurosEscolar();
+          if (this.idEvento === idEvento) {
+            this.idEvento = null;
+          }
+        },
+        error: (err) => {
+     
+          this.cerrarModalEliminarEvento();
+          this.mensajeError = ' No se pudo eliminar el evento.';
+          this.showModalError = true;
+        }
+      });
   }
 
   confirmarCancelEvento() {
@@ -257,9 +547,16 @@ export class HomeComponent implements OnInit ,OnChanges{
         this.cerrarModalCancelEvento();
       },
       error: (err) => {
-        console.error('Error al eliminar evento:', err);
-        alert('Error al eliminar el evento. Revisa la consola.');
+      
+        this.mensajeError = 'No se pudo cancelar el evento.';
+        this.showModalError = true;
       }
     });
+  }
+
+  esActividadDeEquipo(nombreActividad: string): boolean {
+    const nombre = nombreActividad.toLowerCase();
+    return nombre.includes('futbol') || nombre.includes('fútbol') ||
+      nombre.includes('baloncesto') || nombre.includes('basket');
   }
 }

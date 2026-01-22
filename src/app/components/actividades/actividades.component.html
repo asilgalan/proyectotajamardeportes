@@ -94,19 +94,19 @@
 					</div>
 					}
 					} @else if(estaInscritoEnAlgunaActividad()) {
-						<!-- Está inscrito en OTRA actividad del evento -->
+					
 						<button class="btn-otra-actividad" disabled title="Ya estás inscrito en otra actividad de este evento">
 							<i class="bi bi-lock-fill"></i>
 							<span>No disponible</span>
 						</button>
 					} @else if(isFutureEvent(actividad.fechaEvento)) {
-						<!-- Evento futuro y no está inscrito en ninguna -->
+						
 						<button class="btn-primary" (click)="abrirModalUnirse(actividad.idEventoActividad)">
 							<i class="bi bi-plus-circle-fill"></i>
 							<span>Unirse</span>
 						</button>
 					} @else {
-						<!-- Evento ya pasó -->
+					
 						<button class="btn-primary" disabled style="opacity: 0.5; cursor: not-allowed;">
 							<i class="bi bi-check-circle-fill"></i>
 							<span>Finalizada</span>
@@ -119,7 +119,6 @@
 	</main>
 </section>
 
-<!-- Modal de Confirmación -->
 @if(showModal()) {
 <div class="modal-overlay" (click)="cerrarModal()">
 	<div class="modal-container" (click)="$event.stopPropagation()">
@@ -165,7 +164,7 @@
 </div>
 }
 
-<!-- Modal Crear Actividad -->
+
 @if(showModalCrearActividad()) {
 <div class="modal-overlay" (click)="cerrarModalCrearActividad()">
 	<div class="modal-container modal-lg" (click)="$event.stopPropagation()">
@@ -181,8 +180,7 @@
 		<div class="modal-body">
 			<h2>Añadir Actividad al Evento</h2>
 			<p>Elige cómo quieres añadir la actividad</p>
-			
-			<!-- Tabs -->
+	
 			<div class="modal-tabs">
 				<button class="tab-btn" [class.active]="tabActivo() === 'existente'" (click)="cambiarTab('existente')">
 					<i class="bi bi-list-check"></i>
@@ -198,7 +196,7 @@
 				</button>
 			</div>
 
-			<!-- Tab Content: Existente -->
+		
 			@if(tabActivo() === 'existente') {
 			<div class="tab-content">
 				<div class="form-group">
@@ -217,7 +215,7 @@
 			</div>
 			}
 
-			<!-- Tab Content: Copiar -->
+		
 			@if(tabActivo() === 'copiar') {
 			<div class="tab-content">
 				<div class="form-group">
@@ -250,7 +248,7 @@
 			</div>
 			}
 
-			<!-- Tab Content: Nueva -->
+		
 			@if(tabActivo() === 'nueva') {
 			<div class="tab-content">
 				<div class="form-group">
@@ -280,7 +278,7 @@
 </div>
 }
 
-<!-- Modal Editar Actividad -->
+
 @if(showModalEditar()) {
 <div class="modal-overlay" (click)="cerrarModalEditar()">
 	<div class="modal-container" (click)="$event.stopPropagation()">
@@ -294,9 +292,21 @@
 		</div>
 		
 		<div class="modal-body">
-			<h2>Gestionar Actividad</h2>
-			<p><strong>{{actividadParaEditar()?.nombreActividad}}</strong></p>
+			<h2>Editar Actividad</h2>
 			<p class="text-muted">Evento #{{actividadParaEditar()?.idEvento}}</p>
+			
+			<div class="form-group">
+				<label>Nombre de la actividad <span class="required">*</span></label>
+				<input type="text" class="form-input" [ngModel]="nombreEditar()" (ngModelChange)="nombreEditar.set($event)" placeholder="Ej: Fútbol" required>
+			</div>
+			
+			@if(esActividadDeEquipoEditar()) {
+			<div class="form-group">
+				<label>Mínimo jugadores <span class="required">*</span></label>
+				<input type="number" class="form-input" [ngModel]="minimoJugadoresEditar()" (ngModelChange)="minimoJugadoresEditar.set($event)" min="1" required>
+				<small class="text-muted">Requerido para deportes de equipo</small>
+			</div>
+			}
 			
 			<button class="btn-eliminar-actividad" (click)="eliminarActividadDelEvento()">
 				<i class="bi bi-trash3"></i>
@@ -305,8 +315,71 @@
 		</div>
 		
 		<div class="modal-footer">
-			<button class="btn-modal-cancel btn-full" (click)="cerrarModalEditar()">
-				Cerrar
+			<button class="btn-modal-cancel" (click)="cerrarModalEditar()">
+				Cancelar
+			</button>
+			<button class="btn-modal-confirm" (click)="confirmarEditar()" [disabled]="!puedeGuardarEdicion()">
+				<i class="bi bi-check2"></i>
+				Guardar Cambios
+			</button>
+		</div>
+	</div>
+</div>
+}
+
+@if(showModalEliminar()) {
+<div class="modal-overlay" (click)="cerrarModalEliminar()">
+	<div class="modal-container" (click)="$event.stopPropagation()">
+		<div class="modal-header">
+			<div class="modal-icon" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+				<i class="bi bi-exclamation-triangle-fill"></i>
+			</div>
+			<button class="modal-close" (click)="cerrarModalEliminar()">
+				<i class="bi bi-x-lg"></i>
+			</button>
+		</div>
+		
+		<div class="modal-body">
+			<h2>¿Eliminar actividad del evento?</h2>
+			<p><strong>{{actividadParaEditar()?.nombreActividad}}</strong></p>
+			<p class="text-warning">⚠️ Esta acción no se puede deshacer</p>
+			<p class="text-muted">Se eliminarán todas las inscripciones asociadas a esta actividad en el evento.</p>
+		</div>
+		
+		<div class="modal-footer">
+			<button class="btn-modal-cancel" (click)="cerrarModalEliminar()">
+				Cancelar
+			</button>
+			<button class="btn-modal-confirm btn-modal-danger" (click)="confirmarEliminar()">
+				<i class="bi bi-trash3"></i>
+				Eliminar
+			</button>
+		</div>
+	</div>
+</div>
+}
+
+@if(showModalError()) {
+<div class="modal-overlay" (click)="cerrarModalError()">
+	<div class="modal-container" (click)="$event.stopPropagation()">
+		<div class="modal-header">
+			<div class="modal-icon" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+				<i class="bi bi-x-circle-fill"></i>
+			</div>
+			<button class="modal-close" (click)="cerrarModalError()">
+				<i class="bi bi-x-lg"></i>
+			</button>
+		</div>
+		
+		<div class="modal-body">
+			<h2>Error al eliminar</h2>
+			<p>{{mensajeError()}}</p>
+			<p class="text-muted">Por favor, contacta con el administrador si el problema persiste.</p>
+		</div>
+		
+		<div class="modal-footer">
+			<button class="btn-modal-confirm btn-full" (click)="cerrarModalError()">
+				Aceptar
 			</button>
 		</div>
 	</div>

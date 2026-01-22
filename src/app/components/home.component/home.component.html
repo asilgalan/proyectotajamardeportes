@@ -24,6 +24,25 @@
           (ngModelChange)="onFechaChange($event)"
         />
       </div>
+      
+      <div style="margin-top: 20px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">
+          <i class="bi bi-person-badge"></i> Asignar profesor (opcional)
+        </label>
+        <select 
+          [(ngModel)]="idProfesorNuevoEvento"
+          class="form-control"
+          style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; width: 100%; font-size: 14px;"
+        >
+          <option [value]="null">Sin profesor asignado</option>
+          <option *ngFor="let profesor of profesoresActivos" [value]="profesor.idUsuario">
+            {{ profesor.usuario }} - {{ profesor.email }}
+          </option>
+        </select>
+        <small style="color: #6b7280; margin-top: 5px; display: block;">
+          {{ profesoresActivos.length }} profesores disponibles
+        </small>
+      </div>
     </div>
   @if(this.fechaSeleccionada! < now){
     <div class="modal-warning">
@@ -72,6 +91,122 @@
       <button class="btn-modal-confirm" (click)="confirmarCancelEvento()">
         <i class="bi bi-calendar-x"></i>
         Cancelar evento
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para editar evento -->
+<div *ngIf="showModalEditarEvento" class="modal-overlay" (click)="cerrarModalEditarEvento()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+        <i class="bi bi-pencil"></i>
+      </div>
+      <button class="modal-close" (click)="cerrarModalEditarEvento()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <h2>Gestionar Evento</h2>
+      <p class="text-muted" style="margin-bottom: 20px;">Evento #{{eventoSeleccionado?.idEvento}}</p>
+      
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">
+          <i class="bi bi-calendar3"></i> Fecha del evento
+        </label>
+        <input 
+          type="date" 
+          [(ngModel)]="fechaEditar"
+          class="form-control"
+          style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; width: 100%; font-size: 14px;"
+        />
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">
+          <i class="bi bi-person-badge"></i> Profesor asignado
+        </label>
+        <select 
+          [(ngModel)]="idProfesorEditar"
+          class="form-control"
+          style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; width: 100%; font-size: 14px;"
+        >
+          <option [value]="null">Sin profesor asignado</option>
+          <option *ngFor="let profesor of profesoresActivos" [value]="profesor.idUsuario">
+            {{ profesor.usuario }} - {{ profesor.email }}
+          </option>
+        </select>
+        <small style="color: #6b7280; margin-top: 5px; display: block;">
+          {{ profesoresActivos.length }} profesores disponibles
+        </small>
+      </div>
+
+      <button class="btn-eliminar-actividad" (click)="abrirModalEliminarEvento()" style="margin-top: 10px;">
+        <i class="bi bi-trash3"></i>
+        Eliminar evento
+      </button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-modal-cancel" (click)="cerrarModalEditarEvento()">
+        Cancelar
+      </button>
+      <button class="btn-modal-confirm" (click)="guardarCambiosEvento()">
+        <i class="bi bi-check-circle"></i>
+        Guardar cambios
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal confirmación eliminar evento -->
+<div *ngIf="showModalEliminarEvento" class="modal-overlay" (click)="cerrarModalEliminarEvento()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-icon" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+      </div>
+      <button class="modal-close" (click)="cerrarModalEliminarEvento()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <h2>¿Eliminar evento completo?</h2>
+      <p><strong>Evento #{{eventoSeleccionado?.idEvento}}</strong></p>
+      <p>Fecha: {{eventoSeleccionado?.fechaEvento | date:'fullDate'}}</p>
+      <p class="text-warning">⚠️ Esta acción no se puede deshacer</p>
+      <p class="text-muted">Se eliminarán TODAS las actividades, equipos, miembros e inscripciones asociadas a este evento.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-modal-cancel" (click)="cerrarModalEliminarEvento()">
+        Cancelar
+      </button>
+      <button class="btn-modal-confirm btn-modal-danger" (click)="confirmarEliminarEvento()">
+        <i class="bi bi-trash3"></i>
+        Eliminar Evento
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de error -->
+<div *ngIf="showModalError" class="modal-overlay" (click)="cerrarModalError()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-icon" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+        <i class="bi bi-x-circle-fill"></i>
+      </div>
+      <button class="modal-close" (click)="cerrarModalError()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <h2>Error</h2>
+      <p>{{mensajeError}}</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-modal-confirm btn-full" (click)="cerrarModalError()">
+        Aceptar
       </button>
     </div>
   </div>
@@ -139,6 +274,9 @@
                   </div>
                   <div class="event-id">#{{event.idEvento}}</div>
                 </div>
+                <button *ngIf="authservices.isAdmin() && this" class="btn-edit-event" (click)="abrirModalEditarEvento($event, event)" title="Editar evento">
+                  <i class="bi bi-pencil-square"></i>
+                </button>
               </div>
             </ng-container>
           </div>

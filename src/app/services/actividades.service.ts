@@ -26,13 +26,13 @@ export class ActividadesService {
         );
     }
     createActividades(actividades:ActividadesResponse):Observable<ActividadesResponse>{
-        return this.http.post<ActividadesResponse>(this.apiUrl + '/Actividades/Create', actividades).pipe(
+        return this.http.post<ActividadesResponse>(this.apiUrl + '/Actividades/create', actividades).pipe(
             tap(response => console.log(response))
         );
     }
 
         updateActividades(actividades:ActividadesResponse):Observable<ActividadesResponse>{
-        return this.http.put<ActividadesResponse>(this.apiUrl + '/Actividades/Create', actividades).pipe(
+        return this.http.put<ActividadesResponse>(this.apiUrl + '/Actividades/update', actividades).pipe(
             tap(response => console.log(response))
         );
     }
