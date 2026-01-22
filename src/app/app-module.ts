@@ -5,7 +5,7 @@ import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptors, withInterceptorsFromDi } from '@angular/common/http';
 import { LoginComponent } from './auth/components/loginComponent/loginComponent';
-import { ReactiveFormsModule,FormGroup,FormControl } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule, FormGroup, FormControl } from '@angular/forms';
 import { RouterLink, RouterModule,  } from '@angular/router';
 import { authInterceptor } from './auth/interceptors/auth.interceptor';
 import { CommonModule } from '@angular/common';
@@ -30,6 +30,7 @@ import { MaterialesComponent } from './components/materiales.component/materiale
     BrowserModule,
     AppRoutingModule,
     ReactiveFormsModule,
+    FormsModule,
     CommonModule,
     RouterModule,
     RouterLink,

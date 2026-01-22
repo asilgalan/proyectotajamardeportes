@@ -327,6 +327,9 @@
 	justify-content: center;
 	z-index: 1000;
 	animation: fadeIn 0.2s ease;
+	padding: 20px;
+	box-sizing: border-box;
+	overflow-y: auto;
 }
 
 @keyframes fadeIn {
@@ -354,9 +357,13 @@
 	border-radius: 16px;
 	width: 90%;
 	max-width: 400px;
+	max-height: 90vh;
 	box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 	animation: slideUp 0.3s ease;
 	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	margin: auto;
 }
 
 .modal-header {
@@ -364,6 +371,7 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: flex-start;
+	flex-shrink: 0;
 }
 
 .modal-icon {
@@ -402,6 +410,8 @@
 
 .modal-body {
 	padding: 20px;
+	overflow-y: auto;
+	flex: 1;
 }
 
 .modal-body h2 {
@@ -503,6 +513,7 @@
 	padding: 16px 20px 20px;
 	display: flex;
 	gap: 10px;
+	flex-shrink: 0;
 }
 
 .btn-modal-cancel,
@@ -578,4 +589,313 @@
 
 .btn-view-teams i {
     font-size: 0.95rem;
+}
+
+/* ========== ESTILOS PARA CREAR/EDITAR ACTIVIDADES ========== */
+
+/* Header con botón */
+.actividades-header {
+	margin-bottom: 24px;
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 16px;
+}
+
+.btn-crear-actividad {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.75rem 1.25rem;
+	font-size: 0.95rem;
+	font-weight: 600;
+	color: white;
+	background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+	border: none;
+	border-radius: 10px;
+	cursor: pointer;
+	box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+	transition: all 0.3s ease;
+}
+
+.btn-crear-actividad:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+/* Botón Editar */
+.btn-editar {
+	flex: 1;
+	padding: 8px 14px;
+	border: none;
+	border-radius: 6px;
+	font-weight: 500;
+	font-size: 0.85rem;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+	color: white;
+	transition: all 0.2s ease;
+}
+
+.btn-editar:hover {
+	background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+}
+
+/* Modal grande */
+.modal-lg {
+	max-width: 500px;
+}
+
+/* Tabs del modal */
+.modal-tabs {
+	display: flex;
+	gap: 8px;
+	margin-bottom: 20px;
+	background: #f1f5f9;
+	padding: 4px;
+	border-radius: 10px;
+}
+
+.modal-tabs .tab-btn {
+	flex: 1;
+	padding: 10px 12px;
+	border: none;
+	background: transparent;
+	border-radius: 8px;
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: var(--text-secondary);
+	cursor: pointer;
+	transition: all 0.2s ease;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+}
+
+.modal-tabs .tab-btn:hover {
+	color: var(--text-primary);
+}
+
+.modal-tabs .tab-btn.active {
+	background: white;
+	color: var(--primary);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.modal-tabs .tab-btn i {
+	font-size: 1rem;
+}
+
+/* Tab content */
+.tab-content {
+	animation: fadeIn 0.2s ease;
+}
+
+/* Formularios */
+.form-group {
+	margin-bottom: 16px;
+}
+
+.form-group label {
+	display: block;
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: var(--text-primary);
+	margin-bottom: 6px;
+}
+
+.form-group label .required {
+	color: #ef4444;
+	margin-left: 2px;
+}
+
+.form-select,
+.form-input {
+	width: 100%;
+	padding: 10px 14px;
+	font-size: 0.9rem;
+	border: 2px solid #e2e8f0;
+	border-radius: 8px;
+	background: #f8fafc;
+	color: var(--text-primary);
+	transition: all 0.2s ease;
+}
+
+.form-select:focus,
+.form-input:focus {
+	outline: none;
+	border-color: var(--primary);
+	background: white;
+	box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.form-select-multiple {
+	min-height: 120px;
+	padding: 8px;
+}
+
+.form-select-multiple option {
+	padding: 8px 10px;
+	border-radius: 4px;
+	margin-bottom: 2px;
+}
+
+.form-select-multiple option:checked {
+	background: linear-gradient(0deg, var(--primary) 0%, var(--primary) 100%);
+	color: white;
+}
+
+.text-muted {
+	display: block;
+	font-size: 0.8rem;
+	color: var(--text-secondary);
+	margin-top: 4px;
+}
+
+.text-warning {
+	display: block;
+	font-size: 0.9rem;
+	color: #f59e0b;
+	font-weight: 500;
+	margin: 12px 0;
+	padding: 8px 12px;
+	background: #fef3c7;
+	border-radius: 6px;
+	border-left: 3px solid #f59e0b;
+}
+
+/* Estilos para mensajes de error con formato */
+.modal-body p {
+	white-space: pre-line;
+	line-height: 1.6;
+}
+
+.required {
+	color: #ef4444;
+	font-weight: 600;
+	margin-left: 2px;
+}
+
+.form-row {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 12px;
+}
+
+.btn-full {
+	width: 100%;
+	margin-top: 8px;
+}
+
+/* Lista de actividades para copiar */
+.actividades-copiar-list {
+	margin-top: 16px;
+}
+
+.actividades-copiar-list > label {
+	display: block;
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: var(--text-primary);
+	margin-bottom: 10px;
+}
+
+.actividad-copiar-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px;
+	background: #f8fafc;
+	border-radius: 8px;
+	margin-bottom: 8px;
+	border: 1px solid #e2e8f0;
+}
+
+.actividad-copiar-info {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.actividad-copiar-info strong {
+	font-size: 0.9rem;
+	color: var(--text-primary);
+}
+
+.actividad-copiar-info span {
+	font-size: 0.75rem;
+	color: var(--text-secondary);
+}
+
+.btn-copiar-mini {
+	padding: 6px 12px;
+	border: none;
+	border-radius: 6px;
+	font-size: 0.8rem;
+	font-weight: 600;
+	background: var(--primary);
+	color: white;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	transition: all 0.2s ease;
+}
+
+.btn-copiar-mini:hover {
+	background: var(--primary-hover);
+}
+
+/* Botón eliminar actividad */
+.btn-eliminar-actividad {
+	width: 100%;
+	padding: 12px;
+	margin-top: 16px;
+	border: 2px dashed #fca5a5;
+	border-radius: 8px;
+	background: #fef2f2;
+	color: #dc2626;
+	font-size: 0.9rem;
+	font-weight: 600;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	transition: all 0.2s ease;
+}
+
+.btn-eliminar-actividad:hover {
+	background: #fee2e2;
+	border-color: #f87171;
+}
+
+.text-muted {
+	color: var(--text-secondary);
+}
+
+.text-center {
+	text-align: center;
+}
+
+/* Disabled buttons */
+button:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+	.modal-tabs .tab-btn span {
+		display: none;
+	}
+	
+	.form-row {
+		grid-template-columns: 1fr;
+	}
 }

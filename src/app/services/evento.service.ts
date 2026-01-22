@@ -33,6 +33,13 @@ export class ServiceEventos {
                 tap(response => console.log('Evento eliminado:', response))    
         )}
 
+        updateEvento(evento: evento): Observable<evento> {
+            let request = "/Eventos/update";
+            return this._http.put<evento>(this.urlEventos + request, evento).pipe(
+                tap(response => console.log('Evento actualizado:', response))
+            );
+        }
+
         getEventoPorId(idEvento: number): Observable<evento> {
     
         let request = "/Eventos/" + idEvento;
