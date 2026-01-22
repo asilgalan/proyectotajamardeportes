@@ -34,7 +34,7 @@ import { MaterialesComponent } from './components/materiales.component/materiale
     CommonModule,
     RouterModule,
     RouterLink,
-    FullCalendarModule
+    FullCalendarModule,
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),
