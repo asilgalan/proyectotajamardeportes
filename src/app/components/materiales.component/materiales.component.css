@@ -1,34 +1,39 @@
+/* ================================
+   TITULO PRINCIPAL
+   ================================ */
 .material-header-enhanced {
   margin-top: 2rem;
-  background-color: #dbeafe; /* azul clarito que combina con tu paleta */
-  padding: 1.2rem 1.5rem;      /* más compacto */
+  background-color: #dbeafe;
+  padding: 1.2rem 1.5rem;
   border-radius: 0.8rem;
-  color: #1e40af;              /* azul oscuro para el texto */
+  color: #1e40af;
   text-align: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   margin-bottom: 1.2rem;
 }
 
 .material-title-enhanced {
-  font-size: 1.6rem;           /* un poco más pequeño que antes */
+  font-size: 1.6rem;
   font-weight: 700;
   margin: 0;
 }
 
 .material-subtitle-enhanced {
-  font-size: 0.95rem;          /* subtítulo más discreto */
+  font-size: 0.95rem;
   margin-top: 0.4rem;
-  color: #1e3a8a;              /* azul medio para subtítulo */
+  color: #1e3a8a;
   font-weight: 500;
   line-height: 1.4;
 }
 
-/* Mantener el estilo de la fecha y el icono */
+/* ================================
+   FECHA DEL EVENTO
+   ================================ */
 .event-date {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: 0.85rem;           /* pequeño y discreto */
+  font-size: 0.85rem;
   color: #64748b;
   margin-bottom: 0.8rem;
 }
@@ -42,7 +47,7 @@
    TARJETA PRINCIPAL
    ================================ */
 .event-card {
-  background-color: #eef6ff; /* azul clarito para diferenciar del fondo */
+  background-color: #eef6ff;
   border: 1px solid #cbd5e1;
   border-radius: 1rem;
   padding: 1rem 1.2rem;
@@ -56,7 +61,6 @@
   box-shadow: 0 6px 15px rgba(37, 99, 235, 0.15);
   background-color: #dbeafe;
 }
-
 
 /* ================================
    ENCABEZADO DE LA TARJETA
@@ -75,11 +79,10 @@
 
 .material-subtitle {
   font-size: 1rem;
-  color: #64748b; /* gris suave */
+  color: #64748b; 
   margin: 0.3rem 0 0;
   font-weight: 500;
 }
-
 
 /* ================================
    LISTA DE EVENTOS / MATERIALES
@@ -154,7 +157,6 @@
   background-color: rgba(37, 99, 235, 0.05);
 }
 
-/* Fecha dentro de cada evento */
 .event-date {
   display: flex;
   align-items: center;
@@ -183,7 +185,7 @@
    CARD DE ACTIVIDAD
    ================================ */
 .activity-card {
-  background-color: #f8faff; /* azul clarito */
+  background-color: #f8faff; 
   border: 1px solid var(--nav-border-color);
   border-radius: 1rem;
   padding: 0.8rem 1rem;
@@ -195,37 +197,15 @@
   box-shadow: 0 6px 15px rgba(37, 99, 235, 0.15);
 }
 
-/* Título de actividad */
 .activity-title {
   font-weight: 600;
   color: var(--text-main);
   margin: 0;
 }
 
-.material-chat {
-  margin-top: 10px;
-  padding: 10px;
-  border-radius: 10px;
-  background-color: #f5f5f5;
-}
-
-.material-message {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 12px;
-  margin-bottom: 6px;
-  border-radius: 8px;
-}
-
-.material-rojo {
-  background-color: #f8d7da;
-}
-
-.material-verde {
-  background-color: #d4edda;
-}
-
+/* ================================
+   CHAT DE MATERIALES
+   ================================ */
 .activity-buttons {
   display: flex;
   gap: 0.5rem;
@@ -248,56 +228,60 @@
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-/* Botón verde para Proporcionar */
 .btn-proporcionar {
   background-color: #22c55e;
 }
 
-/* Botón rojo para Solicitar */
 .btn-solicitar {
   background-color: #ef4444;
 }
 
+/* ================================
+   CHAT DE MATERIALES
+   ================================ */
 .material-chat {
   margin-top: 10px;
   padding: 10px;
   border-radius: 15px;
-  background-color: #e0f2fe; /* azul clarito que combina con tu paleta */
+  background-color: #e0f2fe; 
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  max-height: 250px; /* limita el alto del chat */
-  overflow-y: auto; /* scroll si hay muchos materiales */
-  border: 1px solid #cbd5e1; /* borde suave */
+  max-height: 250px; 
+  overflow-y: auto;
+  border: 1px solid #cbd5e1;
 }
 
-/* Cada mensaje tipo burbuja */
 .material-message {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 8px 12px;
   border-radius: 15px;
-  max-width: 70%; /* burbuja más corta que el chat */
+  max-width: 70%; 
   word-break: break-word;
   font-size: 0.9rem;
 }
 
-/* Pendiente: rojo */
+.material-message {
+  padding: 8px 12px;
+  border-radius: 16px;
+  display: inline-block;
+  max-width: 70%;
+}
+
 .material-rojo {
   background-color: #f87171;
   color: white;
-  align-self: flex-start; /* mensajes a la izquierda */
+  align-self: flex-start;
 }
 
-/* Aceptado: verde */
 .material-verde {
   background-color: #34d399;
   color: white;
-  align-self: flex-end; /* mensajes a la derecha */
+  align-self: flex-end;
 }
 
-/* Botón aceptar dentro del mensaje */
 .material-message button {
   background-color: rgba(255,255,255,0.3);
   border: none;
@@ -315,28 +299,21 @@
 }
 
 .material-username {
-  font-size: 0.75rem; /* tamaño pequeño como WhatsApp */
-  color: #555; /* gris oscuro */
+  font-size: 0.75rem; 
+  color: #555; 
   margin-bottom: 2px;
   font-weight: 500;
 }
 
 .material-message-container {
-  margin-bottom: 8px; /* espacio entre materiales */
+  display: flex;
+  flex-direction: column; 
 }
 
-.material-username {
-  font-size: 0.75rem;
-  color: #555;
-  margin-bottom: 2px; /* espacio entre nombre y burbuja */
+.material-message-container.left {
+  align-items: flex-start;
 }
 
-.material-message {
-  padding: 8px 12px;
-  border-radius: 16px;
-  display: inline-block;
-  max-width: 70%;
+.material-message-container.right {
+  align-items: flex-end;
 }
-
-
-

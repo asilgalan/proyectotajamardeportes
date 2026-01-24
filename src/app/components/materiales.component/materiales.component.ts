@@ -10,13 +10,13 @@ import ServiceMateriales from '../../services/materiales.service';
 import { ActividadEventoService } from '../../services/actividadEvento.service';
 
 @Component
-({
-  selector: 'app-materiales.component',
-  standalone: false,
-  templateUrl: './materiales.component.html',
-  styleUrls: ['./materiales.component.css'],
-})
-export class MaterialesComponent implements OnInit
+  ({
+    selector: 'app-materiales.component',
+    standalone: false,
+    templateUrl: './materiales.component.html',
+    styleUrls: ['./materiales.component.css'],
+  })
+export class MaterialesComponent implements OnInit 
 {
   public eventos: Array<evento> = new Array<evento>();
   public actividadesEvento: Array<actividadEvento> = new Array<actividadEvento>();
@@ -27,25 +27,29 @@ export class MaterialesComponent implements OnInit
   public idEventoSeleccionado: number | null = null;
   public idActividadSeleccionada: number | null = null;
 
-  public nombreUsuarioSolicitar!: string;
-  public nombreUsuarioProporcionar!: string;
+  public idUsuario!: number;
 
   constructor(private _serviceEventos: ServiceEventos,
-              private _serviceActividades: ActividadesService,
-              private _servicePerfil: ServicePerfil,
-              private _serviceMateriales: ServiceMateriales,
-              private _serviceEventoActividad: ActividadEventoService) {}
+    private _serviceActividades: ActividadesService,
+    private _servicePerfil: ServicePerfil,
+    private _serviceMateriales: ServiceMateriales,
+    private _serviceEventoActividad: ActividadEventoService) { }
 
-  ngOnInit(): void
+  ngOnInit(): void 
   {
-    this._serviceEventos.getEventosCursoEscolar().subscribe((response) =>
+    this._serviceEventos.getEventosCursoEscolar().subscribe((response) => 
     {
       this.eventos = response;
     });
+
+    this._servicePerfil.getPerfil().then(response => 
+    {
+      this.idUsuario = response.idUsuario;
+    });
   }
 
-  seleccionarEvento(idEvento: number): void
-  {
+  seleccionarEvento(idEvento: number): void 
+{
     if (this.idEventoSeleccionado === idEvento) 
     {
       this.idEventoSeleccionado = null;
@@ -53,55 +57,54 @@ export class MaterialesComponent implements OnInit
       return;
     }
 
-    this._serviceActividades.getActividadesByIdEnvento(idEvento).subscribe((response) =>
+    this._serviceActividades.getActividadesByIdEnvento(idEvento).subscribe((response) => 
     {
       this.idEventoSeleccionado = idEvento;
       this.actividadesEvento = response;
     });
   }
 
-  seleccionarActividad(idEvento:number, idActividad:number, event: Event): void
-  {
+  seleccionarActividad(idEvento: number, idActividad: number, event: Event): void 
+{
     event.stopPropagation();
 
     if (this.idActividadSeleccionada === idActividad) 
     {
-    this.idActividadSeleccionada = null;
-    this.materialesActividad = [];
-    } 
+      this.idActividadSeleccionada = null;
+      this.materialesActividad = [];
+    }
     else 
     {
       this.idActividadSeleccionada = idActividad;
 
-      this._serviceEventoActividad.getActividadesEventoByEventoidByActividadid(idEvento, idActividad).subscribe((response) =>
+      this._serviceEventoActividad.getActividadesEventoByEventoidByActividadid(idEvento, idActividad).subscribe((response) => 
       {
         this.idEventoActividadSeleccionado = response.idEventoActividad;
 
-        this._serviceMateriales.getMaterialesActividad(this.idEventoActividadSeleccionado).then(response =>
+        this._serviceMateriales.getMaterialesActividad(this.idEventoActividadSeleccionado).then(response => 
         {
           this.materialesActividad = response;
-          console.log(response)
         });
       });
     }
   }
 
-  aceptarMaterial(material:Material, event:Event): void
-  {
+  aceptarMaterial(material: Material, event: Event): void 
+{
     event.stopPropagation();
 
-    let idUsuario:number;
-    let idMaterial:number = material.idMaterial;
+    let idUsuario: number;
+    let idMaterial: number = material.idMaterial;
 
-    this._servicePerfil.getPerfil().then(response =>
+    this._servicePerfil.getPerfil().then(response => 
     {
       idUsuario = response.idUsuario;
 
-      this._serviceMateriales.putMaterialAceptado(idMaterial, idUsuario).then(response =>
+      this._serviceMateriales.putMaterialAceptado(idMaterial, idUsuario).then(response => 
       {
         console.log("material aceptado");
 
-        this._serviceMateriales.getMaterialesActividad(this.idEventoActividadSeleccionado).then(response =>
+        this._serviceMateriales.getMaterialesActividad(this.idEventoActividadSeleccionado).then(response => 
         {
           this.materialesActividad = response;
           console.log(response)
@@ -115,127 +118,118 @@ export class MaterialesComponent implements OnInit
     event.stopPropagation();
 
     Swal.fire
-    ({
-      title: 'Proporcionar material',
-      html: `
+      ({
+        title: 'Proporcionar material',
+        html: `
         <p>¿Qué material quieres proporcionar?</p>
         <input id="materialInput" class="swal2-input" />
       `,
-      showCancelButton: true,
-      confirmButtonText: 'Aceptar',
-      cancelButtonText: 'Cancelar',
-      preConfirm: () => 
-      {
-        const valor = (document.getElementById('materialInput') as HTMLInputElement).value;
-
-        if (!valor) 
+        showCancelButton: true,
+        confirmButtonText: 'Aceptar',
+        cancelButtonText: 'Cancelar',
+        preConfirm: () => 
         {
-          Swal.showValidationMessage('Debes indicar un material');
+          const valor = (document.getElementById('materialInput') as HTMLInputElement).value;
+
+          if (!valor) {
+            Swal.showValidationMessage('Debes indicar un material');
+          }
+
+          return valor;
         }
-
-        return valor;
-      }
-    }).then(result =>
-    {
-      if (result.isConfirmed) 
+      }).then(result => 
       {
-        let idEventoActividad:number = 0;
-        let idUsuario:number;
-
-        this._servicePerfil.getPerfil().then(response =>
+        if (result.isConfirmed) 
         {
-          idUsuario = response.idUsuario;
-          this.nombreUsuarioProporcionar = response.nombre + ' ' + response.apellidos;
+          let idEventoActividad: number = 0;
+          let idUsuario: number;
 
-          this._serviceEventoActividad.getActividadesEventoByEventoidByActividadid(idEvento, idActividad).subscribe((response) =>
+          this._servicePerfil.getPerfil().then(response => 
           {
-            idEventoActividad = response.idEventoActividad;
+            idUsuario = response.idUsuario;
 
-            const material = new Material(0, idEventoActividad, idUsuario, result.value, true, new Date().toISOString(), 0);
-  
-            this._serviceMateriales.postMaterial(material).then(response => 
+            this._serviceEventoActividad.getActividadesEventoByEventoidByActividadid(idEvento, idActividad).subscribe((response) => 
             {
-              console.log("material propuesto");
-              const idMaterial = response.idMaterial;
+              idEventoActividad = response.idEventoActividad;
 
-              this._serviceMateriales.putMaterialAceptado(idMaterial, idUsuario).then(() => 
+              const material = new Material(0, idEventoActividad, idUsuario, result.value, true, new Date().toISOString(), 0);
+
+              this._serviceMateriales.postMaterial(material).then(response => 
               {
+                console.log("material propuesto");
+                const idMaterial = response.idMaterial;
+
+                this._serviceMateriales.putMaterialAceptado(idMaterial, idUsuario).then(() => 
+                {
                   console.log("material aceptado");
                   this._serviceMateriales.getMaterialesActividad(idEventoActividad).then(response => 
                   {
                     this.materialesActividad = response;
                   });
-
-                  //poner los nombres de aceptado por... y solicitado por ...
+                });
               });
-           });
+            });
           });
-        });
-      }
-    });
+        }
+      });
   }
 
   solicitarMaterial(idEvento: number, idActividad: number, event: Event): void 
-  {
+{
     event.stopPropagation();
 
     Swal.fire
-    ({
-      title: 'Solicitar material',
-      html: `
+      ({
+        title: 'Solicitar material',
+        html: `
         <p>¿Qué material quieres solicitar?</p>
         <input id="materialInput" class="swal2-input" />
       `,
-      showCancelButton: true,
-      confirmButtonText: 'Aceptar',
-      cancelButtonText: 'Cancelar',
-      preConfirm: () => 
-      {
-        const valor = (document.getElementById('materialInput') as HTMLInputElement).value;
-
-        if (!valor) 
+        showCancelButton: true,
+        confirmButtonText: 'Aceptar',
+        cancelButtonText: 'Cancelar',
+        preConfirm: () => 
         {
-          Swal.showValidationMessage('Debes indicar un material');
-        }
+          const valor = (document.getElementById('materialInput') as HTMLInputElement).value;
 
-        return valor;
-      }
-    }).then(result => 
-    {
-      if (result.isConfirmed) 
-      {
-        let idEventoActividad:number = 1;
-        let idUsuario:number;
-
-        this._servicePerfil.getPerfil().then(response =>
-        {
-          idUsuario = response.idUsuario;
-          this.nombreUsuarioSolicitar = response.nombre + ' ' + response.apellidos;
-
-          this._serviceEventoActividad.getActividadesEventoByEventoidByActividadid(idEvento, idActividad).subscribe((response) =>
+          if (!valor) 
           {
-            idEventoActividad = response.idEventoActividad;
+            Swal.showValidationMessage('Debes indicar un material');
+          }
 
-            const material = new Material(0, idEventoActividad, idUsuario, result.value, true, new Date().toISOString(), 0);
-            console.log(material);
+          return valor;
+        }
+      }).then(result => 
+      {
+        if (result.isConfirmed) 
+        {
+          let idEventoActividad: number = 1;
+          let idUsuario: number;
 
-            this._serviceMateriales.postMaterial(material).then(response =>
+          this._servicePerfil.getPerfil().then(response => 
+          {
+            idUsuario = response.idUsuario;
+
+            this._serviceEventoActividad.getActividadesEventoByEventoidByActividadid(idEvento, idActividad).subscribe((response) => 
             {
-              console.log("material propuesto");
-  
-              this._serviceMateriales.getMaterialesActividad(idEventoActividad).then(response => 
+              idEventoActividad = response.idEventoActividad;
+
+              const material = new Material(0, idEventoActividad, idUsuario, result.value, true, new Date().toISOString(), 0);
+              console.log(material);
+
+              this._serviceMateriales.postMaterial(material).then(response => 
               {
-                this.materialesActividad = response;
-              });
+                console.log("material propuesto");
 
-              //poner los nombres de aceptado por... y solicitado por ...
-            })
+                this._serviceMateriales.getMaterialesActividad(idEventoActividad).then(response => 
+                {
+                  this.materialesActividad = response;
+                });
+              })
+            });
+
           });
-
-        });
-      }
-    });
-}
-
-
+        }
+      });
+  }
 }
