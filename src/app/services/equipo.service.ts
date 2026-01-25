@@ -4,6 +4,7 @@ import { environment } from '../../environments/environment.development';
 import { Observable, tap } from 'rxjs';
 import { Equipo } from '../models/equipo';
 import { UsuariosEquipo } from '../models/usuariosEquipo';
+import { Curso } from '../models/curso';
 
 @Injectable({providedIn: 'root'})
 export class EquipoService {
@@ -72,5 +73,15 @@ export class EquipoService {
     getEquiposPorCurso(idEvento: number, idCurso: number): Observable<Array<Equipo>> {
         let request ="/Equipos/EquiposCurso/" + idEvento + "?idcurso=" + idCurso;
         return this._http.get<Array<Equipo>>(this.urlEventos + request);
+    }
+
+    getCursosActivos(): Observable<Array<Curso>> {
+        let request = "/GestionEvento/CursosActivos";
+        return this._http.get<Array<Curso>>(this.urlEventos + request);
+    }
+
+    getIdEventoActividadEquipos(idEvento: number, idActividad: number): Observable<any> {
+        let request = "/ActividadesEvento/FindIdEventoActividad/" + idEvento + "/" + idActividad;
+        return this._http.get<any>(this.urlEventos + request);
     }
 }
