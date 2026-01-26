@@ -1,0 +1,144 @@
+<div class="main-container">
+  <div class="page-header">
+    <h1 class="page-title">Resultados de Partidos</h1>
+    <p class="page-subtitle">Consulta los resultados de todos los partidos disputados</p>
+  </div>
+
+  <!-- Filtros Section -->
+  <div class="filters-section">
+    <div class="filters-container">
+      
+      <!-- Filtro por Evento -->
+      <div class="filter-group">
+        <label for="evento-select" class="filter-label">
+          <i class="bi bi-calendar-event"></i>
+          Filtrar por Evento
+        </label>
+        <select 
+          id="evento-select"
+          [ngModel]="selectedEventoId()" 
+          (ngModelChange)="onEventoChange($event)" 
+          class="filter-select"
+        >
+          <option value="">Todos los eventos</option>
+          @for (evento of eventos(); track evento.idEvento) {
+            <option [value]="evento.idEvento">
+              {{evento.fechaEvento | date:'dd/MM/yyyy'}}
+            </option>
+          }
+        </select>
+      </div>
+
+      <!-- Filtro por Actividad -->
+      @if (actividades().length > 0) {
+        <div class="filter-group">
+          <label for="actividad-select" class="filter-label">
+            <i class="bi bi-trophy"></i>
+            Filtrar por Actividad
+          </label>
+          <select 
+            id="actividad-select"
+            [ngModel]="selectedActividadId()"
+            (ngModelChange)="onActividadChange($event)" 
+            class="filter-select"
+          >
+            <option value="">Todas las actividades</option>
+            @for (actividad of actividades(); track actividad.idEventoActividad) {
+              <option [value]="actividad.idEventoActividad">
+                {{actividad.nombreActividad}}
+              </option>
+            }
+          </select>
+        </div>
+      }
+
+      <!-- Reset Button -->
+      @if (selectedEventoId() || selectedActividadId()) {
+        <button class="btn-reset" (click)="resetFilters()">
+          <i class="bi bi-x-circle"></i>
+          Limpiar filtros
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p>Cargando partidos...</p>
+    </div>
+  }
+
+  <!-- Error Message -->
+  @if (errorMessage()) {
+    <div class="error-message">
+      <i class="bi bi-exclamation-triangle"></i>
+      {{errorMessage()}}
+    </div>
+  }
+
+  <!-- Partidos Grid -->
+  @if (!isLoading() && !errorMessage()) {
+    @if (partidoResultados().length === 0) {
+      <div class="empty-state">
+        <i class="bi bi-inbox"></i>
+        <h3>No hay partidos disponibles</h3>
+        <p>No se encontraron partidos con los filtros seleccionados</p>
+      </div>
+    } @else {
+      <div class="partidos-grid">
+        @for (resultado of partidoResultados(); track resultado.idPartidoResultado) {
+          <div class="partido-card">
+            
+            <!-- Sport Badge -->
+            <div class="sport-badge">
+              {{resultado.nombreActividad || 'Deporte'}}
+            </div>
+
+            <!-- Match Content -->
+            <div class="match-container">
+              
+              <!-- Equipo Local -->
+              <div class="team team-home">
+                <div class="team-name">{{resultado.nombreEquipoLocal || 'Equipo Local'}}</div>
+                <div class="team-score">{{resultado.puntosLocal}}</div>
+              </div>
+
+              <!-- Separator -->
+              <div class="separator">vs</div>
+
+              <!-- Equipo Visitante -->
+              <div class="team team-away">
+                <div class="team-score">{{resultado.puntosVisitante}}</div>
+                <div class="team-name">{{resultado.nombreEquipoVisitante || 'Equipo Visitante'}}</div>
+              </div>
+
+            </div>
+
+            <!-- Result Indicator -->
+            <div class="result-indicator">
+              @if (resultado.puntosLocal > resultado.puntosVisitante) {
+                <span class="win-home">
+                  <i class="bi bi-trophy-fill"></i>
+                  Victoria Local
+                </span>
+              } @else if (resultado.puntosVisitante > resultado.puntosLocal) {
+                <span class="win-away">
+                  <i class="bi bi-trophy-fill"></i>
+                  Victoria Visitante
+                </span>
+              } @else {
+                <span class="draw">
+                  <i class="bi bi-dash-circle-fill"></i>
+                  Empate
+                </span>
+              }
+            </div>
+
+          </div>
+        }
+      </div>
+    }
+  }
+</div>
