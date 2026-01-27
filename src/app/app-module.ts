@@ -19,12 +19,13 @@ import { EquipoComponent } from './components/equipo/equipo.component';
 import { A } from '@angular/cdk/keycodes';
 import { ActividadesComponent } from './components/actividades/actividades.component';
 import { MaterialesComponent } from './components/materiales.component/materiales.component';
+import { OrganizadorComponent } from './components/organizador.component/organizador.component';
 
 
 
 @NgModule({
   declarations: [
-    App,LoginComponent,PerfilComponent, NavbarComponent, HomeComponent, EquipoComponent,ActividadesComponent, MaterialesComponent
+    App,LoginComponent,PerfilComponent, NavbarComponent, HomeComponent, EquipoComponent,ActividadesComponent, MaterialesComponent, OrganizadorComponent
   ],
   imports: [
     BrowserModule,

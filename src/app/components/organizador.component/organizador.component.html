@@ -1,0 +1,27 @@
+<div>
+    <h1>Gestión del organizador</h1>
+    <div>
+        <h3>Elige el curso del organizador</h3>
+        <select #cursoSelect (change)="seleccionarCurso(cursoSelect.value)">
+            <option value="" disabled selected>
+                -- Selecciona un curso --
+            </option>
+
+            <option *ngFor="let curso of cursos" [value]="curso.idCurso">
+                {{ curso.nombre }}
+            </option>
+        </select>
+
+        <h3>Elige al alumno.</h3>
+        <select>
+            <option value="" disabled selected>
+                -- Esperando alumnos --
+            </option>
+            <option *ngFor="let alumno of alumnos">
+                {{ alumno.usuario }} - {{ alumno.estadoUsuario }}
+            </option>
+        </select>
+        <br />
+        <button (click)="elegirOrganizador()">Elegir</button>
+    </div>
+</div>
