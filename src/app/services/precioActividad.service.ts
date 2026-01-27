@@ -62,7 +62,7 @@ export default class ServicePrecioActividad
     }
 
     //crea un precio actividad
-    postPago(precioActividad:PrecioActividad):Promise<any>
+    postPrecio(precioActividad:PrecioActividad):Promise<any>
     {
         let url = environment.apiUrl;
         let endPoint = "/PrecioActividad/create";
@@ -83,7 +83,7 @@ export default class ServicePrecioActividad
     }
 
     //modifica un precio actividad
-    putPago(precioActividad:PrecioActividad):Promise<any>
+    putPrecio(precioActividad:PrecioActividad):Promise<any>
     {
         let url = environment.apiUrl;
         let endPoint = "/PrecioActividad/update";

@@ -35,7 +35,7 @@ import { OrganizadorComponent } from './components/organizador.component/organiz
     CommonModule,
     RouterModule,
     RouterLink,
-    FullCalendarModule,
+    FullCalendarModule
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),

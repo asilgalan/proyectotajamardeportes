@@ -76,7 +76,7 @@ export default class ServiceOrganizadores
         let endPoint = "/Organizadores/create/"+idUsuario;
 
         let promise = new Promise((resolve, reject) =>{
-            this._http.get(url+endPoint).subscribe({
+            this._http.post(url+endPoint,{}).subscribe({
                 next: (response) => {
                     resolve(response);
                 },

@@ -15,6 +15,8 @@ export class OrganizadorComponent implements OnInit
   public cursos: Curso[] = [];
   public alumnos: Alumno[] = [];
 
+  public showToast = false;
+
   constructor(private _serviceOrganizadores:ServiceOrganizadores,
               private _serviceGestion:ServiceGestion){}
 
@@ -30,9 +32,29 @@ export class OrganizadorComponent implements OnInit
   {
     const id = Number(idCurso);
 
+    this.alumnos = [];
     this._serviceGestion.getUsuariosPorCurso(id).then(response =>
     {
       this.alumnos = response;
     })
+  }
+
+  elegirOrganizador(idAlumno:string): void
+  {
+    if (idAlumno != null)
+    {
+      const id = Number(idAlumno);
+
+      this._serviceOrganizadores.postOrganizador(id).then(response =>
+      {
+        console.log(response);
+      })
+
+      this.showToast = true;
+      setTimeout(() => 
+      {
+        this.showToast = false;
+      }, 3500);
+    }
   }
 }

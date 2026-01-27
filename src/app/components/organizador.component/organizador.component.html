@@ -1,27 +1,35 @@
-<div>
-    <h1>Gestión del organizador</h1>
-    <div>
-        <h3>Elige el curso del organizador</h3>
-        <select #cursoSelect (change)="seleccionarCurso(cursoSelect.value)">
-            <option value="" disabled selected>
-                -- Selecciona un curso --
-            </option>
+<div class="container">
+  <h1>Gestión del Organizador</h1>
+  
+  <div class="form-group">
+    <label for="cursoSelect">Elige el curso del organizador</label>
+    <select id="cursoSelect" #cursoSelect (change)="seleccionarCurso(cursoSelect.value)">
+      <option value="" disabled selected>-- Selecciona un curso --</option>
+      <option *ngFor="let curso of cursos" [value]="curso.idCurso">
+        {{ curso.nombre }}
+      </option>
+    </select>
+  </div>
 
-            <option *ngFor="let curso of cursos" [value]="curso.idCurso">
-                {{ curso.nombre }}
-            </option>
-        </select>
+  <div class="form-group">
+    <label for="alumnoSelect">Elige al alumno</label>
+    <select id="alumnoSelect" #alumnoSelect>
+      <option value="" disabled selected>-- Selecciona un alumno --</option>
+      <option *ngFor="let alumno of alumnos" [value]="alumno.idUsuario">
+        {{ alumno.usuario }}
+      </option>
+    </select>
+  </div>
 
-        <h3>Elige al alumno.</h3>
-        <select>
-            <option value="" disabled selected>
-                -- Esperando alumnos --
-            </option>
-            <option *ngFor="let alumno of alumnos">
-                {{ alumno.usuario }} - {{ alumno.estadoUsuario }}
-            </option>
-        </select>
-        <br />
-        <button (click)="elegirOrganizador()">Elegir</button>
-    </div>
+  <button (click)="elegirOrganizador(alumnoSelect.value)">
+    Elegir
+  </button>
+
+</div>
+<!-- Mensaje de confirmación -->
+<div class="toast" *ngIf="showToast">
+  <i class="icon-check">✔️</i>
+  <span>
+    Perfecto! Organizador elegido!"
+  </span>
 </div>

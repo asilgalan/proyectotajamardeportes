@@ -1,1 +1,51 @@
-<p>pagos.component works!</p>
+<div>
+    <h1>Gestiona el precio de una actividad</h1>
+
+    <h2>Elige el evento</h2>
+    <select [(ngModel)]="eventoSeleccionado" (ngModelChange)="seleccionarEvento($event)">
+        <option value="">-- Selecciona un evento --</option>
+        <option *ngFor="let evento of eventos" [value]="evento.idEvento">
+            {{evento.fechaEvento}}
+        </option>
+    </select>
+
+    <h2>Elige la actividad</h2>
+    <select [(ngModel)]="actividadSeleccionada">
+        <option value="">-- Selecciona una actividad --</option>
+        <option *ngFor="let actividad of actividades" [value]="actividad.idActividad">
+            {{actividad.nombre}}
+        </option>
+    </select>
+
+    <h2>¿Cuánto va a costar esta actividad?</h2>
+    <input type="number" [(ngModel)]="precioActividad" min="0" />
+
+    <button (click)="insertarPrecio(actividadSeleccionada, eventoSeleccionado, precioActividad)"
+        [disabled]="!precioActividad">
+        Insertar precio
+    </button>
+
+
+    <div>
+        <h1>Gestiona el pago de una actividad</h1>
+        <h2>Elige el evento</h2>
+        <select>
+            <option *ngFor="let evento of eventos">
+                {{evento.fechaEvento}}
+            </option>
+        </select>
+        <h2>Elige la actividad</h2>
+        <select>
+            <option *ngFor="let actividad of actividades">
+                {{actividad.nombre}}
+            </option>
+        </select>
+        <h3>El precio a pagar es {{precioActividad}}</h3>
+        <h2>Elige el curso</h2>
+        <select>
+            <option *ngFor="let curso of cursos">
+                {{curso.nombre}}
+            </option>
+        </select>
+        <button>Pagar</button>
+    </div>
