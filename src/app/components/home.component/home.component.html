@@ -228,7 +228,7 @@
 
   <!-- Two Column Layout (Top) + Calendar (Bottom) -->
   <div class="professional-layout">
-       @if(authservices.isAdmin()){
+       @if(authservices.isAdmin() || authservices.isOrganizador()){
      <button class="btn-crear-evento" (click)="abrirModalCrearEvento()">
       <i class="bi bi-plus-circle me-2"></i>
       Crear Evento
@@ -272,9 +272,9 @@
                     <i class="bi bi-clock me-2"></i>
                     {{ event.fechaEvento | date:'HH:mm' }}h
                   </div>
-                  <div class="event-id">#{{event.idEvento}}</div>
+                
                 </div>
-                <button *ngIf="authservices.isAdmin() && this" class="btn-edit-event" (click)="abrirModalEditarEvento($event, event)" title="Editar evento">
+                <button *ngIf="authservices.isOrganizador() || authservices.isAdmin()" class="btn-edit-event" (click)="abrirModalEditarEvento($event, event)" title="Editar evento">
                   <i class="bi bi-pencil-square"></i>
                 </button>
               </div>

@@ -1,15 +1,18 @@
+import { EquipoService } from './../../services/equipo.service';
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { PartidoResultadoService } from '../../services/partidoResultado.service';
 import { PartidoResultado } from '../../interface/partidoResultado.interface';
-import { catchError, forkJoin, map, of, switchMap } from 'rxjs';
-import { EquipoService } from '../../services/equipo.service';
+import { catchError, forkJoin, map, of, switchMap, tap } from 'rxjs';
+
 import { ActividadesService } from '../../services/actividades.service';
 import { ActividadEventoService } from '../../services/actividadEvento.service';
 import { evento } from '../../models/evento';
 import { ServiceEventos } from '../../services/evento.service';
-import { FormsModule } from "@angular/forms";
+import { FormBuilder, FormsModule } from "@angular/forms";
 import { ActividadEventoResponse } from '../../interface/actividades.interface';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../auth/services/auth.service';
+import { Equipo } from '../../models/equipo';
 
 @Component({
   selector: 'app-partido-resultado',
@@ -25,24 +28,55 @@ export class PartidoResultadoComponent implements OnInit {
   private actividadService = inject(ActividadesService);
   private actividadEventoService = inject(ActividadEventoService);
   private eventoService = inject(ServiceEventos);
+  public authService = inject(AuthService);
 
   public partidoResultados = signal<PartidoResultado[]>([]);
   public eventos = signal<evento[]>([]);
   public actividades = signal<ActividadEventoResponse[]>([]);
+  public equipos = signal<any[]>([]);
+  public idEventoActividad = signal<number | null>(null);
   public selectedEventoId = signal<number | null>(null);
   public selectedActividadId = signal<number | null>(null);
+  public selectedEquipoId = signal<number | null>(null);
   public isLoading = signal<boolean>(false);
   public errorMessage = signal<string | null>(null);
-  
+  private allPartidosCache = signal<PartidoResultado[]>([]);
+  private fb=inject(FormBuilder);
+  public eventosCreate=signal<evento[]>([]);
+  public equipocreate=signal<Equipo[]>([]);
+  private EquipoService=inject(EquipoService);
+  public selectIdEventoCreate=signal<number | null>(null);
+
   ngOnInit(): void {
     this.loadEventos();
     this.loadAllPartidoResultados();
   }
 
+  loginForm=this.fb.group({
+    idEventoActividad:[''],
+    idEquipoLocal:[''],
+    idEquipoVisitante:[''],
+    puntosLocal:[''],
+    puntosVisitante:['']
+  })
+
+  onSubmit(){
+    const {idEventoActividad,idEquipoLocal,idEquipoVisitante,puntosLocal,puntosVisitante}=this.loginForm.value;
+    const nuevoResultado:PartidoResultado={
+      idEventoActividad:Number(idEventoActividad),
+      idEquipoLocal:Number(idEquipoLocal),
+      idEquipoVisitante:Number(idEquipoVisitante),
+      puntosLocal:Number(puntosLocal),
+      puntosVisitante:Number(puntosVisitante)
+    };
+  }
+
   private loadEventos(): void {
     this.eventoService.getEventosCursoEscolar()
       .pipe(
-        map(eventos => eventos.filter(ev => new Date(ev.fechaEvento) >= new Date())),
+
+        // por si en un futuro se quiere filtrar por fecha actual
+        // map(eventos => eventos.filter(ev => new Date(ev.fechaEvento) >= new Date())),
         catchError(error => {
           console.error('Error cargando eventos:', error);
           this.errorMessage.set('Error al cargar los eventos');
@@ -110,12 +144,16 @@ export class PartidoResultadoComponent implements OnInit {
       this.selectedEventoId.set(null);
       this.actividades.set([]);
       this.selectedActividadId.set(null);
+      this.selectedEquipoId.set(null);
+      this.equipos.set([]);
       this.loadAllPartidoResultados();
       return;
     }
 
     this.selectedEventoId.set(id);
     this.selectedActividadId.set(null);
+    this.selectedEquipoId.set(null);
+    this.equipos.set([]);
     this.isLoading.set(true);
 
     this.actividadService.getActividadesByIdEnvento(id)
@@ -143,6 +181,8 @@ export class PartidoResultadoComponent implements OnInit {
     
     if (!id) {
       this.selectedActividadId.set(null);
+      this.selectedEquipoId.set(null);
+      this.equipos.set([]);
       if (this.selectedEventoId()) {
         this.onEventoChange(this.selectedEventoId()!.toString());
       }
@@ -150,7 +190,41 @@ export class PartidoResultadoComponent implements OnInit {
     }
 
     this.selectedActividadId.set(id);
+    this.selectedEquipoId.set(null);
+    this.loadEquiposByActividad(id);
     this.loadPartidosByActividad(id);
+  }
+
+  onEquipoChange(equipoId: string): void {
+    const id = Number(equipoId);
+    
+    if (!id) {
+      this.selectedEquipoId.set(null);
+      this.partidoResultados.set(this.allPartidosCache());
+      return;
+    }
+
+    this.selectedEquipoId.set(id);
+    this.filterPartidosByEquipo(id);
+  }
+
+  private loadEquiposByActividad(idEventoActividad: number): void {
+    this.equipoService.getEquipos()
+      .pipe(
+        map(equipos => equipos.filter(eq => eq.idEventoActividad === idEventoActividad)),
+        catchError(error => {
+          console.error('Error cargando equipos:', error);
+          return of([]);
+        })
+      )
+      .subscribe(equipos => this.equipos.set(equipos));
+  }
+
+  private filterPartidosByEquipo(idEquipo: number): void {
+    const partidosFiltrados = this.allPartidosCache().filter(partido => 
+      partido.idEquipoLocal === idEquipo || partido.idEquipoVisitante === idEquipo
+    );
+    this.partidoResultados.set(partidosFiltrados);
   }
 
   private loadPartidosByActividad(idEventoActividad: number): void {
@@ -167,15 +241,64 @@ export class PartidoResultadoComponent implements OnInit {
         })
       )
       .subscribe(partidosEnriquecidos => {
+        this.allPartidosCache.set(partidosEnriquecidos);
         this.partidoResultados.set(partidosEnriquecidos);
         this.isLoading.set(false);
       });
+  }
+  onEventoChangeCreate(eventoId: string): void {
+    const id = Number(eventoId);
+    
+    if (!id) {
+      this.selectIdEventoCreate.set(null);
+      return;
+    }
+    this.selectIdEventoCreate.set(id);
+  }
+  public loadEventosActividad(): void {
+    this.eventoService.getEventosCursoEscolar().pipe(
+      switchMap(eventos =>{
+        const idEvento=eventos.map(ev=>ev.idEvento);
+        return forkJoin(
+          idEvento.map(id=>this.actividadEventoService.getActividadEventoById(id).pipe(
+            tap(actividadEvento => {
+             
+              const actividadesIds = actividadEvento.idActividad;
+              this.equipoService.getEquiposPorActividadEvento(actividadesIds,this.selectIdEventoCreate()!).subscribe(equipos => {
+                this.equipocreate.set(equipos);
+
+              })
+
+            }),
+           
+          ))        )
+      })
+    ).subscribe();
   }
 
   resetFilters(): void {
     this.selectedEventoId.set(null);
     this.selectedActividadId.set(null);
+    this.selectedEquipoId.set(null);
     this.actividades.set([]);
+    this.equipos.set([]);
+    this.allPartidosCache.set([]);
     this.loadAllPartidoResultados();
   }
-}
+
+  deleteResultado(idPartidoResultado: number): void {
+
+     if(idPartidoResultado===null) return;
+
+    this.partidoResultadoService.deletePartidoResultado(idPartidoResultado).subscribe();
+
+    const partidosActualizados = this.partidoResultados().filter(pr => pr.idPartidoResultado !== idPartidoResultado);
+    this.partidoResultados.set(partidosActualizados);
+    }
+
+    
+
+
+}   
+   
+

@@ -1,5 +1,5 @@
 export interface PartidoResultado {
-    idPartidoResultado: number;
+    idPartidoResultado?: number;
     idEventoActividad:  number;
     idEquipoLocal:      number;
     idEquipoVisitante:  number;

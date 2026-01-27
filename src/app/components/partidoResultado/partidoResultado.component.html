@@ -4,6 +4,25 @@
     <p class="page-subtitle">Consulta los resultados de todos los partidos disputados</p>
   </div>
 
+     <div class="filter-group">
+        <label for="evento-select" class="filter-label">
+          <i class="bi bi-calendar-event"></i>
+          Filtrar por Evento
+        </label>
+        <select 
+          id="evento-select"
+          [ngModel]="selectedEventoId()" 
+          (ngModelChange)="onEventoChangeCreate($event)" 
+          class="filter-select"
+        >
+          <option value="">Todos los eventos</option>
+          @for (evento of eventos(); track evento.idEvento) {
+            <option [value]="evento.idEvento">
+              {{evento.fechaEvento | date:'dd/MM/yyyy'}}
+            </option>
+          }
+        </select>
+      </div>
   <!-- Filtros Section -->
   <div class="filters-section">
     <div class="filters-container">
@@ -51,9 +70,31 @@
           </select>
         </div>
       }
+           <!-- Filtro por Equipo -->
+      @if (equipos().length > 0) {
+        <div class="filter-group">
+          <label for="equipo-select" class="filter-label">
+            <i class="bi bi-people-fill"></i>
+            Filtrar por Equipo
+          </label>
+          <select 
+            id="equipo-select"
+            [ngModel]="selectedEquipoId()"
+            (ngModelChange)="onEquipoChange($event)" 
+            class="filter-select"
+          >
+            <option value="">Todos los equipos</option>
+            @for (equipo of equipos(); track equipo.idEquipo) {
+              <option [value]="equipo.idEquipo">
+                {{equipo.nombreEquipo}}
+              </option>
+            }
+          </select>
+        </div>
+      }
 
       <!-- Reset Button -->
-      @if (selectedEventoId() || selectedActividadId()) {
+      @if (selectedEventoId() || selectedActividadId() || selectedEquipoId()) {
         <button class="btn-reset" (click)="resetFilters()">
           <i class="bi bi-x-circle"></i>
           Limpiar filtros
@@ -91,6 +132,11 @@
         @for (resultado of partidoResultados(); track resultado.idPartidoResultado) {
           <div class="partido-card">
             
+            <!-- @if(authService.isCapitan()){
+          
+            }  -->
+              <button (click)="deleteResultado(resultado.idPartidoResultado!)">Eliminar</button>
+
             <!-- Sport Badge -->
             <div class="sport-badge">
               {{resultado.nombreActividad || 'Deporte'}}
