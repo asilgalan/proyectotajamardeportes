@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, inject } from '@angular/core';
 import { EquipoService } from '../../services/equipo.service';
 import { Equipo } from '../../models/equipo';
 import { ActivatedRoute, Params } from '@angular/router';
@@ -10,6 +10,8 @@ import { Curso } from '../../models/curso';
 import { UsuariosInscripciones } from '../../models/usuariosInscripciones';
 import { MiembrosDelEquipo } from '../../models/miembrosDelEquipo';
 import { MiembroEquiposService } from '../../services/miembroEquipos.service';
+import { AuthService } from '../../auth/services/auth.service';
+import Perfil from '../../models/perfil';
 
 @Component({
   selector: 'app-equipo.component',
@@ -18,6 +20,7 @@ import { MiembroEquiposService } from '../../services/miembroEquipos.service';
   styleUrl: './equipo.component.css',
 })
 export class EquipoComponent implements OnInit{
+  public authService=inject(AuthService);
   public equipos: Array<Equipo> = [];
   public idActividad!: number;
   public idEvento!: number;
@@ -54,6 +57,10 @@ export class EquipoComponent implements OnInit{
   public showModalMiembrosEquipo: boolean = false;
   public miembrosEquipo: Array<MiembrosDelEquipo> = [];
   public nombreEquipoSeleccionado: string = "";
+  public idEquipoSeleccionado: number = 0;
+  @ViewChild("nuevoMiembroId") nuevoMiembroId!: ElementRef;
+  public estaInscrito: boolean = false;
+  public usuarioLogueado!: Perfil;
 
   constructor(private _serviceEquipo: EquipoService, private _activateRoute: ActivatedRoute, private _serviceActividaes: ActividadesService, private _serviceEvento: ServiceEventos, private _serviceColor: ColorService, private _serviceMiembrosEquipo: MiembroEquiposService){
 
@@ -89,6 +96,10 @@ export class EquipoComponent implements OnInit{
     this._serviceEquipo.getInscripcionesEventoActividad(this.idEvento, this.idActividad).subscribe(response => {
       this.miembrosInscripcion = response
     })
+
+    this._serviceMiembrosEquipo.getUsuarioLogueado().subscribe(response => {
+      this.usuarioLogueado = response
+    })
   }
 
   cargarEquipos() {
@@ -96,6 +107,20 @@ export class EquipoComponent implements OnInit{
           this.equipos = response;
           this.cargarNombresDeColores();
       });
+  }
+
+  funcionEstaInscrito(){
+    this._serviceEquipo.getEquiposPorActividadEvento(this.idActividad, this.idEvento).subscribe(responseLosEquipos => {
+      responseLosEquipos.forEach(elEquipo => {
+        this._serviceEquipo.getUsuariosPorEquipo(elEquipo.idEquipo).subscribe(responseMiembros => {
+          responseMiembros.forEach(unMiembro => {
+            if (unMiembro.idUsuario == this.usuarioLogueado.idUsuario){
+              this.estaInscrito = true;
+            }
+          });
+        })
+      });
+    });
   }
 
   cargarNombresDeColores() {
@@ -219,18 +244,42 @@ export class EquipoComponent implements OnInit{
     this.showModalInscritos = false;
   }
 
+  cargarMiembrosDelEquipo() {
+    this._serviceMiembrosEquipo.getMiembrosDelEquipo(this.idEquipoSeleccionado).subscribe(response => {
+        this.miembrosEquipo = response;
+        this.showModalMiembrosEquipo = true;
+    });
+  }
+
   abrirModalMiembrosEquipo(idEquipo: number, nombreEquipo: string) {
-    console.log("Entra 1");
     this.nombreEquipoSeleccionado = nombreEquipo;
-    
-     this._serviceMiembrosEquipo.getMiembrosDelEquipo(idEquipo).subscribe(response => {
-         this.miembrosEquipo = response;
-         this.showModalMiembrosEquipo = true;
-         console.log("consulta hecha");
-     });
+    this.idEquipoSeleccionado = idEquipo;
+    this.cargarMiembrosDelEquipo();
+    this.funcionEstaInscrito();
   }
 
   cerrarModalMiembrosEquipo() {
     this.showModalMiembrosEquipo = false;
+    this.estaInscrito = false;
+  }
+
+  insertMiembroAEquipo() {  
+    let idUsuario = this.nuevoMiembroId.nativeElement.value;      
+    this._serviceMiembrosEquipo.createMiembroEquipos(idUsuario, this.idEquipoSeleccionado).subscribe(() => {
+        this.cargarMiembrosDelEquipo();
+    });
+  }
+
+  eliminarMiembroDeEquipo(idMiembroEquipo: number) {
+    this._serviceMiembrosEquipo.deleteMiembroEquiposPorId(idMiembroEquipo).subscribe(() => {
+        this.cargarMiembrosDelEquipo();
+    });
+  }
+
+  insertMiembroAEquipoToken() {  
+    this._serviceMiembrosEquipo.insertMiembroEquiposToken(this.idEquipoSeleccionado).subscribe(() => {
+        this.cargarMiembrosDelEquipo();
+        this.funcionEstaInscrito();
+    });
   }
 }
