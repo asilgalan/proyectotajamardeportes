@@ -1,0 +1,353 @@
+/* ========================
+   GLOBAL FORM STYLES
+   ======================== */
+form {
+  background: var(--white);
+  padding: 2rem;
+  border-radius: 16px;
+  border: 1px solid var(--nav-border-color);
+  box-shadow: var(--card-shadow);
+  max-width: 600px;
+  margin: 1.5rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+form h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+form h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 0.35rem;
+}
+
+form h3 {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #64748b;
+  margin-top: 0.5rem;
+}
+
+/* ========================
+   SELECT & INPUT STYLES
+   ======================== */
+select,
+input[type="number"] {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: 2px solid #e2e8f0;
+  background: #f8fafc;
+  color: var(--text-main);
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+select:focus,
+input[type="number"]:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  background: white;
+}
+
+select:hover,
+input[type="number"]:hover {
+  border-color: #cbd5e1;
+}
+
+/* ========================
+   BUTTON STYLES
+   ======================== */
+button {
+  padding: 12px 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* Botón de insertar precio */
+button:nth-of-type(1) {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: #fff;
+}
+
+button:nth-of-type(1):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+}
+
+/* Botón de pagar */
+button:nth-of-type(2) {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: #fff;
+}
+
+button:nth-of-type(2):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+}
+
+/* ========================
+   CARD-LIKE SECTIONS
+   ======================== */
+div > div {
+  background: var(--white);
+  border-radius: 16px;
+  border: 1px solid var(--nav-border-color);
+  box-shadow: var(--card-shadow);
+  padding: 1.5rem 2rem;
+  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+}
+
+div > div:hover {
+  box-shadow: var(--card-hover-shadow);
+}
+
+/* ========================
+   RESPONSIVE DESIGN
+   ======================== */
+@media (max-width: 768px) {
+  form {
+    padding: 1.25rem;
+  }
+
+  div > div {
+    padding: 1rem 1.25rem;
+  }
+
+  form h1 {
+    font-size: 1.3rem;
+  }
+
+  form h2 {
+    font-size: 1rem;
+  }
+
+  button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+ /* ========================
+   CARD STYLES AZUL CLARITO
+   ======================== */
+.blue-card {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-radius: 16px;
+  border: 1px solid #93c5fd; /* borde azul suave */
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+}
+
+.blue-card:hover {
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.2);
+}
+
+/* Mantener selects e inputs legibles sobre fondo azul */
+.blue-card select,
+.blue-card input[type="number"] {
+  background: #ffffff;
+  color: var(--text-main);
+  border: 2px solid #93c5fd;
+}
+
+.blue-card select:focus,
+.blue-card input[type="number"]:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Botones dentro del blue-card */
+.blue-card button:nth-of-type(1) {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: #fff;
+}
+
+.blue-card button:nth-of-type(2) {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: #fff;
+}
+
+/* ========================
+   CARD AZUL CLARITO + EFECTO CHULO
+   ======================== */
+.blue-card {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-radius: 16px;
+  border: 1px solid #93c5fd;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+}
+
+.blue-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px rgba(0,0,0,0.12);
+}
+
+/* ========================
+   FORM ELEMENTS
+   ======================== */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #1e3a8a;
+}
+
+select,
+input[type="number"] {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: 2px solid #93c5fd;
+  background: #ffffff;
+  color: var(--text-main);
+  transition: all 0.2s ease;
+}
+
+select:focus,
+input[type="number"]:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+  background: #ffffff;
+}
+
+/* ========================
+   HEADINGS
+   ======================== */
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #1e3a8a;
+}
+
+h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  color: #334155;
+}
+
+/* ========================
+   BUTTONS
+   ======================== */
+button {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+button:nth-of-type(1) {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+}
+
+button:nth-of-type(2) {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99,102,241,0.4);
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(99,102,241,0.3);
+}
+
+/* ========================
+   RESPONSIVE
+   ======================== */
+@media (max-width: 768px) {
+  .blue-card {
+    padding: 1.5rem;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1rem;
+  }
+
+  select, input[type="number"], button {
+    font-size: 0.95rem;
+    padding: 0.65rem 0.9rem;
+  }
+}
+
+/* ========================
+   TOAST (opcional)
+   ======================== */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  max-width: 350px;
+  opacity: 0;
+  animation: toastIn 0.5s forwards, toastOut 0.5s 3s forwards;
+}
+
+.icon-check {
+  font-size: 1.2rem;
+}
+
+@keyframes toastIn {
+  0% { opacity: 0; transform: translateY(20px) scale(0.95); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes toastOut {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(20px); }
+}

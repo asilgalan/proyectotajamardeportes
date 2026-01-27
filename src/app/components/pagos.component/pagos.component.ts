@@ -6,59 +6,185 @@ import { ActividadesService } from '../../services/actividades.service';
 import ServicePrecioActividad from '../../services/precioActividad.service';
 import PrecioActividad from '../../models/precioActividad';
 import { ActividadEventoService } from '../../services/actividadEvento.service';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ViewChild, ElementRef } from '@angular/core';
+import { Curso } from '../../models/curso';
+import ServiceGestion from '../../services/gestion.service';
+import ServicePagos from '../../services/pagos.service';
 
 @Component({
   selector: 'app-pagos.component',
+  standalone: false,
   templateUrl: './pagos.component.html',
   styleUrls: ['./pagos.component.css'],
 })
 export class PagosComponent implements OnInit 
 {
-  public eventos: evento[] = [];
-  public actividades: actividadEvento[] = [];
+  public eventosPrecios: evento[] = [];
+  public actividadesPrecios: actividadEvento[] = [];
+  
+  @ViewChild('eventoPrecio') eventoPrecio!: ElementRef;
+  @ViewChild('actividadPrecio') actividadPrecio!: ElementRef;
+  @ViewChild('precioInput') precioInput!: ElementRef;
 
-  public eventoSeleccionado!: number;
-  public actividadSeleccionada!: number;
-  public precioActividad!: number;
+  public eventosPagos: evento[] = [];
+  public actividadesPagos: actividadEvento[] = [];
+  public cursos: Curso[] = [];
+
+  @ViewChild('eventoPago') eventoPago!: ElementRef;
+  @ViewChild('actividadPago') actividadPago!: ElementRef;
+  @ViewChild('cursosPago') cursosPago!: ElementRef;
+
+  public coste!: number;
+  public mensaje!: string;
 
   constructor(private _serviceEventos: ServiceEventos,
               private _serviceActividad: ActividadesService,
               private _servicePrecios: ServicePrecioActividad,
-              private _serviceEventoActividad:ActividadEventoService) {}
+              private _serviceEventoActividad:ActividadEventoService,
+              private _serviceGestion:ServiceGestion,
+              private _servicePagos:ServicePagos){}
 
   ngOnInit(): void 
   {
     this._serviceEventos.getEventosCursoEscolar().subscribe((response) => 
     {
-      this.eventos = response;
+      this.eventosPrecios = response;
+      this.eventosPagos = response;
     });
-  }
 
-  seleccionarEvento(idEvento: number): void 
-  {
-    this._serviceActividad.getActividadesByIdEnvento(idEvento).subscribe((response) => 
+    this._serviceGestion.getCursosActivos().then((response) =>
     {
-      this.actividades = response;
-      this.actividadSeleccionada = 0;
+      this.cursos = response;
     });
   }
 
-  insertarPrecio(idActividad: number, idEvento:number, cantidad: number): void 
+  seleccionarEventoPrecio(): void 
+  {
+    let idEvento = Number(this.eventoPrecio.nativeElement.value);
+    this.actividadesPrecios = [];
+
+    this._serviceActividad.getActividadesByIdEnvento(idEvento).subscribe(actividades => 
+    {
+      for (let actividad of actividades) 
+      {
+        this._serviceEventoActividad.getActividadesEventoByEventoidByActividadid(idEvento, actividad.idActividad).subscribe(eventoActividad => 
+        {
+          this._servicePrecios.findIdPrecioPorIdEventoActividad(eventoActividad.idEventoActividad).then(precio => 
+            {
+              if (precio == null) 
+              {
+                this.actividadesPrecios.push(actividad);
+              }
+
+            });
+        });
+      }
+    });
+  }
+
+  insertarPrecio(): void 
   {
     let idEventoActividad:number;
 
-    this._serviceEventoActividad.getActividadesEventoByEventoidByActividadid(idActividad, idEvento).subscribe(response =>
+    let idActividad = Number(this.actividadPrecio.nativeElement.value);
+    let idEvento = Number(this.eventoPrecio.nativeElement.value);
+    let cantidad = Number(this.precioInput.nativeElement.value);
+
+    this._serviceEventoActividad.getActividadesEventoByEventoidByActividadid(idEvento, idActividad).subscribe(response =>
     {
-      idEventoActividad = response;
+      idEventoActividad = response.idEventoActividad;
 
       let precio = new PrecioActividad(0, idEventoActividad, cantidad);
+
+      console.log(precio)
   
       this._servicePrecios.postPrecio(precio).then((response) => 
       {
-        console.log('Precio insertado:', response);
+        console.log(response);
       });
-    })
+    });
+  }
+
+  seleccionarEventoPago(): void 
+  {
+    let idEvento = Number(this.eventoPago.nativeElement.value);
+    this.actividadesPagos = [];
+
+    this._serviceActividad.getActividadesByIdEnvento(idEvento).subscribe(actividades => 
+    {
+      this._servicePagos.getPagosEvento(idEvento).then(pagos => 
+      {
+        for (let actividad of actividades) 
+        {
+          let estaPagada = false;
+
+          for (let pago of pagos) 
+          {
+            if (pago.idActividad === actividad.idActividad) 
+            {
+              if (pago.estado === 'PAGADO') 
+              {
+                estaPagada = true;
+              }
+            }
+          }
+          if (!estaPagada) 
+          {
+            this.actividadesPagos.push(actividad);
+          }
+        }
+      });
+    });
+  }
+
+  calcularCoste(): void
+  {
+    let idEventoActividad:number;
+    let idPrecioActividad:number;
+
+    let idActividad = Number(this.actividadPago.nativeElement.value);
+    let idEvento = Number(this.eventoPago.nativeElement.value);
+
+    this._serviceEventoActividad.getActividadesEventoByEventoidByActividadid(idEvento, idActividad).subscribe(response =>
+    {
+      idEventoActividad = response.idEventoActividad;
+
+         this._servicePrecios.findIdPrecioPorIdEventoActividad(idEventoActividad).then(response =>
+         {
+          if (response == null)
+          {
+            this.mensaje = "Esta actividad no tiene coste";
+          }
+          else
+          {
+            idPrecioActividad = response.idPrecioActividad;
+   
+            this._servicePrecios.findPrecioActividad(idPrecioActividad).then(response =>
+            {
+              this.coste = response.precioTotal;
+              this.mensaje = "El coste de la actividad es " + this.coste;
+            });
+          }
+        });
+    });
+  }
+
+  insertarPago():void
+  {
+    let idEventoActividad:number;
+    let idCurso = Number(this.cursosPago.nativeElement.value);
+
+    let idActividad = Number(this.actividadPago.nativeElement.value);
+    let idEvento = Number(this.eventoPago.nativeElement.value);
+
+    this._serviceEventoActividad.getActividadesEventoByEventoidByActividadid(idEvento, idActividad).subscribe(response =>
+    {
+      idEventoActividad = response.idEventoActividad;
+
+      this._servicePagos.postPagoPagado(idEventoActividad, idCurso, this.coste).then(response =>
+      {
+        console.log(response);
+      });
+    });
   }
 }
