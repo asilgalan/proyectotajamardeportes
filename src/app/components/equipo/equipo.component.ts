@@ -7,6 +7,9 @@ import { ServiceEventos } from '../../services/evento.service';
 import { ColorService } from '../../services/colores.service';
 import { Color } from '../../models/color';
 import { Curso } from '../../models/curso';
+import { UsuariosInscripciones } from '../../models/usuariosInscripciones';
+import { MiembrosDelEquipo } from '../../models/miembrosDelEquipo';
+import { MiembroEquiposService } from '../../services/miembroEquipos.service';
 
 @Component({
   selector: 'app-equipo.component',
@@ -15,7 +18,7 @@ import { Curso } from '../../models/curso';
   styleUrl: './equipo.component.css',
 })
 export class EquipoComponent implements OnInit{
-  public equipos!: Array<Equipo>;
+  public equipos: Array<Equipo> = [];
   public idActividad!: number;
   public idEvento!: number;
   public nombreActividad!: string;
@@ -45,7 +48,14 @@ export class EquipoComponent implements OnInit{
   @ViewChild("cajUpdateCurso") cajUpdateCurso!: ElementRef;
   @ViewChild("cajaUpdateid") cajaUpdateid!: ElementRef;
 
-  constructor(private _serviceEquipo: EquipoService, private _activateRoute: ActivatedRoute, private _serviceActividaes: ActividadesService, private _serviceEvento: ServiceEventos, private _serviceColor: ColorService){
+  public showModalInscritos: boolean = false;
+  public miembrosInscripcion: Array<UsuariosInscripciones> = [];
+
+  public showModalMiembrosEquipo: boolean = false;
+  public miembrosEquipo: Array<MiembrosDelEquipo> = [];
+  public nombreEquipoSeleccionado: string = "";
+
+  constructor(private _serviceEquipo: EquipoService, private _activateRoute: ActivatedRoute, private _serviceActividaes: ActividadesService, private _serviceEvento: ServiceEventos, private _serviceColor: ColorService, private _serviceMiembrosEquipo: MiembroEquiposService){
 
   }
 
@@ -74,6 +84,10 @@ export class EquipoComponent implements OnInit{
 
     this._serviceEquipo.getIdEventoActividadEquipos(this.idEvento, this.idActividad).subscribe(response => {
       this.idEventoActividad = response.idEventoActividad
+    })
+
+    this._serviceEquipo.getInscripcionesEventoActividad(this.idEvento, this.idActividad).subscribe(response => {
+      this.miembrosInscripcion = response
     })
   }
 
@@ -195,5 +209,28 @@ export class EquipoComponent implements OnInit{
       this.cargarEquipos();
       this.cerrarModalEditar();
     })
+  }
+
+  verInscritos() {
+    this.showModalInscritos = true;
+  }
+
+  cerrarModalInscritos() {
+    this.showModalInscritos = false;
+  }
+
+  abrirModalMiembrosEquipo(idEquipo: number, nombreEquipo: string) {
+    console.log("Entra 1");
+    this.nombreEquipoSeleccionado = nombreEquipo;
+    
+     this._serviceMiembrosEquipo.getMiembrosDelEquipo(idEquipo).subscribe(response => {
+         this.miembrosEquipo = response;
+         this.showModalMiembrosEquipo = true;
+         console.log("consulta hecha");
+     });
+  }
+
+  cerrarModalMiembrosEquipo() {
+    this.showModalMiembrosEquipo = false;
   }
 }

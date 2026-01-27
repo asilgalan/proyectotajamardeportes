@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 import { Observable } from 'rxjs';
 import { MiembroEquipos } from '../models/miembroEquipos';
+import { MiembrosDelEquipo } from '../models/miembrosDelEquipo';
 
 @Injectable({providedIn: 'root'})
 export class MiembroEquiposService {
@@ -10,6 +11,11 @@ export class MiembroEquiposService {
     private urlEventos = environment.apiUrl;
     constructor(private _http: HttpClient){
 
+    }
+
+    getMiembrosDelEquipo(idEquipo: number): Observable<Array<MiembrosDelEquipo>> {
+        let request = "/Equipos/UsuariosEquipo/" + idEquipo;
+        return this._http.get<Array<MiembrosDelEquipo>>(this.urlEventos + request);
     }
 
     getMiembroEquipos(): Observable<Array<MiembroEquipos>> {
