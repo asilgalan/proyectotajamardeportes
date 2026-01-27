@@ -425,7 +425,7 @@ export class PartidoResultadoComponent implements OnInit {
     const resultado = this.resultadoParaEditar();
     if (!resultado) return;
 
-    // Enviar solo las propiedades necesarias para el backend
+
     const resultadoActualizado: PartidoResultado = {
       idPartidoResultado: resultado.idPartidoResultado,
       idEventoActividad: resultado.idEventoActividad,
