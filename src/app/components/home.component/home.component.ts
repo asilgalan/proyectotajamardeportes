@@ -122,7 +122,7 @@ export class HomeComponent implements OnInit ,OnChanges{
   
   cargarProfesores() {
  
-    this.profesorEventoService.getProfesoresActivos().subscribe({
+    this.profesorEventoService.getProfesoresSinEvento().subscribe({
       next: (profesores) => {
   
         this.profesoresActivos = profesores;
