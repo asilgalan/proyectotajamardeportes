@@ -13,6 +13,10 @@
     </header>
 
     <div class="actions-toolbar">
+        <button class="btn-secondary-action" (click)="verInscritos()">
+            <i class="bi bi-people"></i> <span>Ver Inscritos</span>
+        </button>
+
         <button class="btn-secondary-action" (click)="abrirModalColores()"> <i class="bi bi-palette"></i>
             <span>Colores</span>
         </button>
@@ -22,7 +26,7 @@
         </button>
     </div>
 
-    @if (equipos) {
+    @if (equipos.length > 0 && equipos) {
         <div class="teams-grid">
             @for (equipo of equipos; track equipo.idEquipo) {
                 <article class="team-card">
@@ -55,6 +59,11 @@
                                 <span class="value">{{mapaColores[equipo.idColor] || 'Sin asignar'}}</span>
                             </div>
                         </div>
+
+                        <button class="btn-card-action" (click)="abrirModalMiembrosEquipo(equipo.idEquipo, equipo.nombreEquipo)">
+                            <i class="bi bi-people"></i>
+                            Ver Miembros
+                        </button>
                     </div>
 
                     <div class="card-footer">
@@ -211,7 +220,7 @@
                         <div class="input-wrapper">
                             <i class="bi bi-palette input-icon"></i>
                             <select class="modal-select" name="cajaColorEquipo" #cajaColorEquipo>
-                                <option [value]="1" disabled selected>Elige color...</option>
+                                <option [value]="0" disabled selected>Elige color...</option>
                                 @for(color of colores; track color.idColor) {
                                     <option [value]="color.idColor" class="text-capitalize">
                                         {{color.nombreColor}}
@@ -336,6 +345,148 @@
                 <i class="bi bi-save"></i>
                 Actualizar
             </button>
+        </div>
+
+    </div>
+</div>
+}
+
+@if(showModalInscritos) {
+<div class="modal-overlay" (click)="cerrarModalInscritos()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+        
+        <div class="modal-header">
+            <div class="modal-icon-users">
+                <i class="bi bi-people-fill"></i>
+            </div>
+            <button class="modal-close" (click)="cerrarModalInscritos()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <h2>Inscritos en la actividad</h2>
+            <p class="mb-3">
+                Hay <span class="highlight-count">{{miembrosInscripcion.length}}</span> personas apuntadas:
+            </p>
+            
+            <div class="users-list-container">
+                @for (usuario of miembrosInscripcion; track usuario.idUsuario) {
+                    <div class="user-item">
+                        <div class="user-avatar">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        
+                        <div class="user-info">
+                            <span class="user-name">{{usuario.usuario}}</span>
+                            
+                            <div class="user-meta">
+                                <span class="user-role">{{usuario.role}}</span>
+                                
+                                <span class="separator">•</span>
+                                
+                                <span class="user-course">{{usuario.curso}}</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @if (miembrosInscripcion.length === 0) {
+                    <div class="empty-list-msg">
+                        <i class="bi bi-inbox"></i>
+                        <p>No hay nadie inscrito todavía.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+}
+
+@if(showModalMiembrosEquipo) {
+<div class="modal-overlay" (click)="cerrarModalMiembrosEquipo()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+        
+        <div class="modal-header">
+            <div class="modal-icon-team">
+                <i class="bi bi-shield-shaded"></i>
+            </div>
+            <button class="modal-close" (click)="cerrarModalMiembrosEquipo()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <h2>{{nombreEquipoSeleccionado}}</h2>
+            <p class="mb-3">
+                Miembros actuales del equipo (<span class="highlight-count">{{miembrosEquipo.length}}</span>):
+            </p>
+            
+            <div class="users-list-container">
+                @for (miembro of miembrosEquipo; track miembro.idUsuario) {
+                    <div class="user-item">
+                        <div class="user-item-left">
+                            <div class="user-avatar">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                            <div class="user-info">
+                                <span class="user-name">{{miembro.usuario}}</span>
+                                <div class="user-meta">
+                                    <span class="user-role">{{miembro.role}}</span>
+                                    <span class="separator">•</span>
+                                    <span class="user-course">{{miembro.curso || 'Sin curso'}}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="btn-delete-color" title="Expulsar del equipo" (click)="eliminarMiembroDeEquipo(miembro.idMiembroEquipo)">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                }
+
+                @if (miembrosEquipo.length == 0) {
+                    <div class="empty-list-msg">
+                        <i class="bi bi-people"></i>
+                        <p>Este equipo aún no tiene jugadores.</p>
+                    </div>
+                }
+            </div>
+        </div>
+        
+        <div class="modal-footer footer-form">
+            @if(authService.isAdmin()){
+                <form class="add-color-form" #miembrosForm="ngForm">
+                <div class="input-wrapper w-100">
+                    <i class="bi bi-person-plus input-icon"></i>
+                    <select class="modal-select" name="nuevoMiembroId" #nuevoMiembroId>
+                        <option [value]="0" disabled selected>Seleccionar usuario...</option>
+                        @for (inscrito of miembrosInscripcion; track inscrito.idUsuario) {
+                            <option [value]="inscrito.idUsuario">
+                                {{inscrito.usuario}} ({{inscrito.curso}})
+                            </option>
+                        }
+                    </select>
+                </div>
+                
+                <button class="btn-add-new" (click)="insertMiembroAEquipo()">
+                    <i class="bi bi-plus-lg"></i>
+                    Añadir
+                </button>
+            </form>
+            } @else {
+                @if (estaInscrito == false) {
+                    <button class="btn-join-team" (click)="insertMiembroAEquipoToken()">
+                        <i class="bi bi-person-plus-fill"></i>
+                        Unirme a este Equipo
+                    </button>
+                }@else {
+                    <div class="already-joined-msg">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span>Ya perteneces a un equipo en esta actividad.</span>
+                    </div>
+                }
+            }
         </div>
 
     </div>
