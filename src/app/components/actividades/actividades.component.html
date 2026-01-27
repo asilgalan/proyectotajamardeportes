@@ -4,12 +4,20 @@
 			<h1>Actividades Deportivas</h1>
 			<p class="subtitle">Explora y únete a las actividades disponibles</p>
 		</div>
-		@if(authService.isOrganizador()) {
-		<button class="btn-crear-actividad" (click)="abrirModalCrearActividad()">
-			<i class="bi bi-plus-circle me-2"></i>
-			Añadir Actividad
-		</button>
-		}
+		<div class="header-actions">
+			@if(authService.isAdmin() && idEvento) {
+			<button class="btn-sorteo-header" (click)="abrirModalSorteoCapitan(0, 0, 'Fútbol')" title="Sortear capitán de fútbol">
+				<i class="bi bi-trophy-fill me-2"></i>
+				Sortear Capitán
+			</button>
+			}
+			@if(authService.isOrganizador()) {
+			<button class="btn-crear-actividad" (click)="abrirModalCrearActividad()">
+				<i class="bi bi-plus-circle me-2"></i>
+				Añadir Actividad
+			</button>
+			}
+		</div>
 	</header>
 
 	<main class="actividades-main">
@@ -23,6 +31,8 @@
 					<div class="card-badge">
 						@if(isFutureEvent(actividad.fechaEvento)) {
 							<span class="badge active">Disponible</span>
+					
+
 						} @else {
 							<span class="badge past">Finalizada</span>
 						}
@@ -52,16 +62,14 @@
 					}
 					</div>
 				</div>
-
-				<div class="card-footer">
-					@if(authService.isOrganizador()) {
+							@if(authService.isOrganizador()) {
 					<button class="btn-editar" (click)="abrirModalEditar(actividad)">
 						<i class="bi bi-pencil-square"></i>
 						<span>Editar</span>
 					</button>
-					} @else {
-					
-					}
+					} 
+
+				<div class="card-footer">
 					@if(estaInscritoEnEstaActividad(actividad.idEventoActividad)) {
 				
 					
@@ -139,6 +147,7 @@
 			<h2>Confirmar inscripción</h2>
 			<p>Estás a punto de unirte a esta actividad</p>
 			
+			@if(actividadSeleccionada() && esActividadFutbol(actividadSeleccionada()!.idEventoActividad)) {
 			<div class="capitan-option">
 				<label class="checkbox-container">
 					<input 
@@ -149,10 +158,11 @@
 					<span class="checkmark"></span>
 					<div class="checkbox-content">
 						<span class="checkbox-title">¿Quieres ser capitán?</span>
-						<span class="checkbox-subtitle">Lidera y organiza a tu equipo</span>
+						<span class="checkbox-subtitle">Lidera y organiza a tu equipo de fútbol</span>
 					</div>
 				</label>
 			</div>
+			}
 		</div>
 		
 		<div class="modal-footer">
@@ -387,5 +397,124 @@
 			</button>
 		</div>
 	</div>
+</div>
+}
+<!-- Modal Sorteo de Capitán -->
+@if (showModalSorteoCapitan()) {
+<div class="modal-overlay" (click)="cerrarModalSorteoCapitan()">
+<div class="modal-container modal-sorteo-capitan" (click)="$event.stopPropagation()">
+<div class="modal-header">
+<div class="modal-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+<i class="bi bi-trophy-fill"></i>
+</div>
+<button class="modal-close" (click)="cerrarModalSorteoCapitan()">
+<i class="bi bi-x-lg"></i>
+</button>
+</div>
+
+<div class="modal-body">
+<h2>Sorteo de Capitán</h2>
+<p class="actividad-nombre">
+<i class="bi bi-award me-2"></i>
+{{actividadParaSorteo()?.nombreActividad}}
+</p>
+
+<div class="candidatos-info">
+<div class="info-badge">
+<i class="bi bi-people-fill me-2"></i>
+{{candidatosCapitan().length}} candidato{{candidatosCapitan().length !== 1 ? 's' : ''}}
+</div>
+</div>
+
+<!-- Lista de Candidatos -->
+<div class="candidatos-lista">
+@for (candidato of candidatosCapitan(); track candidato.idUsuario) {
+<div class="candidato-card" [class.seleccionado]="capitanSeleccionado()?.idUsuario === candidato.idUsuario">
+<div class="candidato-avatar">
+@if (candidato.imagen) {
+<img [src]="candidato.imagen" [alt]="candidato.usuario">
+} @else {
+<div class="avatar-placeholder">
+<i class="bi bi-person-fill"></i>
+</div>
+}
+</div>
+<div class="candidato-info">
+<div class="candidato-nombre">{{candidato.usuario}}</div>
+<div class="candidato-curso">{{candidato.curso}}</div>
+</div>
+@if (capitanSeleccionado()?.idUsuario === candidato.idUsuario) {
+<div class="candidato-badge">
+<i class="bi bi-star-fill"></i>
+Seleccionado
+</div>
+}
+</div>
+}
+</div>
+
+@if (capitanSeleccionado()) {
+<div class="resultado-sorteo">
+<i class="bi bi-trophy-fill me-2"></i>
+<span>{{capitanSeleccionado().usuario}} será el capitán!</span>
+</div>
+}
+</div>
+
+<div class="modal-footer">
+<button class="btn-modal-cancel" (click)="cerrarModalSorteoCapitan()">
+Cancelar
+</button>
+<button class="btn-modal-sorteo" (click)="realizarSorteoRandom()" [disabled]="sorteoEnProgreso()">
+<i class="bi bi-shuffle me-2"></i>
+@if (modoEdicionCapitan()) {
+Nuevo Sorteo
+} @else {
+Sortear
+}
+</button>
+@if (capitanSeleccionado()) {
+<button class="btn-modal-confirm" (click)="confirmarAsignacionCapitan()" [disabled]="sorteoEnProgreso()">
+<i class="bi bi-check2 me-2"></i>
+@if (modoEdicionCapitan()) {
+Actualizar
+} @else {
+Confirmar
+}
+</button>
+}
+</div>
+</div>
+</div>
+}
+
+<!-- Modal de éxito -->
+@if (showModalExito()) {
+<div class="modal-overlay" (click)="cerrarModalExito()">
+  <div class="modal-container modal-exito" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <i class="bi bi-check-circle-fill text-success me-2"></i>
+        Operación Exitosa!
+      </h2>
+      <button class="btn-close-modal" (click)="cerrarModalExito()" title="Cerrar">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="exito-content">
+        <div class="exito-icon">
+          <i class="bi bi-trophy-fill"></i>
+        </div>
+        <p class="exito-mensaje">{{ mensajeExito() }}</p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-modal-confirm" (click)="cerrarModalExito()">
+        <i class="bi bi-check2 me-2"></i>
+        Entendido
+      </button>
+    </div>
+  </div>
 </div>
 }

@@ -467,6 +467,7 @@
   box-shadow: 0 4px 16px rgba(37, 99, 235, 0.2);
 }
 
+/* Botón de editar evento */
 .btn-edit-event {
   position: absolute;
   top: 8px;
