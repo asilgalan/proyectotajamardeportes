@@ -56,9 +56,8 @@ export class AuthService {
         return this._admin() === 'ADMINISTRADOR';
       });
 
-      isOrganizador=computed(() => this._admin() === 'ORGANIZADOR');
-
-      isCapitan=computed(() => this._capitan() === 'CAPITAN');
+      isOrganizador=computed(() => this._admin() === 'ORGANIZADOR' || this._admin() === 'ADMINISTRADOR');
+      isCapitan=computed(() => this._capitan() === 'CAPITAN' || this._admin() === 'ADMINISTRADOR');
 
     private async loadUserProfile() {
         try {

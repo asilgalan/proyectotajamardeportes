@@ -40,41 +40,182 @@ export class PartidoResultadoComponent implements OnInit {
   public selectedEquipoId = signal<number | null>(null);
   public isLoading = signal<boolean>(false);
   public errorMessage = signal<string | null>(null);
+  public modalErrorMessage = signal<string | null>(null);
   private allPartidosCache = signal<PartidoResultado[]>([]);
-  private fb=inject(FormBuilder);
-  public eventosCreate=signal<evento[]>([]);
-  public equipocreate=signal<Equipo[]>([]);
-  private EquipoService=inject(EquipoService);
-  public selectIdEventoCreate=signal<number | null>(null);
+  
+  // Signals para crear resultado
+  public showModalCrear = signal<boolean>(false);
+  public eventosParaCrear = signal<evento[]>([]);
+  public selectedEventoParaCrear = signal<number | null>(null);
+  public actividadesParaCrear = signal<ActividadEventoResponse[]>([]);
+  public equiposParaCrear = signal<Equipo[]>([]);
+  public selectedActividadParaCrear = signal<number | null>(null);
+  public selectedEquipoLocal = signal<number | null>(null);
+  public selectedEquipoVisitante = signal<number | null>(null);
+  public puntosLocal = signal<number>(0);
+  public puntosVisitante = signal<number>(0);
+  
+  // Signals para eliminar resultado
+  public showModalEliminar = signal<boolean>(false);
+  public resultadoParaEliminar = signal<number | null>(null);
+  
+  // Signals para editar resultado
+  public showModalEditar = signal<boolean>(false);
+  public resultadoParaEditar = signal<PartidoResultado | null>(null);
+  public puntosLocalEditar = signal<number>(0);
+  public puntosVisitanteEditar = signal<number>(0);
 
   ngOnInit(): void {
     this.loadEventos();
     this.loadAllPartidoResultados();
   }
 
-  loginForm=this.fb.group({
-    idEventoActividad:[''],
-    idEquipoLocal:[''],
-    idEquipoVisitante:[''],
-    puntosLocal:[''],
-    puntosVisitante:['']
-  })
+  abrirModalCrear(): void {
+    this.showModalCrear.set(true);
+    this.eventoService.getEventosCursoEscolar()
+      .pipe(
+        catchError(error => {
+          console.error('Error cargando eventos:', error);
+          return of([]);
+        })
+      )
+      .subscribe(eventos => this.eventosParaCrear.set(eventos));
+  }
 
-  onSubmit(){
-    const {idEventoActividad,idEquipoLocal,idEquipoVisitante,puntosLocal,puntosVisitante}=this.loginForm.value;
-    const nuevoResultado:PartidoResultado={
-      idEventoActividad:Number(idEventoActividad),
-      idEquipoLocal:Number(idEquipoLocal),
-      idEquipoVisitante:Number(idEquipoVisitante),
-      puntosLocal:Number(puntosLocal),
-      puntosVisitante:Number(puntosVisitante)
+  cerrarModalCrear(): void {
+    this.showModalCrear.set(false);
+    this.modalErrorMessage.set(null);
+    this.resetFormCrear();
+  }
+
+  onEventoParaCrearChange(eventoId: string): void {
+    const id = Number(eventoId);
+    if (!id) {
+      this.selectedEventoParaCrear.set(null);
+      this.actividadesParaCrear.set([]);
+      this.selectedActividadParaCrear.set(null);
+      this.equiposParaCrear.set([]);
+      return;
+    }
+
+    this.selectedEventoParaCrear.set(id);
+    this.selectedActividadParaCrear.set(null);
+    this.equiposParaCrear.set([]);
+    
+    this.actividadService.getActividadesByIdEnvento(id)
+      .pipe(
+        catchError(error => {
+          console.error('Error cargando actividades:', error);
+          return of([]);
+        })
+      )
+      .subscribe((actividades: ActividadEventoResponse[]) => {
+        this.actividadesParaCrear.set(actividades);
+      });
+  }
+
+  resetFormCrear(): void {
+    this.selectedEventoParaCrear.set(null);
+    this.selectedActividadParaCrear.set(null);
+    this.equiposParaCrear.set([]);
+    this.selectedEquipoLocal.set(null);
+    this.selectedEquipoVisitante.set(null);
+    this.puntosLocal.set(0);
+    this.puntosVisitante.set(0);
+  }
+
+  onActividadParaCrearChange(actividadId: string): void {
+    const id = Number(actividadId);
+    if (!id) {
+      this.selectedActividadParaCrear.set(null);
+      this.equiposParaCrear.set([]);
+      return;
+    }
+
+    this.selectedActividadParaCrear.set(id);
+    this.selectedEquipoLocal.set(null);
+    this.selectedEquipoVisitante.set(null);
+    this.modalErrorMessage.set(null);
+    
+    this.equipoService.getEquipos()
+      .pipe(
+        map(equipos => equipos.filter(eq => eq.idEventoActividad === id)),
+        catchError(error => {
+          console.error('Error cargando equipos:', error);
+          return of([]);
+        })
+      )
+      .subscribe(equipos => this.equiposParaCrear.set(equipos));
+  }
+
+  onEquipoLocalChange(equipoId: string): void {
+    const id = Number(equipoId);
+    this.selectedEquipoLocal.set(id || null);
+    this.validarEquipos();
+  }
+
+  onEquipoVisitanteChange(equipoId: string): void {
+    const id = Number(equipoId);
+    this.selectedEquipoVisitante.set(id || null);
+    this.validarEquipos();
+  }
+
+  validarEquipos(): void {
+    const local = this.selectedEquipoLocal();
+    const visitante = this.selectedEquipoVisitante();
+    
+    if (local && visitante && local === visitante) {
+      this.modalErrorMessage.set('Los equipos local y visitante deben ser diferentes');
+    } else {
+      this.modalErrorMessage.set(null);
+    }
+  }
+
+  confirmarCrearResultado(): void {
+    const idActividad = this.selectedActividadParaCrear();
+    const idLocal = this.selectedEquipoLocal();
+    const idVisitante = this.selectedEquipoVisitante();
+    const ptosLocal = this.puntosLocal();
+    const ptosVisitante = this.puntosVisitante();
+
+    if (!idActividad || !idLocal || !idVisitante) {
+      this.modalErrorMessage.set('Debes seleccionar actividad y ambos equipos');
+      return;
+    }
+
+    if (idLocal === idVisitante) {
+      this.modalErrorMessage.set('Los equipos local y visitante deben ser diferentes');
+      return;
+    }
+
+    const nuevoResultado: PartidoResultado = {
+      idEventoActividad: idActividad,
+      idEquipoLocal: idLocal,
+      idEquipoVisitante: idVisitante,
+      puntosLocal: ptosLocal,
+      puntosVisitante: ptosVisitante
     };
+
+    this.partidoResultadoService.createPartidoResultado(nuevoResultado)
+      .pipe(
+        catchError(error => {
+          console.error('Error creando resultado:', error);
+          this.modalErrorMessage.set('Error al crear el resultado');
+          return of(null);
+        })
+      )
+      .subscribe(resultado => {
+        if (resultado) {
+          this.modalErrorMessage.set(null);
+          this.cerrarModalCrear();
+          this.loadAllPartidoResultados();
+        }
+      });
   }
 
   private loadEventos(): void {
     this.eventoService.getEventosCursoEscolar()
       .pipe(
-
         // por si en un futuro se quiere filtrar por fecha actual
         // map(eventos => eventos.filter(ev => new Date(ev.fechaEvento) >= new Date())),
         catchError(error => {
@@ -168,11 +309,7 @@ export class PartidoResultadoComponent implements OnInit {
         this.actividades.set(actividades);
         this.isLoading.set(false);
         
-        if (actividades.length > 0) {
-          this.loadPartidosByActividad(actividades[0].idEventoActividad);
-        } else {
-          this.partidoResultados.set([]);
-        }
+    
       });
   }
 
@@ -190,7 +327,6 @@ export class PartidoResultadoComponent implements OnInit {
     }
 
     this.selectedActividadId.set(id);
-    this.selectedEquipoId.set(null);
     this.loadEquiposByActividad(id);
     this.loadPartidosByActividad(id);
   }
@@ -246,35 +382,7 @@ export class PartidoResultadoComponent implements OnInit {
         this.isLoading.set(false);
       });
   }
-  onEventoChangeCreate(eventoId: string): void {
-    const id = Number(eventoId);
-    
-    if (!id) {
-      this.selectIdEventoCreate.set(null);
-      return;
-    }
-    this.selectIdEventoCreate.set(id);
-  }
-  public loadEventosActividad(): void {
-    this.eventoService.getEventosCursoEscolar().pipe(
-      switchMap(eventos =>{
-        const idEvento=eventos.map(ev=>ev.idEvento);
-        return forkJoin(
-          idEvento.map(id=>this.actividadEventoService.getActividadEventoById(id).pipe(
-            tap(actividadEvento => {
-             
-              const actividadesIds = actividadEvento.idActividad;
-              this.equipoService.getEquiposPorActividadEvento(actividadesIds,this.selectIdEventoCreate()!).subscribe(equipos => {
-                this.equipocreate.set(equipos);
 
-              })
-
-            }),
-           
-          ))        )
-      })
-    ).subscribe();
-  }
 
   resetFilters(): void {
     this.selectedEventoId.set(null);
@@ -286,19 +394,79 @@ export class PartidoResultadoComponent implements OnInit {
     this.loadAllPartidoResultados();
   }
 
-  deleteResultado(idPartidoResultado: number): void {
+  abrirModalEliminar(idPartidoResultado: number): void {
+    this.resultadoParaEliminar.set(idPartidoResultado);
+    this.showModalEliminar.set(true);
+  }
 
-     if(idPartidoResultado===null) return;
+  cerrarModalEliminar(): void {
+    this.showModalEliminar.set(false);
+    this.resultadoParaEliminar.set(null);
+  }
 
-    this.partidoResultadoService.deletePartidoResultado(idPartidoResultado).subscribe();
+  abrirModalEditar(resultado: PartidoResultado): void {
+    this.resultadoParaEditar.set(resultado);
+    this.puntosLocalEditar.set(resultado.puntosLocal);
+    this.puntosVisitanteEditar.set(resultado.puntosVisitante);
+    this.modalErrorMessage.set(null);
+    this.showModalEditar.set(true);
+  }
 
-    const partidosActualizados = this.partidoResultados().filter(pr => pr.idPartidoResultado !== idPartidoResultado);
-    this.partidoResultados.set(partidosActualizados);
-    }
+  cerrarModalEditar(): void {
+    this.showModalEditar.set(false);
+    this.resultadoParaEditar.set(null);
+    this.puntosLocalEditar.set(0);
+    this.puntosVisitanteEditar.set(0);
+    this.modalErrorMessage.set(null);
 
-    
+  }
 
+  confirmarEditarResultado(): void {
+    const resultado = this.resultadoParaEditar();
+    if (!resultado) return;
 
-}   
-   
+    // Enviar solo las propiedades necesarias para el backend
+    const resultadoActualizado: PartidoResultado = {
+      idPartidoResultado: resultado.idPartidoResultado,
+      idEventoActividad: resultado.idEventoActividad,
+      idEquipoLocal: resultado.idEquipoLocal,
+      idEquipoVisitante: resultado.idEquipoVisitante,
+      puntosLocal: this.puntosLocalEditar(),
+      puntosVisitante: this.puntosVisitanteEditar()
+    };
 
+    this.partidoResultadoService.updatePartidoResultado(resultadoActualizado)
+      .pipe(
+        catchError(error => {
+          console.error('Error actualizando resultado:', error);
+          this.modalErrorMessage.set('Error al actualizar el resultado');
+          return of(null);
+        })
+      )
+      .subscribe(resultadoUpdated => {
+        console.log('Resultado de la actualización:', resultadoUpdated);
+        this.modalErrorMessage.set(null);
+        this.cerrarModalEditar();
+        this.loadAllPartidoResultados();
+      });
+  }
+
+  confirmarEliminarResultado(): void {
+    const idPartidoResultado = this.resultadoParaEliminar();
+    if (!idPartidoResultado) return;
+
+    this.partidoResultadoService.deletePartidoResultado(idPartidoResultado)
+      .pipe(
+        catchError(error => {
+          console.error('Error eliminando resultado:', error);
+          this.errorMessage.set('Error al eliminar el resultado');
+          return of(null);
+        })
+      )
+      .subscribe(() => {
+        const partidosActualizados = this.partidoResultados().filter(pr => pr.idPartidoResultado !== idPartidoResultado);
+        this.partidoResultados.set(partidosActualizados);
+        this.cerrarModalEliminar();
+      });
+  }
+}

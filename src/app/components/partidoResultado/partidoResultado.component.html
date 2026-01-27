@@ -2,27 +2,14 @@
   <div class="page-header">
     <h1 class="page-title">Resultados de Partidos</h1>
     <p class="page-subtitle">Consulta los resultados de todos los partidos disputados</p>
+    @if (authService.isAdmin()) {
+      <button class="btn-crear-resultado" (click)="abrirModalCrear()">
+        <i class="bi bi-plus-circle me-2"></i>
+        Crear Resultado
+      </button>
+    }
   </div>
 
-     <div class="filter-group">
-        <label for="evento-select" class="filter-label">
-          <i class="bi bi-calendar-event"></i>
-          Filtrar por Evento
-        </label>
-        <select 
-          id="evento-select"
-          [ngModel]="selectedEventoId()" 
-          (ngModelChange)="onEventoChangeCreate($event)" 
-          class="filter-select"
-        >
-          <option value="">Todos los eventos</option>
-          @for (evento of eventos(); track evento.idEvento) {
-            <option [value]="evento.idEvento">
-              {{evento.fechaEvento | date:'dd/MM/yyyy'}}
-            </option>
-          }
-        </select>
-      </div>
   <!-- Filtros Section -->
   <div class="filters-section">
     <div class="filters-container">
@@ -131,11 +118,6 @@
       <div class="partidos-grid">
         @for (resultado of partidoResultados(); track resultado.idPartidoResultado) {
           <div class="partido-card">
-            
-            <!-- @if(authService.isCapitan()){
-          
-            }  -->
-              <button (click)="deleteResultado(resultado.idPartidoResultado!)">Eliminar</button>
 
             <!-- Sport Badge -->
             <div class="sport-badge">
@@ -148,7 +130,12 @@
               <!-- Equipo Local -->
               <div class="team team-home">
                 <div class="team-name">{{resultado.nombreEquipoLocal || 'Equipo Local'}}</div>
-                <div class="team-score">{{resultado.puntosLocal}}</div>
+                <div class="team-score" 
+                     [class.score-winner]="resultado.puntosLocal > resultado.puntosVisitante"
+                     [class.score-loser]="resultado.puntosLocal < resultado.puntosVisitante"
+                     [class.score-draw]="resultado.puntosLocal === resultado.puntosVisitante">
+                  {{resultado.puntosLocal}}
+                </div>
               </div>
 
               <!-- Separator -->
@@ -156,7 +143,12 @@
 
               <!-- Equipo Visitante -->
               <div class="team team-away">
-                <div class="team-score">{{resultado.puntosVisitante}}</div>
+                <div class="team-score"
+                     [class.score-winner]="resultado.puntosVisitante > resultado.puntosLocal"
+                     [class.score-loser]="resultado.puntosVisitante < resultado.puntosLocal"
+                     [class.score-draw]="resultado.puntosVisitante === resultado.puntosLocal">
+                  {{resultado.puntosVisitante}}
+                </div>
                 <div class="team-name">{{resultado.nombreEquipoVisitante || 'Equipo Visitante'}}</div>
               </div>
 
@@ -182,9 +174,309 @@
               }
             </div>
 
+            <!-- Botones de acción (solo admin) -->
+            @if(authService.isAdmin()){
+              <div class="card-actions">
+                <button class="btn-edit-resultado" (click)="abrirModalEditar(resultado)" title="Editar resultado">
+                  <i class="bi bi-pencil-fill me-1"></i>
+                  Editar
+                </button>
+                <button class="btn-delete-resultado" (click)="abrirModalEliminar(resultado.idPartidoResultado!)" title="Eliminar resultado">
+                  <i class="bi bi-trash-fill me-1"></i>
+                  Eliminar
+                </button>
+              </div>
+            }
+
           </div>
         }
       </div>
     }
   }
 </div>
+
+<!-- Modal Crear Resultado -->
+@if (showModalCrear()) {
+  <div class="modal-overlay" (click)="cerrarModalCrear()">
+    <div class="modal-container modal-lg" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
+          <i class="bi bi-trophy-fill"></i>
+        </div>
+        <button class="modal-close" (click)="cerrarModalCrear()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <h2>Crear Resultado de Partido</h2>
+        <p class="text-muted mb-4">Registra el resultado de un partido disputado</p>
+        
+        <!-- Mensaje de Error -->
+        @if (modalErrorMessage()) {
+          <div class="alert alert-danger mb-3">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            {{ modalErrorMessage() }}
+          </div>
+        }
+        
+        <!-- Seleccionar Evento -->
+        <div class="form-group mb-3">
+          <label class="form-label">
+            <i class="bi bi-calendar-event me-2"></i>
+            Seleccionar Evento
+          </label>
+          <select 
+            class="form-select"
+            [ngModel]="selectedEventoParaCrear()"
+            (ngModelChange)="onEventoParaCrearChange($event)"
+          >
+            <option value="">-- Selecciona un evento --</option>
+            @for (evento of eventosParaCrear(); track evento.idEvento) {
+              <option [value]="evento.idEvento">
+                {{evento.fechaEvento | date:'dd/MM/yyyy HH:mm'}}
+              </option>
+            }
+          </select>
+        </div>
+
+        <!-- Seleccionar Actividad -->
+        @if (actividadesParaCrear().length > 0) {
+          <div class="form-group mb-3">
+            <label class="form-label">
+              <i class="bi bi-trophy me-2"></i>
+              Seleccionar Actividad
+            </label>
+            <select 
+              class="form-select"
+              [ngModel]="selectedActividadParaCrear()"
+              (ngModelChange)="onActividadParaCrearChange($event)"
+            >
+              <option value="">-- Selecciona una actividad --</option>
+              @for (actividad of actividadesParaCrear(); track actividad.idEventoActividad) {
+                <option [value]="actividad.idEventoActividad">
+                  {{actividad.nombreActividad}}
+                </option>
+              }
+            </select>
+          </div>
+        }
+
+        @if (equiposParaCrear().length > 0) {
+          <!-- Equipo Local -->
+          <div class="form-group mb-3">
+            <label class="form-label">
+              <i class="bi bi-house-fill me-2"></i>
+              Equipo Local
+            </label>
+            <select 
+              class="form-select"
+              [ngModel]="selectedEquipoLocal()"
+              (ngModelChange)="onEquipoLocalChange($event)"
+            >
+              <option value="">-- Selecciona equipo local --</option>
+              @for (equipo of equiposParaCrear(); track equipo.idEquipo) {
+                <option [value]="equipo.idEquipo">
+                  {{equipo.nombreEquipo}}
+                </option>
+              }
+            </select>
+          </div>
+
+          <!-- Puntos Local -->
+          <div class="form-group mb-3">
+            <label class="form-label">
+              <i class="bi bi-hash me-2"></i>
+              Puntos Equipo Local
+            </label>
+            <input 
+              type="number" 
+              class="form-control"
+              min="0"
+              [ngModel]="puntosLocal()"
+              (ngModelChange)="puntosLocal.set(+$event)"
+            />
+          </div>
+
+          <!-- Equipo Visitante -->
+          <div class="form-group mb-3">
+            <label class="form-label">
+              <i class="bi bi-airplane-fill me-2"></i>
+              Equipo Visitante
+            </label>
+            <select 
+              class="form-select"
+              [ngModel]="selectedEquipoVisitante()"
+              (ngModelChange)="onEquipoVisitanteChange($event)"
+            >
+              <option value="">-- Selecciona equipo visitante --</option>
+              @for (equipo of equiposParaCrear(); track equipo.idEquipo) {
+                <option [value]="equipo.idEquipo">
+                  {{equipo.nombreEquipo}}
+                </option>
+              }
+            </select>
+          </div>
+
+          <!-- Puntos Visitante -->
+          <div class="form-group mb-3">
+            <label class="form-label">
+              <i class="bi bi-hash me-2"></i>
+              Puntos Equipo Visitante
+            </label>
+            <input 
+              type="number" 
+              class="form-control"
+              min="0"
+              [ngModel]="puntosVisitante()"
+              (ngModelChange)="puntosVisitante.set(+$event)"
+            />
+          </div>
+        }
+
+        @if (equiposParaCrear().length === 0 && selectedActividadParaCrear()) {
+          <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i>
+            No hay equipos disponibles para esta actividad
+          </div>
+        }
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn-modal-cancel" (click)="cerrarModalCrear()">
+          Cancelar
+        </button>
+        <button 
+          class="btn-modal-confirm"
+          (click)="confirmarCrearResultado()"
+          [disabled]="!selectedActividadParaCrear() || !selectedEquipoLocal() || !selectedEquipoVisitante() || (selectedEquipoLocal() === selectedEquipoVisitante())"
+        >
+          <i class="bi bi-check2"></i>
+          Crear Resultado
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal Eliminar Resultado -->
+@if (showModalEliminar()) {
+  <div class="modal-overlay" (click)="cerrarModalEliminar()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-icon" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+          <i class="bi bi-trash-fill"></i>
+        </div>
+        <button class="modal-close" (click)="cerrarModalEliminar()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <h2>¿Eliminar resultado?</h2>
+        <p class="text-muted">Esta acción no se puede deshacer. El resultado del partido será eliminado permanentemente.</p>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn-modal-cancel" (click)="cerrarModalEliminar()">
+          Cancelar
+        </button>
+        <button 
+          class="btn-modal-confirm btn-modal-danger"
+          (click)="confirmarEliminarResultado()"
+        >
+          <i class="bi bi-trash-fill"></i>
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal Editar Resultado -->
+@if (showModalEditar()) {
+  <div class="modal-overlay" (click)="cerrarModalEditar()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+          <i class="bi bi-pencil-fill"></i>
+        </div>
+        <button class="modal-close" (click)="cerrarModalEditar()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <h2>Editar Resultado</h2>
+        <p class="text-muted mb-4">Modifica los puntos del partido</p>
+        
+        <!-- Mensaje de Error -->
+        @if (modalErrorMessage()) {
+          <div class="alert alert-danger mb-3">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            {{ modalErrorMessage() }}
+          </div>
+        }
+
+        @if (resultadoParaEditar()) {
+          <!-- Info del partido -->
+          <div class="partido-info mb-3">
+            <div class="info-badge">
+              <i class="bi bi-trophy me-2"></i>
+              {{ resultadoParaEditar()!.nombreActividad || 'Actividad' }}
+            </div>
+          </div>
+
+          <div class="equipos-editar">
+            <!-- Equipo Local -->
+            <div class="equipo-edit-group">
+              <label class="form-label">
+                <i class="bi bi-house-fill me-2"></i>
+                {{ resultadoParaEditar()!.nombreEquipoLocal || 'Equipo Local' }}
+              </label>
+              <input 
+                type="number" 
+                class="form-control"
+                min="0"
+                [ngModel]="puntosLocalEditar()"
+                (ngModelChange)="puntosLocalEditar.set(+$event)"
+              />
+            </div>
+
+            <!-- VS -->
+            <div class="vs-divider">vs</div>
+
+            <!-- Equipo Visitante -->
+            <div class="equipo-edit-group">
+              <label class="form-label">
+                <i class="bi bi-airplane-fill me-2"></i>
+                {{ resultadoParaEditar()!.nombreEquipoVisitante || 'Equipo Visitante' }}
+              </label>
+              <input 
+                type="number" 
+                class="form-control"
+                min="0"
+                [ngModel]="puntosVisitanteEditar()"
+                (ngModelChange)="puntosVisitanteEditar.set(+$event)"
+              />
+            </div>
+          </div>
+        }
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn-modal-cancel" (click)="cerrarModalEditar()">
+          Cancelar
+        </button>
+        <button 
+          class="btn-modal-confirm"
+          style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);"
+          (click)="confirmarEditarResultado()"
+        >
+          <i class="bi bi-check2"></i>
+          Guardar Cambios
+        </button>
+      </div>
+    </div>
+  </div>
+}

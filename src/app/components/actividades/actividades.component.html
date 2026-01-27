@@ -4,7 +4,7 @@
 			<h1>Actividades Deportivas</h1>
 			<p class="subtitle">Explora y únete a las actividades disponibles</p>
 		</div>
-		@if(authService.isAdmin()) {
+		@if(authService.isOrganizador()) {
 		<button class="btn-crear-actividad" (click)="abrirModalCrearActividad()">
 			<i class="bi bi-plus-circle me-2"></i>
 			Añadir Actividad
@@ -37,21 +37,24 @@
 							<i class="bi bi-calendar-event"></i>
 							<span>{{actividad.fechaEvento | date: 'dd MMM yyyy'}}</span>
 						</div>
-						@if(actividad.nombreActividad.toLowerCase() === "futbol" || actividad.nombreActividad.toLowerCase() === "basket") {
+						@if(actividad.nombreActividad.toLowerCase() === "futbol" || actividad.nombreActividad.toLowerCase() === "basket" || actividad.nombreActividad.toLowerCase() === "baloncesto" || actividad.nombreActividad.toLowerCase() === "fútbol") {
 						<div class="info-item">
 							<i class="bi bi-people-fill"></i>		
 							<span>Mín. {{actividad.minimoJugadores}} jugadores</span>
 						</div>
+
+						@if(estaInscritoEnEstaActividad(actividad.idEventoActividad)) {	
 						<button class="btn-view-teams" (click)="verEquipos(actividad.idActividad, idEvento)">
 							<i class="bi bi-shield-shaded"></i>
 							<span>Ver Equipos</span>
 						</button>
 						}
+					}
 					</div>
 				</div>
 
 				<div class="card-footer">
-					@if(authService.isAdmin()) {
+					@if(authService.isOrganizador()) {
 					<button class="btn-editar" (click)="abrirModalEditar(actividad)">
 						<i class="bi bi-pencil-square"></i>
 						<span>Editar</span>
@@ -66,6 +69,7 @@
 						<i class="bi bi-x-circle"></i>
 						<span>Desapuntarse</span>
 					</button>
+
 					@if(showModalDesapuntar()) {
 					<div class="modal-overlay" (click)="cerrarModalDesapuntar()">
 						<div class="modal-container" (click)="$event.stopPropagation()">
