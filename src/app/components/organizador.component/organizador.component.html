@@ -1,6 +1,6 @@
 <div class="container">
   <h1>Gestión del Organizador</h1>
-  
+
   <div class="form-group">
     <label for="cursoSelect">Elige el curso del organizador</label>
     <select id="cursoSelect" #cursoSelect (change)="seleccionarCurso(cursoSelect.value)">
@@ -21,15 +21,51 @@
     </select>
   </div>
 
-  <button (click)="elegirOrganizador(alumnoSelect.value)">
-    Elegir
-  </button>
+  <div class="button-group">
+    <button class="btn-success" (click)="elegirOrganizador(alumnoSelect.value)">
+      Elegir
+    </button>
 
+    <button class="btn-danger" (click)="eliminarOrganizador(alumnoSelect.value)">
+      Eliminar
+    </button>
+  </div>
 </div>
+
+<!-- =======================
+     Burbuja Organizador por curso
+======================= -->
+<div class="organizador-wrapper">
+  <h1 class="title">Organizadores</h1>
+
+  <div class="curso-grid">
+    <div class="curso-card" *ngFor="let curso of cursos">
+      <div class="curso-header">
+        <span class="curso-icon">🎓</span>
+        <h2>{{ curso.nombre }}</h2>
+      </div>
+
+      <div class="organizador-list">
+        <div
+          class="organizador-item"
+          *ngFor="let organizador of organizadores"
+          [hidden]="organizador.idCurso !== curso.idCurso"
+        >
+          <span class="avatar">
+            {{ organizador.usuario.charAt(0) | uppercase }}
+          </span>
+          <span class="nombre">{{ organizador.usuario }}</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Mensaje de confirmación -->
-<div class="toast" *ngIf="showToast">
-  <i class="icon-check">✔️</i>
-  <span>
-    Perfecto! Organizador elegido!"
-  </span>
+<div class="toast" [ngClass]="toastTipo" *ngIf="showToast">
+  <i class="icon-check">
+    {{ toastTipo === 'success' ? '✔️' : '✔️' }}
+  </i>
+  <span>{{ toastMensaje }}</span>
 </div>

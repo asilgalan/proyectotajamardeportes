@@ -16,6 +16,10 @@ export class OrganizadorComponent implements OnInit
   public alumnos: Alumno[] = [];
 
   public showToast = false;
+  public toastTipo: 'success' | 'error' = 'success';
+  public toastMensaje = '';
+
+  public organizadores:Alumno[] = [];
 
   constructor(private _serviceOrganizadores:ServiceOrganizadores,
               private _serviceGestion:ServiceGestion){}
@@ -25,7 +29,9 @@ export class OrganizadorComponent implements OnInit
     this._serviceGestion.getCursosActivos().then(response =>
     {
       this.cursos = response;
-    })  
+    })
+
+    this.mostrarOrganizadores();
   }
 
   seleccionarCurso(idCurso:string): void
@@ -48,13 +54,43 @@ export class OrganizadorComponent implements OnInit
       this._serviceOrganizadores.postOrganizador(id).then(response =>
       {
         console.log(response);
+        this.lanzarToast('success', '¡Organizador añadido correctamente!');
+        this.mostrarOrganizadores();
       })
-
-      this.showToast = true;
-      setTimeout(() => 
-      {
-        this.showToast = false;
-      }, 3500);
     }
+  }
+
+  eliminarOrganizador(idAlumno:string): void
+  {
+    if (idAlumno != null)
+    {
+      const id = Number(idAlumno);
+
+      this._serviceOrganizadores.deleteOrganizador(id).then(response =>
+      {
+        console.log(response);
+        this.lanzarToast('error', 'Organizador eliminado correctamente');
+        this.mostrarOrganizadores();
+      })
+    }
+  }
+
+  mostrarOrganizadores():void
+  {
+    this._serviceOrganizadores.getOrganizadores().then(response =>
+    {
+      this.organizadores = response;
+    })
+  }
+
+  lanzarToast(tipo: 'success' | 'error', mensaje: string): void 
+  {
+    this.toastTipo = tipo;
+    this.toastMensaje = mensaje;
+    this.showToast = true;
+
+    setTimeout(() => {
+      this.showToast = false;
+    }, 3500);
   }
 }

@@ -89,4 +89,24 @@ export default class ServiceOrganizadores
         return promise;
     }
 
+    //borra un organizador
+    deleteOrganizador(idUsuario:number):Promise<any>
+    {
+        let url = environment.apiUrl;
+        let endPoint = "/Organizadores/QuitarOrganizadorEvento/"+idUsuario;
+
+        let promise = new Promise((resolve, reject) =>{
+            this._http.delete(url+endPoint,{}).subscribe({
+                next: (response) => {
+                    resolve(response);
+                },
+                error: (error) => {
+                    reject(error);
+                }
+            })
+        })
+
+        return promise;
+    }
+
 }
