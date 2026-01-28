@@ -20,7 +20,7 @@ import { A } from '@angular/cdk/keycodes';
 import { ActividadesComponent } from './components/actividades/actividades.component';
 import { MaterialesComponent } from './components/materiales.component/materiales.component';
 import { OrganizadorComponent } from './components/organizador.component/organizador.component';
-import { PagosComponent } from './components/pagos/pagos.component';
+import { PagosComponent } from './components/pagos.component/pagos.component';
 
 
 @NgModule({

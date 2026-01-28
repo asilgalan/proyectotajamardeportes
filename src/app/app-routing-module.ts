@@ -8,7 +8,7 @@ import { MaterialesComponent } from './components/materiales.component/materiale
 import { authGuard } from './auth/guards/auth.guard';
 import { PartidoResultadoComponent } from './components/partidoResultado/partidoResultado.component';
 import { OrganizadorComponent } from './components/organizador.component/organizador.component';
-import { PagosComponent } from './components/pagos/pagos.component';
+import { PagosComponent } from './components/pagos.component/pagos.component';
 
 export const routes: Routes = [
   {
