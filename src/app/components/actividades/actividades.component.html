@@ -5,13 +5,13 @@
 			<p class="subtitle">Explora y únete a las actividades disponibles</p>
 		</div>
 		<div class="header-actions">
-			@if(authService.isAdmin() && idEvento) {
+			@if(authService.isAdmin() || isOrganizador) {
 			<button class="btn-sorteo-header" (click)="abrirModalSorteoCapitan(0, 0, 'Fútbol')" title="Sortear capitán de fútbol">
 				<i class="bi bi-trophy-fill me-2"></i>
 				Sortear Capitán
 			</button>
 			}
-			@if(authService.isOrganizador()) {
+			@if(isOrganizador) {
 			<button class="btn-crear-actividad" (click)="abrirModalCrearActividad()">
 				<i class="bi bi-plus-circle me-2"></i>
 				Añadir Actividad
@@ -53,7 +53,7 @@
 							<span>Mín. {{actividad.minimoJugadores}} jugadores</span>
 						</div>
 
-						@if(estaInscritoEnEstaActividad(actividad.idEventoActividad)) {	
+						@if(estaInscritoEnEstaActividad(actividad.idEventoActividad) || this.authService.isAdmin() || this.organizadorService.esOrganizador()) {	
 						<button class="btn-view-teams" (click)="verEquipos(actividad.idActividad, idEvento)">
 							<i class="bi bi-shield-shaded"></i>
 							<span>Ver Equipos</span>
@@ -62,14 +62,15 @@
 					}
 					</div>
 				</div>
-							@if(authService.isOrganizador()) {
+
+				<div class="card-footer">
+					@if(isOrganizador) {
 					<button class="btn-editar" (click)="abrirModalEditar(actividad)">
 						<i class="bi bi-pencil-square"></i>
 						<span>Editar</span>
 					</button>
 					} 
-
-				<div class="card-footer">
+					
 					@if(estaInscritoEnEstaActividad(actividad.idEventoActividad)) {
 				
 					

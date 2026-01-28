@@ -21,6 +21,7 @@ import { AuthService } from '../../auth/services/auth.service';
 import { CapitanActividadService } from '../../services/capitanActividad.service';
 import { CapitanActividad } from '../../interface/capitanActividad.interface';
 import { ActividadEventoResponse } from '../../interface/actividades.interface';
+import ServiceOrganizadores from '../../services/organizadores.service';
 
 @Component({
   selector: 'app-home',
@@ -34,6 +35,7 @@ export class HomeComponent implements OnInit ,OnChanges{
   idEvento: number | null = null;
   public perfil!:Perfil;
    authservices=inject(AuthService);
+   organizadorService=inject(ServiceOrganizadores);
 
   public showModalAddEvento = false;
   public fechaSeleccionada: string | null = null;
@@ -46,6 +48,7 @@ export class HomeComponent implements OnInit ,OnChanges{
   public showModalError = false;
   public mensajeError = '';
   nombre=signal<string >('');
+  public isOrganizador: boolean = false;
   
   // Campos para editar evento
   public fechaEditar: string = '';
@@ -64,6 +67,7 @@ export class HomeComponent implements OnInit ,OnChanges{
     if (!userId) return false;
     return this.capitanesDelUsuario().some(c => c.idUsuario === userId);
   });
+
   
   // Computed signal para obtener las actividades donde el usuario es capitán
   actividadesDondeEsCapitan = computed(() => {
@@ -114,6 +118,32 @@ export class HomeComponent implements OnInit ,OnChanges{
    
     this.getEventoCurosEscolar();
     this.cargarCapitanesDelUsuario();
+    
+    if (this.authservices.currentUser()?.idUsuario) {
+      this.verificarSiEsOrganizador();
+    }
+  }
+
+  verificarSiEsOrganizador(): void {
+    const userId = this.authservices.currentUser()?.idUsuario;
+    console.log('verificarSiEsOrganizador - userId:', userId);
+    if (!userId) {
+      console.log('No hay userId, abortando');
+      return;
+    }
+    console.log('Llamando a organizadorService.isOrganizador()...');
+    this.organizadorService.isOrganizador(userId)
+      .subscribe({
+        next: (isOrganizador) => {
+          console.log('Respuesta de isOrganizador:', isOrganizador);
+          this.isOrganizador = isOrganizador;
+          console.log('this.isOrganizador actualizado a:', this.isOrganizador);
+        },
+        error: (error) => {
+          console.error('Error al verificar si es organizador:', error);
+          this.isOrganizador = false;
+        }
+      });
   }
 
   getEventoCurosEscolar(){
@@ -167,10 +197,15 @@ export class HomeComponent implements OnInit ,OnChanges{
   }
 
   onDateClick(arg: any) {
+    console.log('onDateClick llamado');
+    console.log('isAdmin:', this.authservices.isAdmin());
+    console.log('isOrganizador:', this.isOrganizador);
 
-    if(!this.authservices.isAdmin()){
+    if(!this.authservices.isAdmin() && !this.organizadorService.esOrganizador()){
+      console.log('Acceso denegado');
       return;
     }
+    console.log('Acceso permitido, abriendo modal');
     this.fechaSeleccionada = arg.dateStr;
 
   
@@ -178,9 +213,15 @@ export class HomeComponent implements OnInit ,OnChanges{
   }
 
   abrirModalCrearEvento() {
-    if(!this.authservices.isAdmin()){
+    console.log('abrirModalCrearEvento llamado');
+    console.log('isAdmin:', this.authservices.isAdmin());
+    console.log('isOrganizador:', this.isOrganizador);
+    
+    if(!this.authservices.isAdmin() && !this.isOrganizador){
+      console.log('Acceso denegado');
       return;
     }
+    console.log('Acceso permitido, abriendo modal');
     const hoy = new Date();
     this.fechaSeleccionada = hoy.toISOString();
     this.showModalAddEvento = true;
@@ -335,7 +376,7 @@ export class HomeComponent implements OnInit ,OnChanges{
   }
 
   onEventClick(arg: any) {
-    if(!this.authservices.isAdmin()){
+    if(!this.authservices.isAdmin() && !this.isOrganizador){
       return;
     }
     const idEvento = parseInt(arg.event.id);
@@ -632,15 +673,10 @@ export class HomeComponent implements OnInit ,OnChanges{
    * Se ejecuta para todas las actividades del evento que aún no tienen capitán
    */
   async realizarSorteoCapitanes(idEvento: number): Promise<void> {
-    if (this.sorteoEnProgreso() || !this.authservices.isOrganizador() === false) {
-  
+    if (this.sorteoEnProgreso() || (!this.authservices.isAdmin() && !this.isOrganizador)) {
+
       return;
     }
-
-
-
-  
-
     this.sorteoEnProgreso.set(true);
 
     try {
@@ -741,7 +777,7 @@ export class HomeComponent implements OnInit ,OnChanges{
    * Verificar y ejecutar sorteo automático si el evento está a 1 semana o menos
    */
   verificarYEjecutarSorteoAutomatico(evento: evento): void {
-    if (!this.authservices.isAdmin()) return;
+    if (!this.authservices.isAdmin() && !this.isOrganizador) return;
     
     if (this.estaAUnaSemanaDelEvento(evento.fechaEvento)) {
       const confirmar = confirm(

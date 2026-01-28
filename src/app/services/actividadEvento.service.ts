@@ -36,7 +36,7 @@ export class ActividadEventoService {
         );
     }
     createActividadEvento(actividadEvento: ActividadEventoCreate):Observable<ActividadEvento>{
-        return this.http.post<ActividadEvento>(`${this.apiUrl}/ActividadesEvento/create?idevento=${actividadEvento.idEvento}&idactividad=${actividadEvento.idActividad}`, {})
+        return this.http.post<ActividadEvento>(`${this.apiUrl}/ActividadesEvento/create/${actividadEvento.idEvento}/${actividadEvento.idActividad}`, {})
         .pipe(
             tap(response => console.log('ActividadEvento creada :', response))
         );

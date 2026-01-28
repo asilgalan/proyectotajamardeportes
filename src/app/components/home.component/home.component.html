@@ -228,7 +228,7 @@
 
   <!-- Two Column Layout (Top) + Calendar (Bottom) -->
   <div class="professional-layout">
-       @if(authservices.isAdmin() || authservices.isOrganizador()){
+       @if(authservices.isAdmin() || organizadorService.esOrganizador()){
      <button class="btn-crear-evento" (click)="abrirModalCrearEvento()">
       <i class="bi bi-plus-circle me-2"></i>
       Crear Evento
@@ -274,7 +274,7 @@
                   </div>
                 
                 </div>
-                @if (authservices.isOrganizador() || authservices.isAdmin()) {
+                @if (organizadorService.esOrganizador() || authservices.isAdmin()) {
                   <button 
                     class="btn-edit-event" 
                     (click)="abrirModalEditarEvento($event, event)" 

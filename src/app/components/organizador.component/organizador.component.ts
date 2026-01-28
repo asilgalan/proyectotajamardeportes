@@ -18,6 +18,7 @@ export class OrganizadorComponent implements OnInit
   public showToast = false;
   public toastTipo: 'success' | 'error' = 'success';
   public toastMensaje = '';
+  
 
   public organizadores:Alumno[] = [];
 

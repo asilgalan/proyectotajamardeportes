@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnInit, OnChanges, SimpleChanges, signal } from '@angular/core';
+import { Component, inject, Input, OnInit, OnChanges, SimpleChanges, signal, computed } from '@angular/core';
 import { ActividadesService } from '../../services/actividades.service';
 import { ActividadesResponse, ActividadEventoResponse } from '../../interface/actividades.interface';
 import { ActividadEvento, ActividadEventoCreate } from '../../interface/actividadEvento.interface';
@@ -17,6 +17,7 @@ import { EquipoService } from '../../services/equipo.service';
 import { MiembroEquiposService } from '../../services/miembroEquipos.service';
 import { CapitanActividadService } from '../../services/capitanActividad.service';
 import { CapitanActividad } from '../../interface/capitanActividad.interface';
+import ServiceOrganizadores from '../../services/organizadores.service';
 
 
 @Component({
@@ -28,7 +29,8 @@ import { CapitanActividad } from '../../interface/capitanActividad.interface';
 export class ActividadesComponent implements OnInit,OnChanges {
 
 
-
+  public organizadorService=inject(ServiceOrganizadores);
+ public isOrganizador: boolean = false;
   private actividadesService=inject(ActividadesService);
   private inscripcionService=inject(InscripcionesService);
   public authService=inject(AuthService);
@@ -92,7 +94,7 @@ export class ActividadesComponent implements OnInit,OnChanges {
     
     return true;
   }
-
+  public perfil = computed(() => this.authService.currentUser());
   // Modal Editar Actividad
   public showModalEditar = signal<boolean>(false);
   public actividadParaEditar = signal<ActividadEventoResponse | null>(null);
@@ -122,6 +124,27 @@ export class ActividadesComponent implements OnInit,OnChanges {
 
   ngOnInit(): void {
       this.getActividadesByIdEnvento(this.idEvento);
+          if (this.perfil()?.idUsuario){
+         this.verificarSiEsOrganizador();
+  }
+}
+ 
+
+ 
+    verificarSiEsOrganizador(): void {
+    if (!this.perfil()?.idUsuario) {
+      return;
+    }
+    this.organizadorService.isOrganizador(this.perfil()?.idUsuario!)
+      .subscribe({
+        next: (isOrganizador) => {
+          this.isOrganizador = isOrganizador;
+        },
+        error: (error) => {
+          console.error('Error al verificar si es organizador:', error);
+          this.isOrganizador = false;
+        }
+      }); 
   }
   getActividades(){
     this.actividadesService.getActividades().subscribe();
@@ -436,8 +459,8 @@ export class ActividadesComponent implements OnInit,OnChanges {
       return;
     }
 
-    // Verificar si es organizador primero
-    if (this.authService.isOrganizador()) {
+  
+    if (this.isOrganizador) {
       this.actividadParaEditar.set(actividad);
       this.posicionEditar.set(actividad.posicion);
       this.profesorIdEditar.set(actividad.idProfesor);
@@ -576,7 +599,19 @@ export class ActividadesComponent implements OnInit,OnChanges {
             );
           }),
           switchMap(() => {
-          
+            // Eliminar el capitán de la actividad si existe
+            return this.capitanActividadService.getCapitanActividad().pipe(
+              switchMap(capitanes => {
+                const capitan = capitanes.find(c => c.idEventoActividad === actividad.idEventoActividad);
+                if (capitan) {
+                  return this.capitanActividadService.deleteCapitanActividad(capitan.idCapitanActividad);
+                }
+                return of(null);
+              })
+            );
+          }),
+          switchMap(() => {
+            // Finalmente eliminar la actividad
             return this.actividadEventoService.deleteActividadEvento(actividad.idEventoActividad);
           })
         )
@@ -610,7 +645,19 @@ export class ActividadesComponent implements OnInit,OnChanges {
             );
           }),
           switchMap(() => {
-          
+            // Eliminar el capitán de la actividad si existe
+            return this.capitanActividadService.getCapitanActividad().pipe(
+              switchMap(capitanes => {
+                const capitan = capitanes.find(c => c.idEventoActividad === actividad.idEventoActividad);
+                if (capitan) {
+                  return this.capitanActividadService.deleteCapitanActividad(capitan.idCapitanActividad);
+                }
+                return of(null);
+              })
+            );
+          }),
+          switchMap(() => {
+            
             return this.actividadEventoService.deleteActividadEvento(actividad.idEventoActividad);
           })
         )
@@ -724,7 +771,7 @@ export class ActividadesComponent implements OnInit,OnChanges {
    * Abrir modal para sortear capitán (solo para fútbol)
    */
   async abrirModalSorteoCapitan(idEventoActividad?: number, idActividad?: number, nombreActividad?: string): Promise<void> {
-    if (!this.authService.isAdmin()) {
+    if (!this.authService.isAdmin() && !this.isOrganizador) {
      
       return;
     }

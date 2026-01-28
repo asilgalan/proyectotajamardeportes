@@ -56,7 +56,7 @@ export class AuthService {
         return this._role() === 3;
       });
 
-      isOrganizador=computed(() => this._role() ===4);
+  
   
 
     private async loadUserProfile() {

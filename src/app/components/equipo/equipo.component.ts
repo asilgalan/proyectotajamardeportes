@@ -13,6 +13,7 @@ import { MiembroEquiposService } from '../../services/miembroEquipos.service';
 import { AuthService } from '../../auth/services/auth.service';
 import Perfil from '../../models/perfil';
 import { CapitanActividadService } from '../../services/capitanActividad.service';
+import ServiceOrganizadores from '../../services/organizadores.service';
 
 @Component({
   selector: 'app-equipo.component',
@@ -23,12 +24,14 @@ import { CapitanActividadService } from '../../services/capitanActividad.service
 export class EquipoComponent implements OnInit{
   public authService=inject(AuthService);
   public capitanService=inject(CapitanActividadService);
+  public organizadorService=inject(ServiceOrganizadores);
   public equipos: Array<Equipo> = [];
   public idActividad!: number;
   public idEvento!: number;
   public nombreActividad!: string;
   public fechaEvento!: string;
   public mapaColores: { [key: number]: string } = {};
+
 
   public showModalColores: boolean = false;
   public colores!: Array<Color>;
@@ -64,6 +67,7 @@ export class EquipoComponent implements OnInit{
   public estaInscrito: boolean = false;
   public usuarioLogueado!: Perfil;
   public isCapitan: boolean = false; 
+  public isOrganizador: boolean = false;
 
   constructor(private _serviceEquipo: EquipoService, private _activateRoute: ActivatedRoute, private _serviceActividaes: ActividadesService, private _serviceEvento: ServiceEventos, private _serviceColor: ColorService, private _serviceMiembrosEquipo: MiembroEquiposService){
 
@@ -98,6 +102,7 @@ export class EquipoComponent implements OnInit{
       // Verificar si es capitán una vez tengamos el idEventoActividad
       if (this.usuarioLogueado?.idUsuario) {
         this.verificarSiEsCapitan();
+        this.verificarSiEsOrganizador();
       }
     })
 
@@ -111,6 +116,7 @@ export class EquipoComponent implements OnInit{
   
       if (this.idEventoActividad) {
         this.verificarSiEsCapitan();
+        this.verificarSiEsOrganizador();
       }
     })
   }
@@ -128,6 +134,22 @@ export class EquipoComponent implements OnInit{
         error: (error) => {
           console.error('Error al verificar si es capitán:', error);
           this.isCapitan = false;
+        }
+      });
+  }
+
+  verificarSiEsOrganizador(): void {
+    if (!this.usuarioLogueado?.idUsuario) {
+      return;
+    }
+    this.organizadorService.isOrganizador(this.usuarioLogueado.idUsuario)
+      .subscribe({
+        next: (isOrganizador) => {
+          this.isOrganizador = isOrganizador;
+        },
+        error: (error) => {
+          console.error('Error al verificar si es organizador:', error);
+          this.isOrganizador = false;
         }
       });
   }

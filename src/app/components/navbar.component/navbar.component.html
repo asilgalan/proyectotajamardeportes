@@ -49,7 +49,7 @@
           </li>
         }
 
-        @if(this.authService.isAdmin() || this.authService.isOrganizador())
+        @if(this.authService.isAdmin() || this.organizadorService.esOrganizador())
         {
           <li class="nav-item">
             <a class="nav-link nav-pill-item me-2" 
