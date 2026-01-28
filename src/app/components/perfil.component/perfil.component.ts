@@ -24,6 +24,8 @@ export class PerfilComponent implements OnInit
   public quiereSerCapitan!:boolean;
   public fechaInscripcion!: string;
 
+  public perfilImagen: string = 'assets/img/perfil.webp';
+
   constructor(private _servicePerfil:ServicePerfil) {}
 
   ngOnInit(): void 
@@ -46,7 +48,7 @@ export class PerfilComponent implements OnInit
     })
   }
 
- seleccionarEvento(evento: number) 
+  seleccionarEvento(evento: number) 
   {
     if (this.idEventoSeleccionado === evento) 
     {
