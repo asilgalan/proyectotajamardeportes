@@ -1,79 +1,82 @@
 <div class="material-card">
   <div class="material-header-enhanced">
-    <h1 class="material-title-enhanced">
-      Materiales
-    </h1>
+    <h1 class="material-title-enhanced">Materiales</h1>
     <p class="material-subtitle-enhanced">
       Informa sobre los materiales que necesites o acepta alguno que haya solicitado un compañero.
     </p>
   </div>
+
   <div class="material-list">
-    <!-- Recorremos eventos -->
     <div *ngIf="eventos && eventos.length === 0"
       class="custom-navbar p-4 rounded-4 shadow-sm mt-3 text-muted text-center">
       No hay eventos disponibles.
     </div>
+
     <div *ngIf="eventos && eventos.length > 0">
-      <div *ngFor="let evento of eventos" class="event-card" (click)="seleccionarEvento(evento.idEvento)">
+      <div *ngFor="let evento of eventos" 
+           class="event-card" 
+           [ngClass]="{'selected': idEventoSeleccionado === evento.idEvento}"
+           (click)="seleccionarEvento(evento.idEvento)">
+
+        <!-- FECHA -->
         <div class="event-date">
-          <span class="material-date-icon">📅</span>
-          {{ evento.fechaEvento | date:'dd' }} /
-          {{ evento.fechaEvento | date:'MM' }} /
-          {{ evento.fechaEvento | date:'yyyy' }}
+          <div class="date-day">{{ evento.fechaEvento | date:'dd' }}</div>
+          <div class="date-month">{{ evento.fechaEvento | date:'MMM' }}</div>
         </div>
 
-        <!-- Tarjetas de actividades del evento seleccionado -->
-        <div *ngIf="idEventoSeleccionado === evento.idEvento" class="activity-list">
-          <div *ngIf="actividadesEvento && actividadesEvento.length === 0"
-            class="custom-navbar p-3 rounded-4 text-muted text-center">
-            Este evento no tiene actividades.
-          </div>
+        <!-- CONTENIDO DEL EVENTO -->
+        <div class="event-content">
 
-          <div *ngFor="let actividad of actividadesEvento" class="activity-card"
-            (click)="seleccionarActividad(evento.idEvento, actividad.idActividad, $event)">
-
-            <h4 class="activity-title">🎯 {{ actividad.nombreActividad }}</h4>
-            <div class="activity-buttons">
-              <button class="btn-proporcionar"
-                (click)="proporcionarMaterial(evento.idEvento, actividad.idActividad, $event)">
-                Proporcionar
-              </button>
-
-              <button class="btn-solicitar" (click)="solicitarMaterial(evento.idEvento, actividad.idActividad, $event)">
-                Solicitar
-              </button>
+          <!-- Actividades -->
+          <div *ngIf="idEventoSeleccionado === evento.idEvento" class="activity-list">
+            <div *ngIf="actividadesEvento && actividadesEvento.length === 0"
+              class="custom-navbar p-3 rounded-4 text-muted text-center">
+              Este evento no tiene actividades.
             </div>
-            <!-- Chat de materiales -->
-            <div *ngIf="idActividadSeleccionada === actividad.idActividad" class="material-chat">
 
-              <div *ngIf="materialesActividad && materialesActividad.length === 0" class="text-muted text-center p-3">
-                No hay materiales para esta actividad.
+            <div *ngFor="let actividad of actividadesEvento" class="activity-card"
+              (click)="seleccionarActividad(evento.idEvento, actividad.idActividad, $event)">
+              
+              <h4 class="activity-title">🎯 {{ actividad.nombreActividad }}</h4>
+
+              <div class="activity-buttons">
+                <button class="btn-proporcionar"
+                  (click)="proporcionarMaterial(evento.idEvento, actividad.idActividad, $event)">
+                  Proporcionar
+                </button>
+                <button class="btn-solicitar"
+                  (click)="solicitarMaterial(evento.idEvento, actividad.idActividad, $event)">
+                  Solicitar
+                </button>
               </div>
 
-              <div *ngFor="let material of materialesActividad" class="material-message-container" [ngClass]="{
-              'left': material.idUsuarioAportacion === -1,
-              'right': material.idUsuarioAportacion !== -1
-            }">
-
-                <!-- Nombre del usuario, encima de la burbuja -->
-                <div class="material-username" *ngIf="
-                (material.idUsuarioAportacion === -1 && material.idUsuario === this.idUsuario) ||
-                (material.idUsuarioAportacion !== -1 && material.idUsuarioAportacion === this.idUsuario)
-              ">
-                  {{ material.idUsuarioAportacion === -1
-                  ? 'Solicitado por ti'
-                  : 'Proporcionado por ti'}}
+              <!-- Chat -->
+              <div *ngIf="idActividadSeleccionada === actividad.idActividad" class="material-chat">
+                <div *ngIf="materialesActividad && materialesActividad.length === 0" class="text-muted text-center p-3">
+                  No hay materiales para esta actividad.
                 </div>
-                <!-- Burbuja del material -->
-                <div class="material-message" [ngClass]="{
-                'material-rojo': material.idUsuarioAportacion === -1,
-                'material-verde': material.idUsuarioAportacion !== -1
-              }">
-                  <span>{{ material.nombreMaterial }}</span>
 
-                  <button *ngIf="material.idUsuarioAportacion === -1" (click)="aceptarMaterial(material, $event)">
-                    Aceptar
-                  </button>
+                <div *ngFor="let material of materialesActividad" class="material-message-container" [ngClass]="{
+                  'left': material.idUsuarioAportacion === -1,
+                  'right': material.idUsuarioAportacion !== -1
+                }">
+
+                  <div class="material-username" *ngIf="
+                    (material.idUsuarioAportacion === -1 && material.idUsuario === this.idUsuario) ||
+                    (material.idUsuarioAportacion !== -1 && material.idUsuarioAportacion === this.idUsuario)
+                  ">
+                    {{ material.idUsuarioAportacion === -1 ? 'Solicitado por ti' : 'Proporcionado por ti'}}
+                  </div>
+
+                  <div class="material-message" [ngClass]="{
+                    'material-rojo': material.idUsuarioAportacion === -1,
+                    'material-verde': material.idUsuarioAportacion !== -1
+                  }">
+                    <span>{{ material.nombreMaterial }}</span>
+                    <button *ngIf="material.idUsuarioAportacion === -1" (click)="aceptarMaterial(material, $event)">
+                      Aceptar
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
