@@ -32,7 +32,6 @@ export class PerfilComponent implements OnInit
     this._servicePerfil.getPerfil().then(response =>
     {
       this.perfil = response;
-      console.log(response);
 
       this._servicePerfil.getEventosYActividades().then(response =>
       {
