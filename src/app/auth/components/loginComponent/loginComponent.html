@@ -1,160 +1,48 @@
 <div class="login-container">
-  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+  <div class="login-card">
     
-    <h2>Bienvenido</h2>
-
- <div class="form-group">
-  <label for="email">Usuario</label>
-  <div class="input-wrapper">
-    <input id="email" type="text" formControlName="userName" placeholder="nombre.usuario" />
-    <span class="domain-label">@tajamar365.com</span>
-  </div>
-  
-  </div>
-    <div class="form-group">
-      <label for="password">Contraseña</label>
-      <input id="password" type="password" formControlName="password" placeholder="••••••" />
-      
-      @if(loginForm.get('password')?.touched && loginForm.get('password')?.invalid){
-        <div class="error-message">
-          @if(loginForm.get('password')?.errors?.['required']){ <small>La contraseña es obligatoria.</small> }
-          @if(loginForm.get('password')?.errors?.['minlength']){ <small>Mínimo 5 caracteres.</small> }
-        </div>
-      }
+    <div class="login-image-side">
+      <img src="images/imagenLogin.png" alt="Deportes Tajamar">
+      <div class="overlay"></div>
     </div>
 
-    @if(mensajeError){
-      <div class="error-message">
-        <small>{{mensajeError}}</small>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form-side">
+      
+      <div class="form-header">
+        <h2>Bienvenido</h2>
+        <p>Introduce tus datos para continuar.</p>
       </div>
-    }
-    <button type="submit" [disabled]="loginForm.invalid">Iniciar Sesión</button>
-  </form>
+
+      <div class="form-group">
+        <label for="email">Usuario</label>
+        <div class="input-wrapper">
+          <input id="email" type="text" formControlName="userName" placeholder="nombre.usuario" />
+          <span class="domain-label">@tajamar365.com</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <div class="input-wrapper-simple">
+             <input id="password" type="password" formControlName="password" placeholder="••••••" />
+        </div>
+        
+        @if(loginForm.get('password')?.touched && loginForm.get('password')?.invalid){
+          <div class="error-message">
+            @if(loginForm.get('password')?.errors?.['required']){ <small>La contraseña es obligatoria.</small> }
+            @if(loginForm.get('password')?.errors?.['minlength']){ <small>Mínimo 5 caracteres.</small> }
+          </div>
+        }
+      </div>
+
+      @if(mensajeError){
+        <div class="error-message alert-box">
+          <small>{{mensajeError}}</small>
+        </div>
+      }
+
+      <button type="submit" [disabled]="loginForm.invalid">Iniciar Sesión</button>
+    </form>
+
+  </div>
 </div>
-
-/* Centrado del formulario en pantalla y fondo suave */
-<style>
-  /* Centrado del formulario en pantalla y fondo suave */
-.login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: #f3f4f6; /* Gris muy claro */
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-/* Diseño de la tarjeta */
-.login-form {
-  background: white;
-  padding: 2.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  width: 100%;
-  max-width: 400px;
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem; /* Espacio entre elementos */
-}
-
-/* Título */
-.login-form h2 {
-  margin: 0 0 1rem 0;
-  text-align: center;
-  color: #1f2937;
-  font-size: 1.5rem;
-}
-
-/* Agrupación de inputs */
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-/* Etiquetas */
-label {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #374151;
-}
-
-/* Campos de texto */
-input {
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 1rem;
-  transition: all 0.2s;
-  outline: none;
-}
-
-/* Efecto al hacer clic en el input */
-input:focus {
-  border-color: #3b82f6; /* Azul */
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-/* Mensajes de error */
-.error-message small {
-  color: #ef4444; /* Rojo suave */
-  font-size: 0.8rem;
-  margin-top: 0.25rem;
-  display: block;
-}
-
-/* Botón */
-button {
-  margin-top: 1rem;
-  padding: 0.75rem;
-  background-color: #2563eb; /* Azul intenso */
-  color: white;
-  font-weight: bold;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  font-size: 1rem;
-}
-
-button:hover:not(:disabled) {
-  background-color: #1d4ed8;
-}
-
-/* Estado deshabilitado del botón */
-button:disabled {
-  background-color: #9ca3af;
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-/* Contenedor relativo para posicionar el hijo */
-.input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.input-wrapper input {
-  width: 100%;
-  /* Añadimos espacio a la derecha para que el texto no choque con el dominio */
-  padding-right: 140px; 
-}
-
-/* El dominio fijo */
-.domain-label {
-  position: absolute;
-  right: 12px;
-  color: #9ca3af; /* Gris suave */
-  font-size: 0.9rem;
-  pointer-events: none; /* Para que si hacen clic sobre el texto, el input reciba el foco */
-  user-select: none;    /* No se puede seleccionar el texto */
-  font-weight: 500;
-}
-
-/* Ajuste de foco para que el borde azul se vea en el input */
-.input-wrapper input:focus {
-  border-color: #2563eb;
-  background-color: #f8fafc;
-}
-</style>

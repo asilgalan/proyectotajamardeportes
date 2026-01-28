@@ -7,6 +7,7 @@ import { Router, RouterLink } from '@angular/router';
   selector: 'app-login-component',
   standalone: false,
   templateUrl: './loginComponent.html',
+  styleUrl: './loginComponent.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent implements OnInit {
