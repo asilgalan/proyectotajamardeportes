@@ -12,6 +12,7 @@ import { MiembrosDelEquipo } from '../../models/miembrosDelEquipo';
 import { MiembroEquiposService } from '../../services/miembroEquipos.service';
 import { AuthService } from '../../auth/services/auth.service';
 import Perfil from '../../models/perfil';
+import { CapitanActividadService } from '../../services/capitanActividad.service';
 
 @Component({
   selector: 'app-equipo.component',
@@ -21,6 +22,7 @@ import Perfil from '../../models/perfil';
 })
 export class EquipoComponent implements OnInit{
   public authService=inject(AuthService);
+  public capitanService=inject(CapitanActividadService);
   public equipos: Array<Equipo> = [];
   public idActividad!: number;
   public idEvento!: number;
@@ -61,6 +63,7 @@ export class EquipoComponent implements OnInit{
   @ViewChild("nuevoMiembroId") nuevoMiembroId!: ElementRef;
   public estaInscrito: boolean = false;
   public usuarioLogueado!: Perfil;
+  public isCapitan: boolean = false; 
 
   constructor(private _serviceEquipo: EquipoService, private _activateRoute: ActivatedRoute, private _serviceActividaes: ActividadesService, private _serviceEvento: ServiceEventos, private _serviceColor: ColorService, private _serviceMiembrosEquipo: MiembroEquiposService){
 
@@ -90,7 +93,12 @@ export class EquipoComponent implements OnInit{
     })
 
     this._serviceEquipo.getIdEventoActividadEquipos(this.idEvento, this.idActividad).subscribe(response => {
-      this.idEventoActividad = response.idEventoActividad
+      this.idEventoActividad = response.idEventoActividad;
+      
+      // Verificar si es capitán una vez tengamos el idEventoActividad
+      if (this.usuarioLogueado?.idUsuario) {
+        this.verificarSiEsCapitan();
+      }
     })
 
     this._serviceEquipo.getInscripcionesEventoActividad(this.idEvento, this.idActividad).subscribe(response => {
@@ -98,8 +106,30 @@ export class EquipoComponent implements OnInit{
     })
 
     this._serviceMiembrosEquipo.getUsuarioLogueado().subscribe(response => {
-      this.usuarioLogueado = response
+      this.usuarioLogueado = response;
+      
+  
+      if (this.idEventoActividad) {
+        this.verificarSiEsCapitan();
+      }
     })
+  }
+
+  verificarSiEsCapitan(): void {
+    if (!this.usuarioLogueado?.idUsuario || !this.idEventoActividad) {
+      return;
+    }
+
+    this.capitanService.isCapitan(this.usuarioLogueado.idUsuario, this.idEventoActividad)
+      .subscribe({
+        next: (isCapitan) => {
+          this.isCapitan = isCapitan;
+        },
+        error: (error) => {
+          console.error('Error al verificar si es capitán:', error);
+          this.isCapitan = false;
+        }
+      });
   }
 
   cargarEquipos() {
@@ -170,6 +200,7 @@ export class EquipoComponent implements OnInit{
   }
 
   abrirModalEliminar(id: number) {
+   
     this.idEquipoAEliminar = id;
     this.showModalEliminar = true;
   }
@@ -189,6 +220,7 @@ export class EquipoComponent implements OnInit{
   }
 
   abrirModalCrearEquipo() {
+ 
     this.showModalNuevoEquipo = true;
   }
 
@@ -211,6 +243,7 @@ export class EquipoComponent implements OnInit{
   }
 
   abrirModalEditar(id: number) {    
+ 
     this.showModalEditarEquipo = true;
     this._serviceEquipo.getEquipoPorId(id).subscribe(response => {
       this.equipoUpdate = response;

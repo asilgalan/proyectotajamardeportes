@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { Observable, pipe, tap } from 'rxjs';
+import { Observable, tap, map, catchError, of } from 'rxjs';
 import { CapitanActividad } from '../interface/capitanActividad.interface';
 
 @Injectable({
@@ -34,6 +34,26 @@ export class CapitanActividadService {
             tap(response => console.log('CapitanActividad por Evento Actividad obtenidas:', response))
         );
 
+    }
+
+    getCapitanActividadByEventoActividad(idUsuario:number,idEventoActividad:number):Observable<CapitanActividad[]>{
+        return this.http.get<CapitanActividad[]>(`${this.apiUrl}/CapitanActividades/GetIdCapitanUsuario/${idUsuario}/${idEventoActividad}`);
+    }
+
+   
+    isCapitan(idUsuario:number, idEventoActividad:number):Observable<boolean>{
+        return this.getCapitanActividadByIdEventoActividad(idEventoActividad)
+        .pipe(
+            tap(response => console.log('Capitán de la actividad:', response)),
+            map(capitanUsuario => {
+                
+                return capitanUsuario && capitanUsuario.idUsuario === idUsuario;
+            }),
+            catchError((error) => {
+                console.log( error.message);
+                return of(false);
+            })
+        );
     }
 
     getCapitanActividadById(id:number):Observable<CapitanActividad>{

@@ -430,12 +430,43 @@ export class ActividadesComponent implements OnInit,OnChanges {
 
  
   abrirModalEditar(actividad: ActividadEventoResponse) {
-    this.actividadParaEditar.set(actividad);
-    this.posicionEditar.set(actividad.posicion);
-    this.profesorIdEditar.set(actividad.idProfesor);
-    this.nombreEditar.set(actividad.nombreActividad);
-    this.minimoJugadoresEditar.set(actividad.minimoJugadores || 2);
-    this.showModalEditar.set(true);
+    const userId = this.authService.currentUser()?.idUsuario;
+    if (!userId) {
+      console.error('Usuario no autenticado');
+      return;
+    }
+
+    // Verificar si es organizador primero
+    if (this.authService.isOrganizador()) {
+      this.actividadParaEditar.set(actividad);
+      this.posicionEditar.set(actividad.posicion);
+      this.profesorIdEditar.set(actividad.idProfesor);
+      this.nombreEditar.set(actividad.nombreActividad);
+      this.minimoJugadoresEditar.set(actividad.minimoJugadores || 2);
+      this.showModalEditar.set(true);
+      return;
+    }
+
+    // Si no es organizador, verificar si es capitán
+    this.capitanActividadService.isCapitan(userId, actividad.idEventoActividad)
+      .subscribe({
+        next: (esCapitan) => {
+          if (esCapitan) {
+            this.actividadParaEditar.set(actividad);
+            this.posicionEditar.set(actividad.posicion);
+            this.profesorIdEditar.set(actividad.idProfesor);
+            this.nombreEditar.set(actividad.nombreActividad);
+            this.minimoJugadoresEditar.set(actividad.minimoJugadores || 2);
+            this.showModalEditar.set(true);
+          } else {
+            alert('No tienes permisos para editar esta actividad. Solo los capitanes o el organizador pueden hacerlo.');
+          }
+        },
+        error: (error) => {
+          console.error('Error al verificar permisos:', error);
+          alert('Error al verificar permisos');
+        }
+      });
   }
 
   cerrarModalEditar() {
