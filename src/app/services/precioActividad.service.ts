@@ -44,6 +44,23 @@ export default class ServicePrecioActividad
         return promise;
     }
 
+    //saca el id de un precio por el idEventoActividad
+    findIdPrecioPorIdEventoActividad(idEventoActividad:number):Promise<any>
+    {
+        let url = environment.apiUrl;
+        let endPoint = "/PrecioActividad/FindPrecioByIdEventoActividad/" + idEventoActividad;
+
+        let promise = new Promise((resolve) =>
+        {
+            this._http.get(url+endPoint).subscribe(response =>
+            {
+                resolve(response);
+            })
+        })
+
+        return promise;
+    }
+
     //borra un precio actividad
     deletePrecioActividad(idPrecioActividad:number):Promise<any>
     {
@@ -62,14 +79,14 @@ export default class ServicePrecioActividad
     }
 
     //crea un precio actividad
-    postPago(precioActividad:PrecioActividad):Promise<any>
+    postPrecio(precioActividad:PrecioActividad):Promise<any>
     {
         let url = environment.apiUrl;
         let endPoint = "/PrecioActividad/create";
 
         let data = JSON.stringify(precioActividad);
         let header = new HttpHeaders();
-        header = header.set("Content-type", "application/json");
+        header = header.set("Content-Type", "application/json");
 
         let promise = new Promise((resolve) =>
         {
@@ -83,7 +100,7 @@ export default class ServicePrecioActividad
     }
 
     //modifica un precio actividad
-    putPago(precioActividad:PrecioActividad):Promise<any>
+    putPrecio(precioActividad:PrecioActividad):Promise<any>
     {
         let url = environment.apiUrl;
         let endPoint = "/PrecioActividad/update";

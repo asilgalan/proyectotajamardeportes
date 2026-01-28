@@ -38,6 +38,27 @@
           </a>
         </li>
 
+        @if(this.authService.isAdmin())
+        {
+          <li class="nav-item">
+            <a class="nav-link nav-pill-item me-2" 
+               [routerLink]="['/organizador']" 
+               routerLinkActive="active-link">
+               <i class="bi bi-people-fill me-2"></i> Gestión organizador
+            </a>
+          </li>
+        }
+
+        @if(this.authService.isAdmin() || this.authService.isOrganizador())
+        {
+          <li class="nav-item">
+            <a class="nav-link nav-pill-item me-2" 
+              [routerLink]="['/pagos']" 
+              routerLinkActive="active-link">
+              <i class="bi bi-cash-coin me-2"></i> Gestión pagos
+            </a>
+          </li>
+        }
       </ul>
 
       <ul class="navbar-nav align-items-center">

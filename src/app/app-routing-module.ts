@@ -7,6 +7,8 @@ import { EquipoComponent } from './components/equipo/equipo.component';
 import { MaterialesComponent } from './components/materiales.component/materiales.component';
 import { authGuard } from './auth/guards/auth.guard';
 import { PartidoResultadoComponent } from './components/partidoResultado/partidoResultado.component';
+import { OrganizadorComponent } from './components/organizador.component/organizador.component';
+import { PagosComponent } from './components/pagos/pagos.component';
 
 export const routes: Routes = [
   {
@@ -37,9 +39,18 @@ export const routes: Routes = [
     component: MaterialesComponent
   },
   {
-
     path:'partido-resultado',
     component:PartidoResultadoComponent
+
+  },
+  {
+    path:'pagos',
+    component:PagosComponent
+
+  },
+  {
+    path:'organizador',
+    component:OrganizadorComponent
 
   },
 
@@ -47,7 +58,7 @@ export const routes: Routes = [
     path: '**', 
     redirectTo: ''
   }
- 
+
 
 ];
 

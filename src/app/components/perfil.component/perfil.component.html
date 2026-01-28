@@ -7,7 +7,7 @@
     <!-- IMAGEN PERFIL -->
     <div class="avatar-wrapper">
       <div class="user-icon-circle avatar-ring">
-        <img [src]="perfil.imagen" alt="Imagen de perfil" />
+        <img [src]="perfil.imagen" alt="Imagen de perfil" (error)="setPerfilImagen()" />
       </div>
 
       <!-- ESTADO MINI -->

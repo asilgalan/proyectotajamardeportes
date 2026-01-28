@@ -95,7 +95,7 @@ export default class ServicePagos
         return promise;
     }
 
-    //crea un pago
+    //crea un pago desde cero
     postPago(pago:Pago):Promise<any>
     {
         let url = environment.apiUrl;
@@ -108,6 +108,23 @@ export default class ServicePagos
         let promise = new Promise((resolve) =>
         {
             this._http.post(url+endPoint, data, {headers: header}).subscribe(response =>
+            {
+                resolve(response);
+            })
+        })
+
+        return promise;
+    }
+
+    //crea un pago ya pagado
+    postPagoPagado(idEventoActividad:number, idCurso:number, cantidad:number):Promise<any>
+    {
+        let url = environment.apiUrl;
+        let endPoint = "/Pagos/PagoEventoActividad/"+idEventoActividad+"/"+idCurso+"/"+cantidad;
+
+        let promise = new Promise((resolve) =>
+        {
+            this._http.post(url+endPoint,{}).subscribe(response =>
             {
                 resolve(response);
             })
