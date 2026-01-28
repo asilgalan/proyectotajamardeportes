@@ -35,7 +35,11 @@ export class PagosComponent implements OnInit
   @ViewChild('cursosPago') cursosPago!: ElementRef;
 
   public coste!: number;
-  public mensaje!: string;
+
+  public mostrarToast: boolean = false;
+  public toastMensaje: string = '';
+  public tipoToast: 'success' | 'info' | 'error' = 'success';
+  public iconoToast: string = '✔';
 
   constructor(private _serviceEventos: ServiceEventos,
               private _serviceActividad: ActividadesService,
@@ -101,6 +105,7 @@ export class PagosComponent implements OnInit
       this._servicePrecios.postPrecio(precio).then((response) => 
       {
         console.log(response);
+        this.mostrarToastMensaje('Precio insertado correctamente', 'success');
       });
     });
   }
@@ -153,7 +158,7 @@ export class PagosComponent implements OnInit
          {
           if (response == null)
           {
-            this.mensaje = "Esta actividad no tiene coste";
+            this.mostrarToastMensaje('Esta actividad no tiene coste', 'error');
           }
           else
           {
@@ -162,7 +167,7 @@ export class PagosComponent implements OnInit
             this._servicePrecios.findPrecioActividad(idPrecioActividad).then(response =>
             {
               this.coste = response.precioTotal;
-              this.mensaje = "El coste de la actividad es " + this.coste;
+              this.mostrarToastMensaje('El coste de la actividad es ' + this.coste, 'info');
             });
           }
         });
@@ -184,7 +189,35 @@ export class PagosComponent implements OnInit
       this._servicePagos.postPagoPagado(idEventoActividad, idCurso, this.coste).then(response =>
       {
         console.log(response);
+        this.mostrarToastMensaje('Pago realizado correctamente', 'success');
       });
     });
   }
+
+  mostrarToastMensaje(mensaje: string, tipo: 'success' | 'info' | 'error'): void
+  {
+    this.toastMensaje = mensaje;
+    this.tipoToast = tipo;
+
+    switch (tipo)
+    {
+      case 'success':
+        this.iconoToast = '✔';
+        break;
+      case 'info':
+        this.iconoToast = 'ℹ';
+        break;
+      case 'error':
+        this.iconoToast = '✖';
+        break;
+    }
+
+    this.mostrarToast = true;
+
+    setTimeout(() =>
+    {
+      this.mostrarToast = false;
+    }, 3500);
+  }
+
 }
