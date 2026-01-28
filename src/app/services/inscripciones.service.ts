@@ -46,7 +46,7 @@ export class InscripcionesService {
     }
       
     getIncripcionesUsuariosEVento(idEvento:number):Observable<IncripcionesEventoResponse[]>{
-        return this.http.get<IncripcionesEventoResponse[]>(`${this.apiurl}/Inscripciones/InscripcionesEvento/${idEvento}`)
+        return this.http.get<IncripcionesEventoResponse[]>(`${this.apiurl}/Inscripciones/InscripcionesUsuariosEvento/${idEvento}`)
         .pipe(  
             tap(response => console.log(response)
         ));
@@ -60,14 +60,14 @@ export class InscripcionesService {
     }
 
     getInscripcionesUsuarioEventoActividad(idEvento:number):Observable<IncripcionesEventoResponse[]>{
-        return this.http.get<IncripcionesEventoResponse[]>(`${this.apiurl}/Inscripciones/InscripcionesUsuarioEventoActividad/${idEvento}`)
+        return this.http.get<IncripcionesEventoResponse[]>(`${this.apiurl}/Inscripciones/InscripcionesUsuariosEventoActividad/${idEvento}`)
         .pipe(  
             tap(response => console.log(response)
         ));
     }
 
-    getIncripcionesUsuariosEventoCapitanActividad(IdEvento:number):Observable<IncripcionesEventoResponse[]>{
-        return this.http.get<IncripcionesEventoResponse[]>(`${this.apiurl}/Inscripciones/InscripcionesUsuariosEventoCapitanActividad/${IdEvento}`)
+    getIncripcionesUsuariosEventoCapitanActividad(IdEvento:number, idActividad:number):Observable<IncripcionesEventoResponse[]>{
+        return this.http.get<IncripcionesEventoResponse[]>(`${this.apiurl}/Inscripciones/InscripcionesUsuariosEventoCapitanActividad/${IdEvento}?idactividad=${idActividad}`)
         .pipe(  
             tap(response => console.log(response)
         ));

@@ -1023,3 +1023,303 @@
 .btn-edit-card i {
     font-size: 1.1rem;
 }
+
+/* Asegura que en móvil se vean bien */
+@media (max-width: 768px) {
+  .actions-toolbar {
+    flex-direction: column-reverse; /* Se apilan verticalmente */
+    gap: 0.75rem;
+  }
+  
+  /* Que ocupen todo el ancho en móvil */
+  .btn-secondary-action, 
+  .btn-primary-action {
+      width: 100%;
+      justify-content: center;
+  }
+}
+
+/* ... TUS ESTILOS ANTERIORES ... */
+
+/* --- ESTILOS ESPECÍFICOS PARA MODAL DE INSCRITOS --- */
+
+/* Icono de cabecera diferente (Degradado morado/azul) */
+.modal-icon-users {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6); /* Indigo a Violeta */
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-size: 1.5rem;
+    box-shadow: 0 4px 6px rgba(99, 102, 241, 0.25);
+}
+
+/* Contador destacado en el texto */
+.highlight-count {
+    color: #6366f1;
+    font-weight: 800;
+}
+
+/* Contenedor de la lista (con scroll) */
+.users-list-container {
+    max-height: 350px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-right: 5px;
+    /* Estilos del scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: var(--nav-border-color) transparent;
+}
+
+/* Item individual de usuario */
+.user-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    background-color: var(--white);
+    border: 1px solid var(--nav-border-color);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.user-item:hover {
+    border-color: #6366f1;
+    background-color: #f5f3ff; /* Fondo violeta muy suave */
+    transform: translateX(4px);
+}
+
+/* Avatar circular */
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    background-color: #e0e7ff; /* Fondo azulito */
+    color: #4338ca; /* Icono oscuro */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+/* Textos */
+.user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-weight: 700;
+    color: var(--text-main);
+    font-size: 0.95rem;
+}
+
+.user-role {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Clase auxiliar para botón ancho completo */
+.w-100 {
+    width: 100%;
+}
+
+/* Empty State del modal */
+.empty-list-msg {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.empty-list-msg i {
+    font-size: 2rem;
+    color: #cbd5e1;
+}
+
+/* ... TUS ESTILOS ANTERIORES ... */
+
+/* Contenedor de metadatos (Rol + Curso) */
+.user-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px; /* Espacio entre elementos */
+    font-size: 0.75rem; /* Letra un poco más pequeña para datos secundarios */
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+/* Estilo del Rol */
+.user-role {
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--accent-color); /* Destacamos el rol en azul/morado */
+    letter-spacing: 0.5px;
+    background-color: #e0e7ff; /* Fondo sutil estilo etiqueta */
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* Separador (puntito) */
+.separator {
+    color: #cbd5e1;
+    font-weight: bold;
+}
+
+/* Estilo del Curso */
+.user-course {
+    font-weight: 600;
+    color: #64748b; /* Gris oscuro */
+    text-transform: capitalize; /* Capitaliza '1º daw' a '1º Daw' si es necesario */
+}
+
+/* ... TUS ESTILOS ANTERIORES ... */
+
+/* BOTÓN DE ACCIÓN DENTRO DE LA TARJETA */
+.btn-card-action {
+    margin-top: auto; /* Empuja el botón hacia el final del card-body */
+    width: 100%;      /* Ocupa todo el ancho disponible */
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--nav-border-color);
+    background-color: #f8fafc; /* Fondo gris muy suave por defecto */
+    color: var(--accent-color); /* Tu azul corporativo */
+    border-radius: 10px;        /* Bordes redondeados acorde a la tarjeta */
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+/* Efecto Hover: Se vuelve azul claro con borde azul intenso */
+.btn-card-action:hover {
+    background-color: #eff6ff; /* Azul muy clarito */
+    border-color: var(--accent-color);
+    transform: translateY(-2px); /* Pequeña elevación */
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.1);
+}
+
+.btn-card-action:active {
+    transform: translateY(0);
+}
+
+.btn-card-action i {
+    font-size: 1.1rem;
+}
+
+/* ... TUS ESTILOS ANTERIORES ... */
+
+/* --- ESTILO ESPECÍFICO PARA MODAL DE EQUIPO --- */
+
+/* Icono de cabecera (Degradado Verde Azulado / Teal) */
+.modal-icon-team {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #0ea5e9, #2dd4bf); /* Sky a Teal */
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-size: 1.5rem;
+    box-shadow: 0 4px 6px rgba(14, 165, 233, 0.25);
+}
+
+/* ... TUS ESTILOS ANTERIORES ... */
+
+/* Ajuste para el item de usuario con botón borrar */
+.user-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Separa info del botón */
+    padding: 0.75rem 1rem;
+    /* ... resto de estilos anteriores ... */
+}
+
+/* Agrupamos avatar y textos a la izquierda */
+.user-item-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Asegura que el select ocupe el espacio disponible en el footer */
+.w-100 {
+    width: 100%;
+    flex: 1; /* Esto hace que el select crezca */
+}
+
+/* ... TUS ESTILOS ANTERIORES ... */
+
+/* Botón "Unirme al Equipo" para usuarios normales */
+.btn-join-team {
+    width: 100%; /* Ocupa todo el footer */
+    padding: 0.8rem;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #10b981, #059669); /* Verde Esmeralda */
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    box-shadow: 0 4px 6px rgba(16, 185, 129, 0.25);
+    transition: all 0.2s ease;
+}
+
+.btn-join-team:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(16, 185, 129, 0.35);
+    filter: brightness(1.1);
+}
+
+.btn-join-team:active {
+    transform: translateY(0);
+}
+
+.btn-join-team i {
+    font-size: 1.2rem;
+}
+
+/* ... TUS ESTILOS ANTERIORES ... */
+
+/* Mensaje de "Ya estás inscrito" */
+.already-joined-msg {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    background-color: #f1f5f9; /* Fondo gris suave */
+    border: 1px solid #cbd5e1; /* Borde sutil */
+    color: #475569; /* Texto gris oscuro */
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    text-align: center;
+    /* No cursor pointer porque no es botón */
+}
+
+.already-joined-msg i {
+    color: #10b981; /* Icono verde check para indicar estado "OK" */
+    font-size: 1.2rem;
+}

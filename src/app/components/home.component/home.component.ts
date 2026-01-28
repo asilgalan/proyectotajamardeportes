@@ -1,4 +1,4 @@
-import { Component, inject, OnChanges, OnInit, SimpleChanges, signal } from '@angular/core';
+import { Component, inject, OnChanges, OnInit, SimpleChanges, signal, computed } from '@angular/core';
 import { ServiceEventos } from '../../services/evento.service';
 import { evento } from '../../models/evento';
 import { ActividadesService } from '../../services/actividades.service';
@@ -9,7 +9,7 @@ import { MiembroEquiposService } from '../../services/miembroEquipos.service';
 import ServicePrecioActividad from '../../services/precioActividad.service';
 import { ProfesorEventoService } from '../../services/ProfesoresEvento.service';
 import { ProfesorEvento } from '../../interface/profesoreEvento.interface';
-import { forkJoin, of, switchMap, from } from 'rxjs';
+import { forkJoin, of, switchMap, from, firstValueFrom, catchError, map } from 'rxjs';
 
 import ServicePerfil from '../../services/perfil.service';
 import { CalendarOptions } from '@fullcalendar/core';
@@ -18,6 +18,9 @@ import interactionPlugin from '@fullcalendar/interaction';
 import esLocale from '@fullcalendar/core/locales/es';
 import Perfil from '../../models/perfil';
 import { AuthService } from '../../auth/services/auth.service';
+import { CapitanActividadService } from '../../services/capitanActividad.service';
+import { CapitanActividad } from '../../interface/capitanActividad.interface';
+import { ActividadEventoResponse } from '../../interface/actividades.interface';
 
 @Component({
   selector: 'app-home',
@@ -50,6 +53,27 @@ export class HomeComponent implements OnInit ,OnChanges{
   public profesoresActivos: ProfesorEvento[] = [];
   public profesorActualEvento: number | null = null; // Para saber qué profesor tenía originalmente
   
+  // Señales para sorteo de capitanes
+  sorteoEnProgreso = signal<boolean>(false);
+  capitanesDelUsuario = signal<CapitanActividad[]>([]);
+  actividadesDelEvento = signal<ActividadEventoResponse[]>([]);
+  
+  // Computed signal para verificar si el usuario es capitán de alguna actividad
+  esCapitanDeActividad = computed(() => {
+    const userId = this.authservices.currentUser()?.idUsuario;
+    if (!userId) return false;
+    return this.capitanesDelUsuario().some(c => c.idUsuario === userId);
+  });
+  
+  // Computed signal para obtener las actividades donde el usuario es capitán
+  actividadesDondeEsCapitan = computed(() => {
+    const userId = this.authservices.currentUser()?.idUsuario;
+    if (!userId) return [];
+    return this.capitanesDelUsuario()
+      .filter(c => c.idUsuario === userId)
+      .map(c => c.idEventoActividad);
+  });
+  
   private actividadesService = inject(ActividadesService);
   private actividadEventoService = inject(ActividadEventoService);
   private inscripcionesService = inject(InscripcionesService);
@@ -57,6 +81,7 @@ export class HomeComponent implements OnInit ,OnChanges{
   private miembroEquiposService = inject(MiembroEquiposService);
   private precioActividadService = inject(ServicePrecioActividad);
   private profesorEventoService = inject(ProfesorEventoService);
+  private capitanActividadService = inject(CapitanActividadService);
 
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
@@ -88,6 +113,7 @@ export class HomeComponent implements OnInit ,OnChanges{
   ngOnInit(): void {
    
     this.getEventoCurosEscolar();
+    this.cargarCapitanesDelUsuario();
   }
 
   getEventoCurosEscolar(){
@@ -122,11 +148,11 @@ export class HomeComponent implements OnInit ,OnChanges{
   
   cargarProfesores() {
  
-    this.profesorEventoService.getProfesoresActivos().subscribe({
+    this.profesorEventoService.getProfesoresSinEvento().subscribe({
       next: (profesores) => {
-  
         this.profesoresActivos = profesores;
       },
+
       error: (err) => {
         console.error('❌ Error al cargar profesores:', err);
       }
@@ -558,5 +584,174 @@ export class HomeComponent implements OnInit ,OnChanges{
     const nombre = nombreActividad.toLowerCase();
     return nombre.includes('futbol') || nombre.includes('fútbol') ||
       nombre.includes('baloncesto') || nombre.includes('basket');
+  }
+
+  // ===================================
+  // FUNCIONALIDAD DE SORTEO DE CAPITANES
+  // ===================================
+
+  /**
+   * Cargar capitanes del usuario actual
+   */
+  async cargarCapitanesDelUsuario(): Promise<void> {
+    const userId = this.authservices.currentUser()?.idUsuario;
+    if (!userId) return;
+
+    try {
+      const capitanes = await firstValueFrom(
+        this.capitanActividadService.getCapitanActividadByIdUsuarioCapitan(userId).pipe(
+          catchError(() => of([]))
+        )
+      );
+      this.capitanesDelUsuario.set(Array.isArray(capitanes) ? capitanes : [capitanes]);
+    } catch (error) {
+      console.error('Error cargando capitanes del usuario:', error);
+      this.capitanesDelUsuario.set([]);
+    }
+  }
+
+  /**
+   * Verificar si el usuario es capitán de una actividad específica
+   */
+  esCapitanDeEstaActividad(idEventoActividad: number): boolean {
+    return this.actividadesDondeEsCapitan().includes(idEventoActividad);
+  }
+
+  /**
+   * Verificar si el evento está a 1 semana o menos de comenzar
+   */
+  estaAUnaSemanaDelEvento(fechaEvento: string): boolean {
+    const ahora = new Date();
+    const fecha = new Date(fechaEvento);
+    const diferenciaDias = Math.floor((fecha.getTime() - ahora.getTime()) / (1000 * 60 * 60 * 24));
+    return diferenciaDias <= 7 && diferenciaDias >= 0;
+  }
+
+  /**
+   * Realizar sorteo de capitanes para un evento específico
+   * Se ejecuta para todas las actividades del evento que aún no tienen capitán
+   */
+  async realizarSorteoCapitanes(idEvento: number): Promise<void> {
+    if (this.sorteoEnProgreso() || !this.authservices.isOrganizador() === false) {
+  
+      return;
+    }
+
+
+
+  
+
+    this.sorteoEnProgreso.set(true);
+
+    try {
+      // 1. Obtener todas las actividades del evento
+      const actividades = await firstValueFrom(
+        this.actividadesService.getActividadesByIdEnvento(idEvento)
+      );
+
+      if (!actividades || actividades.length === 0) {
+     
+        return;
+      }
+
+      this.actividadesDelEvento.set(actividades);
+      let capitanesAsignados = 0;
+      let actividadesSinCandidatos = 0;
+      let actividadesConCapitan = 0;
+
+      // 2. Para cada actividad, verificar si ya tiene capitán y hacer sorteo
+      for (const actividad of actividades) {
+        try {
+          // Verificar si ya tiene capitán
+          const capitanExistente = await firstValueFrom(
+            this.capitanActividadService.getCapitanActividadByIdEventoActividad(actividad.idEventoActividad).pipe(
+              map(result => result ? result : null),
+              catchError(() => of(null))
+            )
+          );
+
+          if (capitanExistente) {
+          
+            actividadesConCapitan++;
+            continue;
+          }
+
+          // Obtener inscripciones que quieren ser capitán para esta actividad específica
+          const candidatos = await firstValueFrom(
+            this.inscripcionesService.getIncripcionesUsuariosEventoCapitanActividad(
+              idEvento,
+              actividad.idActividad
+            ).pipe(
+              catchError(() => of([]))
+            )
+          );
+
+          if (!candidatos || candidatos.length === 0) {
+       
+            actividadesSinCandidatos++;
+            continue;
+          }
+
+          // Random entre candidatos
+          const randomIndex = Math.floor(Math.random() * candidatos.length);
+          const capitanSeleccionado = candidatos[randomIndex];
+
+          // Crear registro de capitán
+          const nuevoCapitan: CapitanActividad = {
+            idCapitanActividad: 0,
+            idEventoActividad: actividad.idEventoActividad,
+            idUsuario: capitanSeleccionado.idUsuario
+          };
+
+          await firstValueFrom(
+            this.capitanActividadService.createCapitanActividad(nuevoCapitan)
+          );
+ 
+          capitanesAsignados++;
+
+        } catch (error) {
+          console.error(`Error procesando actividad ${actividad.idActividad}:`, error);
+        }
+      }
+
+      // 3. Recargar capitanes del usuario actual
+      await this.cargarCapitanesDelUsuario();
+
+      // 4. Mostrar resumen
+      let mensaje = `Sorteo completado:\n\n`;
+      mensaje += `✅ Capitanes asignados: ${capitanesAsignados}\n`;
+      if (actividadesConCapitan > 0) {
+        mensaje += `ℹ Actividades que ya tenían capitán: ${actividadesConCapitan}\n`;
+      }
+      if (actividadesSinCandidatos > 0) {
+        mensaje += `⚠ Actividades sin candidatos: ${actividadesSinCandidatos}\n`;
+      }
+
+   
+
+    } catch (error) {
+      console.error('❌ Error en sorteo de capitanes:', error);
+     
+    } finally {
+      this.sorteoEnProgreso.set(false);
+    }
+  }
+
+  /**
+   * Verificar y ejecutar sorteo automático si el evento está a 1 semana o menos
+   */
+  verificarYEjecutarSorteoAutomatico(evento: evento): void {
+    if (!this.authservices.isAdmin()) return;
+    
+    if (this.estaAUnaSemanaDelEvento(evento.fechaEvento)) {
+      const confirmar = confirm(
+        `El evento "${evento.fechaEvento}" está a menos de una semana.\n\n` +
+        '¿Deseas realizar el sorteo de capitanes ahora?'
+      );
+      
+      if (confirmar) {
+        this.realizarSorteoCapitanes(evento.idEvento);
+      }
+    }
   }
 }

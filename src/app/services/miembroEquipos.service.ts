@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 import { Observable } from 'rxjs';
 import { MiembroEquipos } from '../models/miembroEquipos';
+import { MiembrosDelEquipo } from '../models/miembrosDelEquipo';
+import Perfil from '../models/perfil';
 
 @Injectable({providedIn: 'root'})
 export class MiembroEquiposService {
@@ -10,6 +12,11 @@ export class MiembroEquiposService {
     private urlEventos = environment.apiUrl;
     constructor(private _http: HttpClient){
 
+    }
+
+    getMiembrosDelEquipo(idEquipo: number): Observable<Array<MiembrosDelEquipo>> {
+        let request = "/Equipos/UsuariosEquipo/" + idEquipo;
+        return this._http.get<Array<MiembrosDelEquipo>>(this.urlEventos + request);
     }
 
     getMiembroEquipos(): Observable<Array<MiembroEquipos>> {
@@ -38,5 +45,15 @@ export class MiembroEquiposService {
         header = header.set("Content-Type", "application/json");
         let request = "/MiembroEquipos/update";
         return this._http.put(this.urlEventos + request, miembroEquiposJson, {headers: header});
+    }
+
+    insertMiembroEquiposToken(idEquipo: number): Observable<any> {
+        let request = "/UsuariosDeportes/ApuntarmeEquipo/" + idEquipo;
+        return this._http.post(this.urlEventos + request, {});
+    }
+
+    getUsuarioLogueado(): Observable<Perfil> {
+        let request = "/UsuariosDeportes/Perfil";
+        return this._http.get<Perfil>(this.urlEventos + request);
     }
 }

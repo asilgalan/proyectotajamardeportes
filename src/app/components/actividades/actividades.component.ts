@@ -2,7 +2,7 @@ import { Component, inject, Input, OnInit, OnChanges, SimpleChanges, signal } fr
 import { ActividadesService } from '../../services/actividades.service';
 import { ActividadesResponse, ActividadEventoResponse } from '../../interface/actividades.interface';
 import { ActividadEvento, ActividadEventoCreate } from '../../interface/actividadEvento.interface';
-import { tap, switchMap, forkJoin, of, EMPTY } from 'rxjs';
+import { tap, switchMap, forkJoin, of, EMPTY, firstValueFrom, catchError, map } from 'rxjs';
 import { InscripcionesService } from '../../services/inscripciones.service';
 import { A } from '@angular/cdk/keycodes';
 import { AuthService } from '../../auth/services/auth.service';
@@ -15,6 +15,8 @@ import { ServiceEventos } from '../../services/evento.service';
 import { evento } from '../../models/evento';
 import { EquipoService } from '../../services/equipo.service';
 import { MiembroEquiposService } from '../../services/miembroEquipos.service';
+import { CapitanActividadService } from '../../services/capitanActividad.service';
+import { CapitanActividad } from '../../interface/capitanActividad.interface';
 
 
 @Component({
@@ -35,13 +37,26 @@ export class ActividadesComponent implements OnInit,OnChanges {
   private eventosService=inject(ServiceEventos);
   private equipoService=inject(EquipoService);
   private miembroEquiposService=inject(MiembroEquiposService);
+  private capitanActividadService=inject(CapitanActividadService);
+  
   public actividades=signal<(ActividadEventoResponse & { estaInscrito: UsuarioDeporteResponse[] })[]>([]);
   public actividadEvento=signal<ActividadEventoResponse[] | []>([]);
   public showModal = signal<boolean>(false);
   public quiereSerCapitan = signal<boolean>(false);
-  private actividadSeleccionada = signal<{idEventoActividad: number} | null>(null);
+  public actividadSeleccionada = signal<{idEventoActividad: number} | null>(null);
   public showModalDesapuntar = signal<boolean>(false);
   private inscripcionSeleccionada = signal<{idInscripcion: number, idEventoActividad: number} | null>(null);
+  
+  // Señales para sorteo de capitán
+  public sorteoEnProgreso = signal<boolean>(false);
+  public showModalSorteoCapitan = signal<boolean>(false);
+  public candidatosCapitan = signal<any[]>([]);
+  public actividadParaSorteo = signal<{idEventoActividad: number, idActividad: number, nombreActividad: string} | null>(null);
+  public capitanSeleccionado = signal<any | null>(null);
+  public capitanActual = signal<any | null>(null); // Capitán existente en modo edición
+  public modoEdicionCapitan = signal<boolean>(false); // Si es edición o nuevo sorteo
+  public showModalExito = signal<boolean>(false); // Modal de éxito
+  public mensajeExito = signal<string>(''); // Mensaje del modal de éxito
 
   public showModalCrearActividad = signal<boolean>(false);
   public tabActivo = signal<'existente' | 'copiar' | 'nueva'>('existente');
@@ -213,10 +228,7 @@ export class ActividadesComponent implements OnInit,OnChanges {
     this.quiereSerCapitan.set(!this.quiereSerCapitan());
   }
   
-  showDetails(actividad: number) {
-    console.log("Ver detalles de:", actividad);
-   
-  }
+
 
   abrirModalCrearActividad() {
     this.showModalCrearActividad.set(true);
@@ -292,7 +304,7 @@ export class ActividadesComponent implements OnInit,OnChanges {
       idActividad: actividadId
     };
 
-    console.log('Enviando ActividadEvento:', nuevaActividadEvento);
+    
 
     this.actividadEventoService.createActividadEvento(nuevaActividadEvento).subscribe({
       next: () => {
@@ -335,7 +347,7 @@ export class ActividadesComponent implements OnInit,OnChanges {
         idEvento: this.idEvento,
         idActividad: idActividad
       };
-      console.log('Copiando ActividadEvento:', nuevaActividadEvento);
+   
       return this.actividadEventoService.createActividadEvento(nuevaActividadEvento);
     });
 
@@ -358,7 +370,6 @@ export class ActividadesComponent implements OnInit,OnChanges {
       idActividad: actividad.idActividad
     };
 
-    console.log('Copiando ActividadEvento:', nuevaActividadEvento);
 
     this.actividadEventoService.createActividadEvento(nuevaActividadEvento).subscribe({
       next: () => {
@@ -395,22 +406,22 @@ export class ActividadesComponent implements OnInit,OnChanges {
 
     this.actividadesService.createActividades(nuevaActividad).pipe(
       switchMap((actividadCreada) => {
-        console.log('Actividad base creada:', actividadCreada);
+       
         const nuevaActividadEvento: ActividadEventoCreate = {
           idEvento: this.idEvento,
           idActividad: actividadCreada.idActividad
         };
-        console.log('Asociando al evento:', nuevaActividadEvento);
+      
         return this.actividadEventoService.createActividadEvento(nuevaActividadEvento);
       })
     ).subscribe({
       next: () => {
-        console.log('Actividad asociada al evento correctamente');
+      
         this.cerrarModalCrearActividad();
         this.getActividadesByIdEnvento(this.idEvento);
       },
       error: (err) => {
-        console.error('Error en el proceso:', err);
+       
         this.cerrarModalCrearActividad();
         this.getActividadesByIdEnvento(this.idEvento);
       }
@@ -623,7 +634,7 @@ export class ActividadesComponent implements OnInit,OnChanges {
   }
 
   manejarErrorEliminacion(err: any) {
-    console.error('Error al eliminar actividad:', err);
+ 
     this.cerrarModalEliminar();
     
     let mensaje = 'No se pudo eliminar la actividad del evento.\n\n';
@@ -676,5 +687,217 @@ export class ActividadesComponent implements OnInit,OnChanges {
 
   verEquipos(idActividad: number, idEvento: number): void {
     this._router.navigate(["/equipos/" + idActividad + "/" + idEvento]);
+  }
+
+  /**
+   * Abrir modal para sortear capitán (solo para fútbol)
+   */
+  async abrirModalSorteoCapitan(idEventoActividad?: number, idActividad?: number, nombreActividad?: string): Promise<void> {
+    if (!this.authService.isAdmin()) {
+     
+      return;
+    }
+
+    // Si no se proporciona actividad, buscar la actividad de fútbol del evento actual
+    if (!idEventoActividad || idEventoActividad === 0) {
+    
+      const actividadFutbol = this.actividades().find(a => this.esFutbol(a.nombreActividad));
+      
+      if (!actividadFutbol) {
+      
+        return;
+      }
+      
+      idEventoActividad = actividadFutbol.idEventoActividad;
+      idActividad = actividadFutbol.idActividad;
+      nombreActividad = actividadFutbol.nombreActividad;
+    
+    }
+
+    this.sorteoEnProgreso.set(true);
+
+    try {
+    
+      // Obtener todos los capitanes para encontrar el ID del registro
+      const todosCapitanes = await firstValueFrom(
+        this.capitanActividadService.getCapitanActividad().pipe(
+          catchError(() => of([]))
+        )
+      );
+      
+      // Buscar el capitán para este idEventoActividad
+      const registroCapitan = todosCapitanes.find(c => c.idEventoActividad === idEventoActividad);
+      
+      if (registroCapitan) {
+   
+        // Obtener información del usuario capitán
+        const infoUsuario = await firstValueFrom(
+          this.capitanActividadService.getCapitanActividadByIdEventoActividad(idEventoActividad).pipe(
+            catchError(() => of(null))
+          )
+        );
+        
+        // Modo edición: mostrar capitán actual
+        this.modoEdicionCapitan.set(true);
+        this.capitanActual.set(registroCapitan);
+        this.capitanSeleccionado.set(infoUsuario || registroCapitan);
+        
+  
+      } else {
+      
+        this.modoEdicionCapitan.set(false);
+        this.capitanActual.set(null);
+      }
+
+      
+      const candidatos = await firstValueFrom(
+        this.inscripcionService.getIncripcionesUsuariosEventoCapitanActividad(this.idEvento, idActividad!).pipe(
+          catchError(error => {
+            return of([]);
+          })
+        )
+      );
+
+
+
+      if (!candidatos || !Array.isArray(candidatos) || candidatos.length === 0) {
+      
+        this.sorteoEnProgreso.set(false);
+      
+        return;
+      }
+
+      this.actividadParaSorteo.set({ idEventoActividad, idActividad: idActividad!, nombreActividad: nombreActividad! });
+      this.candidatosCapitan.set(candidatos);
+      if (!this.modoEdicionCapitan()) {
+        this.capitanSeleccionado.set(null);
+      }
+      this.showModalSorteoCapitan.set(true);
+     
+
+    } catch (error) {
+
+    } finally {
+      this.sorteoEnProgreso.set(false);
+    }
+  }
+
+  /**
+   * Cerrar modal de sorteo
+   */
+  cerrarModalSorteoCapitan(): void {
+    this.showModalSorteoCapitan.set(false);
+    this.candidatosCapitan.set([]);
+    this.actividadParaSorteo.set(null);
+    this.capitanSeleccionado.set(null);
+    this.capitanActual.set(null);
+    this.modoEdicionCapitan.set(false);
+  }
+
+  /**
+   * Cerrar modal de éxito
+   */
+  cerrarModalExito(): void {
+    this.showModalExito.set(false);
+    this.mensajeExito.set('');
+    this.getActividadesByIdEnvento(this.idEvento);
+  }
+
+  /**
+   * Realizar sorteo random y mostrar resultado
+   */
+  realizarSorteoRandom(): void {
+    const candidatos = this.candidatosCapitan();
+    if (candidatos.length === 0) return;
+
+    const randomIndex = Math.floor(Math.random() * candidatos.length);
+    const seleccionado = candidatos[randomIndex];
+    this.capitanSeleccionado.set(seleccionado);
+  }
+
+  /**
+   * Confirmar asignación de capitán
+   */
+  async confirmarAsignacionCapitan(): Promise<void> {
+    const capitan = this.capitanSeleccionado();
+    const actividad = this.actividadParaSorteo();
+    const esEdicion = this.modoEdicionCapitan();
+
+    if (!capitan || !actividad) return;
+
+    this.sorteoEnProgreso.set(true);
+
+    try {
+      if (esEdicion) {
+        // Eliminar capitán antiguo y crear uno nuevo
+        const idCapitanAntiguo = this.capitanActual()?.idCapitanActividad;
+        
+      
+        
+        if (idCapitanAntiguo) {
+          await firstValueFrom(
+            this.capitanActividadService.deleteCapitanActividad(idCapitanAntiguo)
+          );
+        }
+        
+        // Crear nuevo capitán
+        const nuevoCapitan: CapitanActividad = {
+          idCapitanActividad: 0,
+          idEventoActividad: actividad.idEventoActividad,
+          idUsuario: capitan.idUsuario
+        };
+
+        
+
+        await firstValueFrom(
+          this.capitanActividadService.createCapitanActividad(nuevoCapitan)
+        );
+
+        this.cerrarModalSorteoCapitan();
+        this.mensajeExito.set(` ¡Capitán actualizado correctamente!\n\n${capitan.usuario} es el nuevo capitán de ${actividad.nombreActividad}.`);
+        this.showModalExito.set(true);
+
+      } else {
+        // Crear nuevo capitán
+        const nuevoCapitan: CapitanActividad = {
+          idCapitanActividad: 0,
+          idEventoActividad: actividad.idEventoActividad,
+          idUsuario: capitan.idUsuario
+        };
+
+        await firstValueFrom(
+          this.capitanActividadService.createCapitanActividad(nuevoCapitan)
+        );
+
+        this.cerrarModalSorteoCapitan();
+        this.mensajeExito.set(` ¡Capitán asignado correctamente!\n\n${capitan.usuario} es el nuevo capitán de ${actividad.nombreActividad}.`);
+        this.showModalExito.set(true);
+      }
+
+  
+
+    } catch (error) {
+    
+      this.cerrarModalSorteoCapitan();
+    
+    } finally {
+      this.sorteoEnProgreso.set(false);
+    }
+  }
+
+  /**
+   * Verificar si la actividad es fútbol
+   */
+  esFutbol(nombreActividad: string): boolean {
+    const nombre = nombreActividad.toLowerCase();
+    return nombre.includes('futbol') || nombre.includes('fútbol');
+  }
+
+  /**
+   * Verificar si una actividad específica  es fútbol
+   */
+  esActividadFutbol(idEventoActividad: number): boolean {
+    const actividad = this.actividades().find(a => a.idEventoActividad === idEventoActividad);
+    return actividad ? this.esFutbol(actividad.nombreActividad) : false;
   }
 }

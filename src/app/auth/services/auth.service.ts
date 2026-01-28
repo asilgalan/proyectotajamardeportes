@@ -20,6 +20,8 @@ export class AuthService {
     private route=inject(Router);
     private perfilService=inject(ServicePerfil);
 
+    public _capitan=signal<string>(null!);
+
   private _token= signal<string | null>(localStorage.getItem('token'));
   private _admin=signal<string |null>(localStorage.getItem('role'));
   private _currentUser = signal<Perfil | null>(null);
@@ -45,16 +47,17 @@ export class AuthService {
    
    
     }
-    
-
 
 
       token = computed(() => this._token());
       currentUser = computed(() => this._currentUser());
       isLoading = computed(() => this._isLoading());
       isAdmin = computed(() => {
-        return this._admin() === 'ADMINISTRADOR' || this._admin() === 'ORGANIZADOR';
+        return this._admin() === 'ADMINISTRADOR';
       });
+
+      isOrganizador=computed(() => this._admin() === 'ORGANIZADOR' || this._admin() === 'ADMINISTRADOR');
+      isCapitan=computed(() => this._capitan() === 'CAPITAN' || this._admin() === 'ADMINISTRADOR');
 
     private async loadUserProfile() {
         try {
@@ -75,6 +78,7 @@ export class AuthService {
                 localStorage.setItem('token', response.response);
                 localStorage.setItem('role', response.role);
                 this._admin.set(response.role);
+                this._capitan.set(response.role);
                 this._token.set(response.response);
                 this.isAuthenticated = true;
         
