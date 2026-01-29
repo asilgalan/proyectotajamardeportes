@@ -122,6 +122,8 @@ export class AuthService {
 
         localStorage.removeItem('token');
         this._token.set(null);
+        localStorage.removeItem('role');
+        this._role.set(0);
         this._currentUser.set(null);
         this.isAuthenticated = false;
         this.route.navigate(['']);
