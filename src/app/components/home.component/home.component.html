@@ -277,7 +277,7 @@
                   </div>
                 
                 </div>
-                @if (organizadorService.esOrganizador() || authservices.isAdmin()) {
+                @if (isOrganizador|| authservices.isAdmin()) {
                   <button 
                     class="btn-edit-event" 
                     (click)="abrirModalEditarEvento($event, event)" 
