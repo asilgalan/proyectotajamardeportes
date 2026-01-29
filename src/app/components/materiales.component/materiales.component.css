@@ -1,0 +1,343 @@
+/* ================================
+   MATERIAL CARD PRINCIPAL
+   ================================ */
+.material-card {
+  max-width: 900px;
+  margin: 2rem auto;
+  background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
+  border-radius: 1rem;
+  padding: 2rem 1.5rem;
+  box-shadow: 0 12px 25px rgba(37, 99, 235, 0.08);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.material-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 35px rgba(37, 99, 235, 0.15);
+}
+
+/* ================================
+   HEADER DEL MATERIAL
+   ================================ */
+.material-header-enhanced {
+  background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+  padding: 1.5rem 2rem;
+  border-radius: 1rem;
+  text-align: center;
+  box-shadow: 0 6px 15px rgba(37, 99, 235, 0.08);
+  margin-bottom: 2rem;
+}
+
+.material-title-enhanced {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e40af;
+  margin: 0;
+}
+
+.material-subtitle-enhanced {
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  color: #1e3a8a;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* ================================
+   LISTA DE EVENTOS
+   ================================ */
+.material-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.material-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.material-list::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.material-list::-webkit-scrollbar-thumb {
+  background: var(--nav-border-color);
+  border-radius: 10px;
+}
+
+.material-list::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-color);
+}
+
+
+/* ================================
+   TARJETA DE EVENTO
+   ================================ */
+.event-card {
+  display: flex;
+  align-items: flex-start;
+  background: white;
+  border-radius: 1rem;
+  border: 1px solid #e2e8f0;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+  transition: transform 0.25s, box-shadow 0.25s, background 0.25s;
+  gap: 1rem;
+}
+
+.event-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.15);
+  background: #f0f9ff;
+}
+
+.event-content {
+  opacity: 0;
+  transform: translateX(20px);
+  transition: all 0.3s ease;
+}
+
+.event-card.selected .event-content {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.event-card:hover .event-content {
+  background: linear-gradient(135deg, #dbeafe, #eff6ff);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.15);
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+}
+
+.event-date {
+  min-width: 60px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  text-align: center;
+  border-radius: 0.8rem;
+  padding: 0.6rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Roboto', sans-serif;
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+}
+
+.event-date .date-day {
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.event-date .date-month {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.event-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 0.8rem;
+}
+
+
+/* ================================
+   LISTA DE ACTIVIDADES DENTRO DEL EVENTO
+   ================================ */
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 1rem;
+  padding-left: 0.5rem;
+  border-left: 3px solid #6366f1;
+}
+
+/* ================================
+   TARJETA DE ACTIVIDAD
+   ================================ */
+.activity-card {
+  background: white;
+  border-radius: 1rem;
+  border: 1px solid #e2e8f0;
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.05);
+  transition: transform 0.25s, box-shadow 0.25s, background 0.25s;
+}
+
+.activity-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.12);
+  background: #f0f9ff;
+}
+
+.activity-title {
+  font-weight: 600;
+  color: #1e3a8a;
+  margin: 0 0 0.5rem 0;
+}
+
+.activity-card {
+  transform: translateY(0);
+  transition: all 0.25s ease;
+}
+
+.activity-card.new {
+  transform: translateY(-5px);
+  opacity: 0;
+  animation: popIn 0.3s forwards;
+}
+
+@keyframes popIn {
+  0% { transform: translateY(-5px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* ================================
+   BOTONES DE ACTIVIDAD
+   ================================ */
+.activity-buttons {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.activity-buttons button {
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.6rem;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.btn-proporcionar {
+  background: linear-gradient(135deg, #22c55e 0%, #10b981 100%);
+}
+
+.btn-proporcionar:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+}
+
+.btn-solicitar {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.btn-solicitar:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+/* ================================
+   CHAT DE MATERIALES
+   ================================ */
+.material-chat {
+  margin-top: 0.8rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: #f0f9ff;
+  border: 1px solid #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 220px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #6366f1 #f1f5f9;
+}
+
+.material-chat::-webkit-scrollbar {
+  width: 6px;
+}
+
+.material-chat::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.material-chat::-webkit-scrollbar-thumb {
+  background: #6366f1;
+  border-radius: 10px;
+}
+
+.material-chat::-webkit-scrollbar-thumb:hover {
+  background: #4f46e5;
+}
+
+/* ================================
+   BURBUJAS DE MATERIAL
+   ================================ */
+.material-message-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.material-message-container.left {
+  align-items: flex-start;
+}
+
+.material-message-container.right {
+  align-items: flex-end;
+}
+
+.material-message {
+  padding: 8px 12px;
+  border-radius: 16px;
+  max-width: 70%;
+  word-break: break-word;
+  font-size: 0.9rem;
+  display: inline-block;
+}
+
+.material-rojo {
+  background: #f87171;
+  color: white;
+  align-self: flex-start;
+}
+
+.material-verde {
+  background: #34d399;
+  color: white;
+  align-self: flex-end;
+}
+
+.material-username {
+  font-size: 0.75rem;
+  color: #555;
+  margin-bottom: 2px;
+  font-weight: 500;
+}
+
+.material-message button {
+  background-color: rgba(255,255,255,0.3);
+  border: none;
+  border-radius: 0.3rem;
+  color: white;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  margin-left: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.material-message button:hover {
+  background-color: rgba(255,255,255,0.5);
+}

@@ -19,7 +19,15 @@
 
 .actividades-header {
 	margin-bottom: 24px;
-	text-align: center;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 16px;
+}
+
+.header-text {
+	text-align: left;
 }
 
 .actividades-header h1 {
@@ -33,6 +41,12 @@
 	font-size: 0.95rem;
 	color: var(--text-secondary);
 	margin: 0;
+}
+
+.header-actions {
+	display: flex;
+	gap: 12px;
+	align-items: center;
 }
 
 .actividades-main {
@@ -185,6 +199,7 @@
 	display: flex;
 	gap: 8px;
 	background: #fafafa;
+	align-items: center;
 }
 
 /* Buttons */
@@ -274,6 +289,8 @@
 	background: #f1f5f9;
 	color: #64748b;
 	border: 1.5px dashed #cbd5e1;
+	height: auto;
+	min-height: 36px;
 }
 
 .btn-otra-actividad i,
@@ -327,6 +344,9 @@
 	justify-content: center;
 	z-index: 1000;
 	animation: fadeIn 0.2s ease;
+	padding: 20px;
+	box-sizing: border-box;
+	overflow-y: auto;
 }
 
 @keyframes fadeIn {
@@ -354,9 +374,13 @@
 	border-radius: 16px;
 	width: 90%;
 	max-width: 400px;
+	max-height: 90vh;
 	box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 	animation: slideUp 0.3s ease;
 	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	margin: auto;
 }
 
 .modal-header {
@@ -364,6 +388,7 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: flex-start;
+	flex-shrink: 0;
 }
 
 .modal-icon {
@@ -402,6 +427,8 @@
 
 .modal-body {
 	padding: 20px;
+	overflow-y: auto;
+	flex: 1;
 }
 
 .modal-body h2 {
@@ -503,6 +530,7 @@
 	padding: 16px 20px 20px;
 	display: flex;
 	gap: 10px;
+	flex-shrink: 0;
 }
 
 .btn-modal-cancel,
@@ -578,4 +606,657 @@
 
 .btn-view-teams i {
     font-size: 0.95rem;
+}
+
+/* ========== ESTILOS PARA CREAR/EDITAR ACTIVIDADES ========== */
+
+/* Header con botón */
+.actividades-header {
+	margin-bottom: 24px;
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 16px;
+}
+
+.btn-crear-actividad {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.75rem 1.25rem;
+	font-size: 0.95rem;
+	font-weight: 600;
+	color: white;
+	background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+	border: none;
+	border-radius: 10px;
+	cursor: pointer;
+	box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+	transition: all 0.3s ease;
+}
+
+.btn-crear-actividad:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+/* Botón Sortear Capitán en Header */
+.btn-sorteo-header {
+	padding: 10px 20px;
+	border: none;
+	border-radius: 10px;
+	font-weight: 600;
+	font-size: 0.9rem;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+	color: white;
+	transition: all 0.3s ease;
+	box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+}
+
+.btn-sorteo-header:hover:not(:disabled) {
+	background: linear-gradient(135deg, #059669 0%, #047857 100%);
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-sorteo-header:disabled {
+	background: #9ca3af;
+	cursor: not-allowed;
+	opacity: 0.6;
+}
+
+/* Botón Sortear Capitán */
+.btn-sorteo-capitan {
+	flex: 1;
+	padding: 8px 14px;
+	border: none;
+	border-radius: 6px;
+	font-weight: 500;
+	font-size: 0.85rem;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+	color: white;
+	transition: all 0.2s ease;
+}
+
+.btn-sorteo-capitan:hover:not(:disabled) {
+	background: linear-gradient(135deg, #059669 0%, #047857 100%);
+	transform: translateY(-1px);
+	box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+}
+
+.btn-sorteo-capitan:disabled {
+	background: #9ca3af;
+	cursor: not-allowed;
+	opacity: 0.6;
+}
+
+.btn-sorteo-capitan i {
+	font-size: 1rem;
+}
+
+/* Botón Editar Mejorado */
+.btn-editar-mejorado {
+	width: 100%;
+	padding: 10px 16px;
+	border: none;
+	border-radius: 8px;
+	font-weight: 600;
+	font-size: 0.9rem;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+	color: white;
+	transition: all 0.3s ease;
+	box-shadow: 0 2px 6px rgba(245, 158, 11, 0.2);
+}
+
+.btn-editar-mejorado:hover {
+	background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+	transform: translateY(-2px);
+	box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
+}
+
+.btn-editar-mejorado:active {
+	transform: translateY(0);
+}
+
+.btn-editar-mejorado i {
+	font-size: 1.1rem;
+}
+
+/* Botón Editar */
+.btn-editar {
+	flex: 1;
+	padding: 8px 14px;
+	border: none;
+	border-radius: 6px;
+	font-weight: 500;
+	font-size: 0.85rem;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+	color: white;
+	transition: all 0.2s ease;
+}
+
+.btn-editar:hover {
+	background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+}
+
+/* Modal grande */
+.modal-lg {
+	max-width: 500px;
+}
+
+/* Tabs del modal */
+.modal-tabs {
+	display: flex;
+	gap: 8px;
+	margin-bottom: 20px;
+	background: #f1f5f9;
+	padding: 4px;
+	border-radius: 10px;
+}
+
+.modal-tabs .tab-btn {
+	flex: 1;
+	padding: 10px 12px;
+	border: none;
+	background: transparent;
+	border-radius: 8px;
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: var(--text-secondary);
+	cursor: pointer;
+	transition: all 0.2s ease;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+}
+
+.modal-tabs .tab-btn:hover {
+	color: var(--text-primary);
+}
+
+.modal-tabs .tab-btn.active {
+	background: white;
+	color: var(--primary);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.modal-tabs .tab-btn i {
+	font-size: 1rem;
+}
+
+/* Tab content */
+.tab-content {
+	animation: fadeIn 0.2s ease;
+}
+
+/* Formularios */
+.form-group {
+	margin-bottom: 16px;
+}
+
+.form-group label {
+	display: block;
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: var(--text-primary);
+	margin-bottom: 6px;
+}
+
+.form-group label .required {
+	color: #ef4444;
+	margin-left: 2px;
+}
+
+.form-select,
+.form-input {
+	width: 100%;
+	padding: 10px 14px;
+	font-size: 0.9rem;
+	border: 2px solid #e2e8f0;
+	border-radius: 8px;
+	background: #f8fafc;
+	color: var(--text-primary);
+	transition: all 0.2s ease;
+}
+
+.form-select:focus,
+.form-input:focus {
+	outline: none;
+	border-color: var(--primary);
+	background: white;
+	box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.form-select-multiple {
+	min-height: 120px;
+	padding: 8px;
+}
+
+.form-select-multiple option {
+	padding: 8px 10px;
+	border-radius: 4px;
+	margin-bottom: 2px;
+}
+
+.form-select-multiple option:checked {
+	background: linear-gradient(0deg, var(--primary) 0%, var(--primary) 100%);
+	color: white;
+}
+
+.text-muted {
+	display: block;
+	font-size: 0.8rem;
+	color: var(--text-secondary);
+	margin-top: 4px;
+}
+
+.text-warning {
+	display: block;
+	font-size: 0.9rem;
+	color: #f59e0b;
+	font-weight: 500;
+	margin: 12px 0;
+	padding: 8px 12px;
+	background: #fef3c7;
+	border-radius: 6px;
+	border-left: 3px solid #f59e0b;
+}
+
+/* Estilos para mensajes de error con formato */
+.modal-body p {
+	white-space: pre-line;
+	line-height: 1.6;
+}
+
+.required {
+	color: #ef4444;
+	font-weight: 600;
+	margin-left: 2px;
+}
+
+.form-row {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 12px;
+}
+
+.btn-full {
+	width: 100%;
+	margin-top: 8px;
+}
+
+/* Lista de actividades para copiar */
+.actividades-copiar-list {
+	margin-top: 16px;
+}
+
+.actividades-copiar-list > label {
+	display: block;
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: var(--text-primary);
+	margin-bottom: 10px;
+}
+
+.actividad-copiar-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px;
+	background: #f8fafc;
+	border-radius: 8px;
+	margin-bottom: 8px;
+	border: 1px solid #e2e8f0;
+}
+
+.actividad-copiar-info {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.actividad-copiar-info strong {
+	font-size: 0.9rem;
+	color: var(--text-primary);
+}
+
+.actividad-copiar-info span {
+	font-size: 0.75rem;
+	color: var(--text-secondary);
+}
+
+.btn-copiar-mini {
+	padding: 6px 12px;
+	border: none;
+	border-radius: 6px;
+	font-size: 0.8rem;
+	font-weight: 600;
+	background: var(--primary);
+	color: white;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	transition: all 0.2s ease;
+}
+
+.btn-copiar-mini:hover {
+	background: var(--primary-hover);
+}
+
+/* Botón eliminar actividad */
+.btn-eliminar-actividad {
+	width: 100%;
+	padding: 12px;
+	margin-top: 16px;
+	border: 2px dashed #fca5a5;
+	border-radius: 8px;
+	background: #fef2f2;
+	color: #dc2626;
+	font-size: 0.9rem;
+	font-weight: 600;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	transition: all 0.2s ease;
+}
+
+.btn-eliminar-actividad:hover {
+	background: #fee2e2;
+	border-color: #f87171;
+}
+
+.text-muted {
+	color: var(--text-secondary);
+}
+
+.text-center {
+	text-align: center;
+}
+
+/* Disabled buttons */
+button:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+	.modal-tabs .tab-btn span {
+		display: none;
+	}
+	
+	.form-row {
+		grid-template-columns: 1fr;
+	}
+}
+/* ===================================
+   MODAL SORTEO DE CAPIT�N
+   =================================== */
+
+.modal-sorteo-capitan {
+max-width: 600px;
+}
+
+.actividad-nombre {
+text-align: center;
+font-size: 1.1rem;
+font-weight: 600;
+color: #10b981;
+margin-bottom: 16px;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+.candidatos-info {
+display: flex;
+justify-content: center;
+margin-bottom: 20px;
+}
+
+.info-badge {
+background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+color: #1e40af;
+padding: 8px 16px;
+border-radius: 20px;
+font-size: 0.85rem;
+font-weight: 600;
+display: inline-flex;
+align-items: center;
+}
+
+.candidatos-lista {
+max-height: 400px;
+overflow-y: auto;
+display: flex;
+flex-direction: column;
+gap: 12px;
+padding: 4px;
+}
+
+.candidato-card {
+display: flex;
+align-items: center;
+gap: 12px;
+padding: 12px;
+border: 2px solid #e5e7eb;
+border-radius: 12px;
+background: #ffffff;
+transition: all 0.3s ease;
+}
+
+.candidato-card:hover {
+border-color: #10b981;
+box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
+transform: translateY(-2px);
+}
+
+.candidato-card.seleccionado {
+border-color: #10b981;
+background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+animation: seleccionPulse 0.5s ease;
+}
+
+@keyframes seleccionPulse {
+0%, 100% { transform: scale(1); }
+50% { transform: scale(1.02); }
+}
+
+.candidato-avatar {
+width: 50px;
+height: 50px;
+border-radius: 50%;
+overflow: hidden;
+flex-shrink: 0;
+border: 2px solid #e5e7eb;
+}
+
+.candidato-card.seleccionado .candidato-avatar {
+border-color: #10b981;
+}
+
+.candidato-avatar img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+}
+
+.avatar-placeholder {
+width: 100%;
+height: 100%;
+background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+display: flex;
+align-items: center;
+justify-content: center;
+color: white;
+font-size: 1.5rem;
+}
+
+.candidato-info {
+flex: 1;
+min-width: 0;
+}
+
+.candidato-nombre {
+font-weight: 600;
+font-size: 0.95rem;
+color: #1e293b;
+margin-bottom: 4px;
+}
+
+.candidato-curso {
+font-size: 0.8rem;
+color: #64748b;
+}
+
+.candidato-badge {
+background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+color: white;
+padding: 6px 12px;
+border-radius: 20px;
+font-size: 0.75rem;
+font-weight: 600;
+display: flex;
+align-items: center;
+gap: 4px;
+white-space: nowrap;
+animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+from { opacity: 0; transform: scale(0.8); }
+to { opacity: 1; transform: scale(1); }
+}
+
+.resultado-sorteo {
+margin-top: 20px;
+padding: 16px;
+background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+border: 2px solid #10b981;
+border-radius: 12px;
+text-align: center;
+font-size: 1.05rem;
+font-weight: 600;
+color: #059669;
+display: flex;
+align-items: center;
+justify-content: center;
+animation: slideDown 0.4s ease;
+}
+
+@keyframes slideDown {
+from { opacity: 0; transform: translateY(-10px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+.btn-modal-sorteo {
+flex: 1;
+padding: 10px 16px;
+border-radius: 8px;
+font-size: 0.85rem;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.2s ease;
+border: none;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 6px;
+background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+color: white;
+}
+
+.btn-modal-sorteo:hover:not(:disabled) {
+box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+transform: translateY(-1px);
+}
+
+.btn-modal-sorteo:active {
+transform: translateY(0);
+}
+
+.btn-modal-sorteo:disabled {
+background: #9ca3af;
+cursor: not-allowed;
+opacity: 0.6;
+}
+
+/* ===================================
+   MODAL DE �XITO
+   =================================== */
+
+.modal-exito {
+  max-width: 500px;
+  text-align: center;
+}
+
+.exito-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 0;
+}
+
+.exito-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  color: white;
+  animation: scaleIn 0.5s ease;
+}
+
+@keyframes scaleIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.exito-mensaje {
+  font-size: 1.1rem;
+  color: #1e293b;
+  white-space: pre-line;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.text-success {
+  color: #10b981 !important;
 }

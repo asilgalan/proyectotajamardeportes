@@ -1,1 +1,86 @@
-<p>pagos.component works!</p>
+<div class="main-container">
+
+  <div class="pagos-layout">
+
+    <div class="bubble-card bubble-precio">
+       <form #precioForm="ngForm">
+
+        <h1>Asigna precio a una actividad</h1>
+
+        <div class="form-group">
+          <label>Elige el evento</label>
+          <select name="eventosPrecio" #eventoPrecio (change)="seleccionarEventoPrecio()">
+            <option value="" disabled selected>-- Selecciona un evento --</option>
+            <option *ngFor="let evento of eventosPrecios" [value]="evento.idEvento">
+              {{ evento.fechaEvento | date:'dd' }} {{ evento.fechaEvento | date:'MMM' | uppercase }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Elige la actividad</label>
+          <select name="actividadesPrecio" #actividadPrecio>
+            <option value="" disabled selected>-- Selecciona una actividad --</option>
+            <option *ngFor="let actividad of actividadesPrecios" [value]="actividad.idActividad">
+              {{ actividad.nombreActividad }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>¿Cuánto va a costar esta actividad?</label>
+          <input type="number" name="precio" #precioInput min="0" />
+        </div>
+
+        <button type="button" (click)="insertarPrecio()">Asignar</button>
+
+      </form>
+    </div>
+
+    <div class="bubble-card bubble-pago">
+       <form #pagoForm="ngForm">
+
+        <h1>Gestiona el pago de una actividad</h1>
+
+        <div class="form-group">
+          <label>Elige el evento</label>
+          <select name="eventosPago" #eventoPago (change)="seleccionarEventoPago()">
+            <option value="" disabled selected>-- Selecciona un evento --</option>
+            <option *ngFor="let evento of eventosPagos" [value]="evento.idEvento">
+              {{ evento.fechaEvento | date:'dd' }} {{ evento.fechaEvento | date:'MMM' | uppercase }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Elige la actividad</label>
+          <select name="actividadesPago" #actividadPago (change)="calcularCoste()">
+            <option value="" disabled selected>-- Selecciona una actividad --</option>
+            <option *ngFor="let actividad of actividadesPagos" [value]="actividad.idActividad">
+              {{actividad.nombreActividad}}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Elige el curso</label>
+          <select name="cursosPago" #cursosPago>
+            <option *ngFor="let curso of cursos" [value]="curso.idCurso">
+              {{curso.nombre}}
+            </option>
+          </select>
+        </div>
+
+        <button type="button" (click)="insertarPago()">Pagar</button>
+
+      </form>
+    </div>
+  </div>
+
+  <div *ngIf="mostrarToast" class="toast" [ngClass]="tipoToast">
+    <span class="icon-check">
+      {{ iconoToast }}
+    </span>
+    {{ toastMensaje }}
+  </div>
+</div>

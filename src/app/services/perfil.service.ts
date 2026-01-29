@@ -17,7 +17,8 @@ export default class ServicePerfil
         let promise = new Promise((resolve, reject) =>{
             this._http.get(url+endPoint).subscribe({
                 next: (response) => {
-                    resolve(response);
+                    const perfilNormalizado = this.normalizarPerfil(response);
+                    resolve(perfilNormalizado);
                 },
                 error: (error) => {
                     reject(error);
@@ -26,6 +27,16 @@ export default class ServicePerfil
         })
 
         return promise;
+    }
+
+    private normalizarPerfil(response: any): any {
+        if (Array.isArray(response)) {
+            return response[0] ?? null;
+        }
+        if (response?.usuario) {
+            return response.usuario;
+        }
+        return response;
     }
 
     getEventosYActividades():Promise<any>

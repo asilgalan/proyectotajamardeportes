@@ -25,12 +25,40 @@
 
         <li class="nav-item">
           <a class="nav-link nav-pill-item me-2" 
-             [routerLink]="['/eventos']" 
+             [routerLink]="['/materiales']" 
              routerLinkActive="active-link">
-            <i class="bi bi-calendar-event-fill me-2"></i> Eventos
+            <i class="bi bi-box-seam me-2"></i> Materiales
+          </a>
+      
+           <li class="nav-item">
+          <a class="nav-link nav-pill-item me-2" 
+             [routerLink]="['/partido-resultado']" 
+             routerLinkActive="active-link">
+            <i class="bi bi-trophy-fill me-2"></i> Partido Resultado
           </a>
         </li>
 
+        @if(this.authService.isAdmin())
+        {
+          <li class="nav-item">
+            <a class="nav-link nav-pill-item me-2" 
+               [routerLink]="['/organizador']" 
+               routerLinkActive="active-link">
+               <i class="bi bi-people-fill me-2"></i> Gestión organizador
+            </a>
+          </li>
+        }
+
+        @if(this.authService.isAdmin() || this.organizadorService.esOrganizador())
+        {
+          <li class="nav-item">
+            <a class="nav-link nav-pill-item me-2" 
+              [routerLink]="['/pagos']" 
+              routerLinkActive="active-link">
+              <i class="bi bi-cash-coin me-2"></i> Gestión pagos
+            </a>
+          </li>
+        }
       </ul>
 
       <ul class="navbar-nav align-items-center">

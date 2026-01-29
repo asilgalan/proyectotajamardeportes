@@ -119,4 +119,20 @@ export default class ServiceMateriales
 
         return promise;
     }
+
+    //modifica un material a aceptado
+    putMaterialAceptado(idMaterial:number, idUsuarioAportacion:number):Promise<any>
+    {
+        let url = environment.apiUrl;
+        let endPoint = "/Materiales/AportarMaterial/"+idMaterial+"/"+idUsuarioAportacion;
+        let promise = new Promise((resolve) =>
+        {
+            this._http.put(url+endPoint, {}).subscribe(response =>
+            {
+                resolve(response);
+            })
+        })
+
+        return promise;
+    }
 }

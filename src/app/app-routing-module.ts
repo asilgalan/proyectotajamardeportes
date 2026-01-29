@@ -4,25 +4,62 @@ import { LoginComponent } from './auth/components/loginComponent/loginComponent'
 import { PerfilComponent } from './components/perfil.component/perfil.component';
 import { HomeComponent } from './components/home.component/home.component';
 import { EquipoComponent } from './components/equipo/equipo.component';
+import { MaterialesComponent } from './components/materiales.component/materiales.component';
+import { authGuard } from './auth/guards/auth.guard';
+import { PartidoResultadoComponent } from './components/partidoResultado/partidoResultado.component';
+import { OrganizadorComponent } from './components/organizador.component/organizador.component';
+import { PagosComponent } from './components/pagos.component/pagos.component';
 
 export const routes: Routes = [
   {
     path: '',
-      component:LoginComponent
+      component:LoginComponent,
+  
+ 
   },
-  {
+         
+ {
     path: 'perfil', 
-    component: PerfilComponent
+    component: PerfilComponent,
+
   },
   
   {
     path: 'home', 
-    component: HomeComponent
+    component: HomeComponent,
+   
   },
   {
     path: 'equipos/:idactividad/:idevento', 
-    component: EquipoComponent
+    component: EquipoComponent,
+ 
   },
+  {
+    path: 'materiales', 
+    component: MaterialesComponent
+  },
+  {
+    path:'partido-resultado',
+    component:PartidoResultadoComponent
+
+  },
+  {
+    path:'pagos',
+    component:PagosComponent
+
+  },
+  {
+    path:'organizador',
+    component:OrganizadorComponent
+
+  },
+
+  {
+    path: '**', 
+    redirectTo: ''
+  }
+
+
 ];
 
 @NgModule({

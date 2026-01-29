@@ -1,0 +1,217 @@
+/* =========================================
+   VARIABLES
+   ========================================= */
+:host {
+  --accent-color: #2563eb;
+  --accent-hover: #1d4ed8;
+  --text-main: #1e3a8a;
+  --text-secondary: #64748b;
+  --white: #ffffff;
+  --input-bg: #f8fafc;
+  --border-color: #e2e8f0;
+  --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
+}
+
+/* CONTAINER PRINCIPAL */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-gradient);
+  padding: 1.5rem;
+}
+
+/* TARJETA GLOBAL (GRID PADRE) */
+.login-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 50% Imagen - 50% Form */
+  width: 100%;
+  max-width: 950px;
+  background: var(--white);
+  border-radius: 24px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  overflow: hidden; /* Recorta la imagen en las esquinas */
+  min-height: 600px;
+}
+
+/* =========================================
+   COLUMNA IZQUIERDA (IMAGEN)
+   ========================================= */
+.login-image-side {
+  position: relative;
+  background-color: #eff6ff; /* Fondo de carga por si la imagen tarda */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-image-side img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Clave: hace que la imagen rellene sin deformarse */
+  display: block;
+}
+
+/* Filtro Azul Superpuesto */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(37, 99, 235, 0.15); /* Azul translúcido */
+  pointer-events: none;
+}
+
+/* =========================================
+   COLUMNA DERECHA (FORMULARIO)
+   ========================================= */
+.login-form-side {
+  padding: 4rem 3.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.form-header {
+  margin-bottom: 2.5rem;
+}
+
+.form-header h2 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.5px;
+}
+
+.form-header p {
+  color: var(--text-secondary);
+  margin: 0;
+  font-size: 1rem;
+}
+
+/* =========================================
+   INPUTS
+   ========================================= */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 0.5rem;
+  margin-left: 4px;
+}
+
+/* Wrapper del Input */
+.input-wrapper,
+.input-wrapper-simple {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background-color: var(--input-bg);
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.input-wrapper:focus-within,
+.input-wrapper-simple:focus-within {
+  background-color: var(--white);
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: none;
+  background: transparent;
+  font-size: 0.95rem;
+  color: #334155;
+  outline: none;
+}
+
+/* Etiqueta @tajamar */
+.domain-label {
+  background-color: #f1f5f9;
+  color: var(--text-secondary);
+  padding: 0.85rem 1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-left: 1px solid var(--border-color);
+  user-select: none;
+}
+
+/* =========================================
+   BOTÓN Y ERRORES
+   ========================================= */
+button[type="submit"] {
+  width: 100%;
+  background: linear-gradient(135deg, var(--accent-color), #3b82f6);
+  color: var(--white);
+  font-weight: 700;
+  padding: 1rem;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 1rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+}
+
+button[type="submit"]:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+}
+
+button[type="submit"]:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.error-message {
+  color: #ef4444;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  margin-left: 4px;
+}
+
+.alert-box {
+  background-color: #fef2f2;
+  border: 1px solid #fee2e2;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+@media (max-width: 850px) {
+  .login-card {
+    grid-template-columns: 1fr; /* Una columna */
+    max-width: 450px;
+    min-height: auto;
+  }
+
+  .login-image-side {
+    display: none; /* Ocultamos la imagen en móvil */
+    /* O si prefieres que salga arriba pequeña: 
+       height: 200px;
+       display: flex;
+    */
+  }
+
+  .login-form-side {
+    padding: 2.5rem 2rem;
+  }
+}

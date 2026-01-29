@@ -1,9 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import Perfil from '../../models/Perfil';
+import { Component, OnInit, inject } from '@angular/core';
+import Perfil from '../../models/perfil';
 import ServicePerfil from '../../services/perfil.service';
-import Swal from 'sweetalert2';
 import {evento} from '../../models/evento';
-
+import { AuthService } from '../../auth/services/auth.service';
 
 @Component
 ({
@@ -18,11 +17,13 @@ export class PerfilComponent implements OnInit
   public perfil!:Perfil
 
   public eventos:Array<evento> = new Array<evento>
-  idEventoSeleccionado: number | null = null;
+  public idEventoSeleccionado: number | null = null;
 
   public nombreActividad!:string;
   public quiereSerCapitan!:boolean;
   public fechaInscripcion!: string;
+
+  public perfilImagen: string = 'assets/images/perfil.webp';
 
   constructor(private _servicePerfil:ServicePerfil) {}
 
@@ -46,7 +47,7 @@ export class PerfilComponent implements OnInit
     })
   }
 
- seleccionarEvento(evento: number) 
+  seleccionarEvento(evento: number) 
   {
     if (this.idEventoSeleccionado === evento) 
     {
@@ -71,5 +72,13 @@ export class PerfilComponent implements OnInit
         }
       }
     });
+  }
+
+  setPerfilImagen():void
+  {
+    if (this.perfil.imagen !== this.perfilImagen)
+    {
+      this.perfil.imagen = this.perfilImagen;
+    }
   }
 }
