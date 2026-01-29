@@ -71,13 +71,42 @@ export class AuthService {
         }
     }
 
+    async ensureUserProfile(): Promise<Perfil | null> {
+        const existing = this._currentUser();
+        if (existing) {
+            console.log('Perfil existente:', existing);
+            return existing;
+        }
+        const token = this._token();
+        if (!token) {
+            console.error('No hay token disponible');
+            return null;
+        }
+        try {
+            this._isLoading.set(true);
+            const perfil = await this.perfilService.getPerfil();
+            console.log('Perfil cargado desde API:', perfil);
+            if (!perfil) {
+                console.error('Perfil es null o undefined');
+                return null;
+            }
+            this._currentUser.set(perfil);
+            return perfil as Perfil;
+        } catch (error) {
+            console.error('Error al cargar el perfil:', error);
+            return null;
+        } finally {
+            this._isLoading.set(false);
+        }
+    }
+
     login(userName: string, password: string):Observable<AuthResponse>{
        return this.http.post<AuthResponse>(`${this.apiurl}/Auth/LoginEventos`,{userName,password})
         .pipe(
             tap(response => {
                 localStorage.setItem('token', response.response);
                 localStorage.setItem('role', String(response.idrole));
-           
+            
                 this._role.set(response.idrole);
                 this._token.set(response.response);
                 this.isAuthenticated = true;

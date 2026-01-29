@@ -44,6 +44,8 @@ export class ActividadesService {
         );
     }
 
+   
+
     getActividadesByIdEnvento(id:number):Observable<ActividadEventoResponse[]>{
         return this.http.get<ActividadEventoResponse[]>(`${this.apiUrl}/Actividades/ActividadesEvento/${id}`).pipe(
             tap(response => console.log(response))

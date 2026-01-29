@@ -1,4 +1,4 @@
-import { Component, inject, OnChanges, OnInit, SimpleChanges, signal, computed } from '@angular/core';
+import { Component, inject, OnChanges, OnInit, SimpleChanges, signal, computed, effect } from '@angular/core';
 import { ServiceEventos } from '../../services/evento.service';
 import { evento } from '../../models/evento';
 import { ActividadesService } from '../../services/actividades.service';
@@ -60,6 +60,8 @@ export class HomeComponent implements OnInit ,OnChanges{
   sorteoEnProgreso = signal<boolean>(false);
   capitanesDelUsuario = signal<CapitanActividad[]>([]);
   actividadesDelEvento = signal<ActividadEventoResponse[]>([]);
+
+  private organizadorVerificado = false;
   
   // Computed signal para verificar si el usuario es capitán de alguna actividad
   esCapitanDeActividad = computed(() => {
@@ -104,7 +106,15 @@ export class HomeComponent implements OnInit ,OnChanges{
     eventClick: this.onEventClick.bind(this)
   };
 
-  constructor(private _service: ServiceEventos, private _servicePerfil: ServicePerfil){ }
+  constructor(private _service: ServiceEventos, private _servicePerfil: ServicePerfil){
+    effect(() => {
+      const userId = this.authservices.currentUser()?.idUsuario;
+      if (userId && !this.organizadorVerificado) {
+        this.organizadorVerificado = true;
+        this.verificarSiEsOrganizador();
+      }
+    });
+  }
 
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -119,9 +129,6 @@ export class HomeComponent implements OnInit ,OnChanges{
     this.getEventoCurosEscolar();
     this.cargarCapitanesDelUsuario();
     
-    if (this.authservices.currentUser()?.idUsuario) {
-      this.verificarSiEsOrganizador();
-    }
   }
 
   verificarSiEsOrganizador(): void {
@@ -177,16 +184,22 @@ export class HomeComponent implements OnInit ,OnChanges{
   }
   
   cargarProfesores() {
- 
-    this.profesorEventoService.getProfesoresSinEvento().subscribe({
-      next: (profesores) => {
-        this.profesoresActivos = profesores;
-      },
-
-      error: (err) => {
-        console.error('❌ Error al cargar profesores:', err);
-      }
-    });
+    this.profesorEventoService.getProfesoresSinEvento()
+      .pipe(
+        catchError((err) => {
+          if (err?.status === 404) {
+            console.warn('Endpoint ProfesSinEvento no encontrado, usando ProfesActivos como fallback');
+            return this.profesorEventoService.getProfesoresActivos();
+          }
+          console.error('❌ Error al cargar profesores:', err);
+          return of([] as ProfesorEvento[]);
+        })
+      )
+      .subscribe({
+        next: (profesores) => {
+          this.profesoresActivos = profesores;
+        }
+      });
   }
     
 

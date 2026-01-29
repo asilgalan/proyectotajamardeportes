@@ -10,7 +10,8 @@
       </button>
     </div>
     <div class="modal-body">
-      <h2>Crear nuevo evento</h2>
+      @if(authservices.isAdmin() || isOrganizador){
+<h2>Crear nuevo evento</h2>
       <p class="mb-3">Selecciona la fecha y hora del evento:</p>
       <div class="date-picker-container">
         <label for="fechaEvento" class="date-label">
@@ -24,6 +25,8 @@
           (ngModelChange)="onFechaChange($event)"
         />
       </div>
+      }
+      
       
       <div style="margin-top: 20px;">
         <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">

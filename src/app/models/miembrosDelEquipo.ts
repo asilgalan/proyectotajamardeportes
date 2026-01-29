@@ -9,5 +9,7 @@ export class MiembrosDelEquipo {
         public curso: string,
         public idMiembroEquipo: number,
         public idEquipo: number,
-    ){}
+    ){
+        
+    }
 }

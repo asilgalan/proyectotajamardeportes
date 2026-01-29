@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnInit, OnChanges, SimpleChanges, signal, computed } from '@angular/core';
+import { Component, inject, Input, OnInit, OnChanges, SimpleChanges, signal, computed, effect } from '@angular/core';
 import { ActividadesService } from '../../services/actividades.service';
 import { ActividadesResponse, ActividadEventoResponse } from '../../interface/actividades.interface';
 import { ActividadEvento, ActividadEventoCreate } from '../../interface/actividadEvento.interface';
@@ -6,6 +6,7 @@ import { tap, switchMap, forkJoin, of, EMPTY, firstValueFrom, catchError, map } 
 import { InscripcionesService } from '../../services/inscripciones.service';
 import { A } from '@angular/cdk/keycodes';
 import { AuthService } from '../../auth/services/auth.service';
+import ServicePerfil from '../../services/perfil.service';
 import { InscripcionesResponse } from '../../interface/inscripciones.interface';
 import { UsuarioDeporteService } from '../../services/usuarioDeporte.service';
 import { UsuarioDeporteResponse } from '../../interface/usuariodeporte.interface';
@@ -40,6 +41,7 @@ export class ActividadesComponent implements OnInit,OnChanges {
   private equipoService=inject(EquipoService);
   private miembroEquiposService=inject(MiembroEquiposService);
   private capitanActividadService=inject(CapitanActividadService);
+  private perfilService=inject(ServicePerfil);
   
   public actividades=signal<(ActividadEventoResponse & { estaInscrito: UsuarioDeporteResponse[] })[]>([]);
   public actividadEvento=signal<ActividadEventoResponse[] | []>([]);
@@ -110,7 +112,17 @@ export class ActividadesComponent implements OnInit,OnChanges {
   public showModalError = signal<boolean>(false);
   public mensajeError = signal<string>('');
 
-  constructor(private _router: Router){}
+  private organizadorVerificado = false;
+
+  constructor(private _router: Router){
+    effect(() => {
+      const userId = this.perfil()?.idUsuario;
+      if (userId && !this.organizadorVerificado) {
+        this.organizadorVerificado = true;
+        this.verificarSiEsOrganizador();
+      }
+    });
+  }
    
   
   @Input() idEvento!:number;
@@ -124,9 +136,7 @@ export class ActividadesComponent implements OnInit,OnChanges {
 
   ngOnInit(): void {
       this.getActividadesByIdEnvento(this.idEvento);
-          if (this.perfil()?.idUsuario){
-         this.verificarSiEsOrganizador();
-  }
+      
 }
  
 
@@ -454,13 +464,34 @@ export class ActividadesComponent implements OnInit,OnChanges {
  
   abrirModalEditar(actividad: ActividadEventoResponse) {
     const userId = this.authService.currentUser()?.idUsuario;
-    if (!userId) {
-      console.error('Usuario no autenticado');
+    if (userId) {
+      this.procesarEdicionActividad(userId, actividad);
       return;
     }
 
-  
-    if (this.isOrganizador) {
+    console.log('currentUser es null, cargando perfil...');
+    this.authService.ensureUserProfile()
+      .then((perfil) => {
+        console.log('ensureUserProfile devolvió:', perfil);
+        if (!perfil) {
+          console.error('ensureUserProfile devolvió null');
+          return;
+        }
+        const perfilId = perfil.idUsuario;
+        if (perfilId === undefined || perfilId === null) {
+          console.error('Perfil sin idUsuario:', perfil);
+          return;
+        }
+        console.log('Usuario cargado, idUsuario:', perfilId);
+        this.procesarEdicionActividad(perfilId, actividad);
+      })
+      .catch((error) => {
+        console.error('Error al cargar perfil para editar:', error);
+      });
+  }
+
+  private procesarEdicionActividad(userId: number, actividad: ActividadEventoResponse) {
+    if (this.isOrganizador || this.authService.isAdmin()) {
       this.actividadParaEditar.set(actividad);
       this.posicionEditar.set(actividad.posicion);
       this.profesorIdEditar.set(actividad.idProfesor);
@@ -559,117 +590,127 @@ export class ActividadesComponent implements OnInit,OnChanges {
     const actividad = this.actividadParaEditar();
     if (!actividad) return;
 
-    const esActividadEquipo = this.esActividadDeEquipo(actividad.nombreActividad);
 
-    if (esActividadEquipo) {
+    this.actividadEventoService.deleteActividadDelPanico(actividad.idEventoActividad).subscribe({
+           next: () => {
+            this.cerrarModalEliminar();
+            this.cerrarModalEditar();
+             this.getActividadesByIdEnvento(this.idEvento);
+          },
+          error: (err) => this.manejarErrorEliminacion(err)
+       });
+
+    // const esActividadEquipo = this.esActividadDeEquipo(actividad.nombreActividad);
+
+    // if (esActividadEquipo) {
       
-      this.equipoService.getEquiposPorActividadEvento(actividad.idActividad, actividad.idEvento)
-        .pipe(
-          switchMap(equipos => {
-            if (equipos.length === 0) {
+    //   this.equipoService.getEquiposPorActividadEvento(actividad.idActividad, actividad.idEvento)
+    //     .pipe(
+    //       switchMap(equipos => {
+    //         if (equipos.length === 0) {
          
-              return of(null);
-            }
+    //           return of(null);
+    //         }
             
            
-            const deleteMiembros$ = equipos.map(equipo => 
-              this.miembroEquiposService.getMiembroEquipos().pipe(
-                switchMap(miembros => {
-                  const miembrosDelEquipo = miembros.filter(m => m.idEquipo === equipo.idEquipo);
-                  if (miembrosDelEquipo.length === 0) {
+    //         const deleteMiembros$ = equipos.map(equipo => 
+    //           this.miembroEquiposService.getMiembroEquipos().pipe(
+    //             switchMap(miembros => {
+    //               const miembrosDelEquipo = miembros.filter(m => m.idEquipo === equipo.idEquipo);
+    //               if (miembrosDelEquipo.length === 0) {
                   
-                    return of('sin-miembros');
-                  }
+    //                 return of('sin-miembros');
+    //               }
                  
-                  return forkJoin(
-                    miembrosDelEquipo.map(m => this.miembroEquiposService.deleteMiembroEquiposPorId(m.idMiembroEquipo))
-                  );
-                })
-              )
-            );
+    //               return forkJoin(
+    //                 miembrosDelEquipo.map(m => this.miembroEquiposService.deleteMiembroEquiposPorId(m.idMiembroEquipo))
+    //               );
+    //             })
+    //           )
+    //         );
             
            
-            return forkJoin(deleteMiembros$).pipe(
-              switchMap(() => {
+    //         return forkJoin(deleteMiembros$).pipe(
+    //           switchMap(() => {
                 
-                return forkJoin(
-                  equipos.map(equipo => this.equipoService.deleteEquipoPorId(equipo.idEquipo))
-                );
-              })
-            );
-          }),
-          switchMap(() => {
-            // Eliminar el capitán de la actividad si existe
-            return this.capitanActividadService.getCapitanActividad().pipe(
-              switchMap(capitanes => {
-                const capitan = capitanes.find(c => c.idEventoActividad === actividad.idEventoActividad);
-                if (capitan) {
-                  return this.capitanActividadService.deleteCapitanActividad(capitan.idCapitanActividad);
-                }
-                return of(null);
-              })
-            );
-          }),
-          switchMap(() => {
-            // Finalmente eliminar la actividad
-            return this.actividadEventoService.deleteActividadEvento(actividad.idEventoActividad);
-          })
-        )
-        .subscribe({
-          next: () => {
-            this.cerrarModalEliminar();
-            this.cerrarModalEditar();
-            this.getActividadesByIdEnvento(this.idEvento);
-          },
-          error: (err) => this.manejarErrorEliminacion(err)
-        });
-    } else {
+    //             return forkJoin(
+    //               equipos.map(equipo => this.equipoService.deleteEquipoPorId(equipo.idEquipo))
+    //             );
+    //           })
+    //         );
+    //       }),
+    //       switchMap(() => {
+    //         // Eliminar el capitán de la actividad si existe
+    //         return this.capitanActividadService.getCapitanActividad().pipe(
+    //           switchMap(capitanes => {
+    //             const capitan = capitanes.find(c => c.idEventoActividad === actividad.idEventoActividad);
+    //             if (capitan) {
+    //               return this.capitanActividadService.deleteCapitanActividad(capitan.idCapitanActividad);
+    //             }
+    //             return of(null);
+    //           })
+    //         );
+    //       }),
+    //       switchMap(() => {
+    //         // Finalmente eliminar la actividad
+    //         return this.actividadEventoService.deleteActividadEvento(actividad.idEventoActividad);
+    //       })
+    //     )
+    //     .subscribe({
+    //       next: () => {
+    //         this.cerrarModalEliminar();
+    //         this.cerrarModalEditar();
+    //         this.getActividadesByIdEnvento(this.idEvento);
+    //       },
+    //       error: (err) => this.manejarErrorEliminacion(err)
+    //     });
+    // } else {
      
-      this.inscripcionService.getInscripciones()
-        .pipe(
-          switchMap((inscripciones: any) => {
-            const inscripcionesActividad = (inscripciones as any[]).filter(
-              i => i.idEventoActividad === actividad.idEventoActividad
-            );
+    //   this.inscripcionService.getInscripciones()
+    //     .pipe(
+    //       switchMap((inscripciones: any) => {
+    //         const inscripcionesActividad = (inscripciones as any[]).filter(
+    //           i => i.idEventoActividad === actividad.idEventoActividad
+    //         );
             
-            if (inscripcionesActividad.length === 0) {
+    //         if (inscripcionesActividad.length === 0) {
           
-              return of(null);
-            }
+    //           return of(null);
+    //         }
             
            
-            return forkJoin(
-              inscripcionesActividad.map(i => 
-                this.inscripcionService.deleteInscripcionById(i.idInscripcion)
-              )
-            );
-          }),
-          switchMap(() => {
-            // Eliminar el capitán de la actividad si existe
-            return this.capitanActividadService.getCapitanActividad().pipe(
-              switchMap(capitanes => {
-                const capitan = capitanes.find(c => c.idEventoActividad === actividad.idEventoActividad);
-                if (capitan) {
-                  return this.capitanActividadService.deleteCapitanActividad(capitan.idCapitanActividad);
-                }
-                return of(null);
-              })
-            );
-          }),
-          switchMap(() => {
+    //         return forkJoin(
+    //           inscripcionesActividad.map(i => 
+    //             this.inscripcionService.deleteInscripcionById(i.idInscripcion)
+    //           )
+    //         );
+    //       }),
+    //       switchMap(() => {
+    //         // Eliminar el capitán de la actividad si existe
+    //         return this.capitanActividadService.getCapitanActividad().pipe(
+    //           switchMap(capitanes => {
+    //             const capitan = capitanes.find(c => c.idEventoActividad === actividad.idEventoActividad);
+    //             if (capitan) {
+    //               return this.capitanActividadService.deleteCapitanActividad(capitan.idCapitanActividad);
+    //             }
+    //             return of(null);
+    //           })
+    //         );
+    //       }),
+    //       switchMap(() => {
             
-            return this.actividadEventoService.deleteActividadEvento(actividad.idEventoActividad);
-          })
-        )
-        .subscribe({
-          next: () => {
-            this.cerrarModalEliminar();
-            this.cerrarModalEditar();
-            this.getActividadesByIdEnvento(this.idEvento);
-          },
-          error: (err) => this.manejarErrorEliminacion(err)
-        });
-    }
+    //         return this.actividadEventoService.deleteActividadEvento(actividad.idEventoActividad);
+    //       })
+    //     )
+    //     .subscribe({
+    //       next: () => {
+    //         this.cerrarModalEliminar();
+    //         this.cerrarModalEditar();
+    //         this.getActividadesByIdEnvento(this.idEvento);
+    //       },
+    //       error: (err) => this.manejarErrorEliminacion(err)
+    //     });
+    // }
   }
 
   esActividadDeEquipo(nombreActividad: string): boolean {

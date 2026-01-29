@@ -11,7 +11,7 @@
 				Sortear Capitán
 			</button>
 			}
-			@if(isOrganizador) {
+			@if(isOrganizador || authService.isAdmin()) {
 			<button class="btn-crear-actividad" (click)="abrirModalCrearActividad()">
 				<i class="bi bi-plus-circle me-2"></i>
 				Añadir Actividad
@@ -64,7 +64,7 @@
 				</div>
 
 				<div class="card-footer">
-					@if(isOrganizador) {
+					@if(isOrganizador || authService.isAdmin()) {
 					<button class="btn-editar" (click)="abrirModalEditar(actividad)">
 						<i class="bi bi-pencil-square"></i>
 						<span>Editar</span>
