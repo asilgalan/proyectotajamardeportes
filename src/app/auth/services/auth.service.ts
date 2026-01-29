@@ -6,6 +6,7 @@ import { AuthResponse } from '../interface/auth.interface';
 import { Router } from '@angular/router';
 import Perfil from '../../models/perfil';
 import ServicePerfil from '../../services/perfil.service';
+import ServiceOrganizadores from '../../services/organizadores.service';
 
 
 
@@ -19,6 +20,7 @@ export class AuthService {
     private isAuthenticated = false;
     private route=inject(Router);
     private perfilService=inject(ServicePerfil);
+    private organizadorService=inject(ServiceOrganizadores);
 
  
 
@@ -126,6 +128,7 @@ export class AuthService {
         this._role.set(0);
         this._currentUser.set(null);
         this.isAuthenticated = false;
+        this.organizadorService.resetOrganizadorState();
         this.route.navigate(['']);
     }
 }

@@ -73,15 +73,23 @@ export default class ServiceOrganizadores
                 this._isOrganizador.set(true);
                 console.log("Organizador confirmado para usuario ID: " + OrganizadorUsuario.idCursosUsuarios);
                 
+            }else{
+                this._isOrganizador.set(false);
             }
                 return OrganizadorUsuario && OrganizadorUsuario.idCursosUsuarios === idUsuario;
            }), 
            catchError((error) => {
             console.log(error.message);
+            this._isOrganizador.set(false);
             return of(false);
           })
      
         )
+    }
+
+    resetOrganizadorState(): void {
+        this._isOrganizador.set(false);
+        console.log('Estado de organizador reseteado');
     }
     //crea un nuevo organizador con un id
     postOrganizador(idUsuario:number):Promise<any>
