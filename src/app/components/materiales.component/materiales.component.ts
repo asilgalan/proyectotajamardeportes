@@ -65,7 +65,7 @@ export class MaterialesComponent implements OnInit
   }
 
   seleccionarActividad(idEvento: number, idActividad: number, event: Event): void 
-{
+  {
     event.stopPropagation();
 
     if (this.idActividadSeleccionada === idActividad) 
@@ -102,12 +102,9 @@ export class MaterialesComponent implements OnInit
 
       this._serviceMateriales.putMaterialAceptado(idMaterial, idUsuario).then(response => 
       {
-        console.log("material aceptado");
-
         this._serviceMateriales.getMaterialesActividad(this.idEventoActividadSeleccionado).then(response => 
         {
           this.materialesActividad = response;
-          console.log(response)
         });
       })
     });
@@ -156,12 +153,10 @@ export class MaterialesComponent implements OnInit
 
               this._serviceMateriales.postMaterial(material).then(response => 
               {
-                console.log("material propuesto");
                 const idMaterial = response.idMaterial;
 
                 this._serviceMateriales.putMaterialAceptado(idMaterial, idUsuario).then(() => 
                 {
-                  console.log("material aceptado");
                   this._serviceMateriales.getMaterialesActividad(idEventoActividad).then(response => 
                   {
                     this.materialesActividad = response;
@@ -215,12 +210,9 @@ export class MaterialesComponent implements OnInit
               idEventoActividad = response.idEventoActividad;
 
               const material = new Material(0, idEventoActividad, idUsuario, result.value, true, new Date().toISOString(), 0);
-              console.log(material);
 
               this._serviceMateriales.postMaterial(material).then(response => 
               {
-                console.log("material propuesto");
-
                 this._serviceMateriales.getMaterialesActividad(idEventoActividad).then(response => 
                 {
                   this.materialesActividad = response;

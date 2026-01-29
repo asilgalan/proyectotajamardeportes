@@ -99,12 +99,9 @@ export class PagosComponent implements OnInit
       idEventoActividad = response.idEventoActividad;
 
       let precio = new PrecioActividad(0, idEventoActividad, cantidad);
-
-      console.log(precio)
   
       this._servicePrecios.postPrecio(precio).then((response) => 
       {
-        console.log(response);
         this.mostrarToastMensaje('Precio insertado correctamente', 'success');
       });
     });
@@ -156,20 +153,13 @@ export class PagosComponent implements OnInit
 
          this._servicePrecios.findIdPrecioPorIdEventoActividad(idEventoActividad).then(response =>
          {
-          if (response == null)
+          idPrecioActividad = response.idPrecioActividad;
+ 
+          this._servicePrecios.findPrecioActividad(idPrecioActividad).then(response =>
           {
-            this.mostrarToastMensaje('Esta actividad no tiene coste', 'error');
-          }
-          else
-          {
-            idPrecioActividad = response.idPrecioActividad;
-   
-            this._servicePrecios.findPrecioActividad(idPrecioActividad).then(response =>
-            {
-              this.coste = response.precioTotal;
-              this.mostrarToastMensaje('El coste de la actividad es ' + this.coste, 'info');
-            });
-          }
+            this.coste = response.precioTotal;
+            this.mostrarToastMensaje('El coste de la actividad es ' + this.coste, 'info');
+          });
         });
     });
   }
@@ -188,7 +178,6 @@ export class PagosComponent implements OnInit
 
       this._servicePagos.postPagoPagado(idEventoActividad, idCurso, this.coste).then(response =>
       {
-        console.log(response);
         this.mostrarToastMensaje('Pago realizado correctamente', 'success');
       });
     });
@@ -219,5 +208,4 @@ export class PagosComponent implements OnInit
       this.mostrarToast = false;
     }, 3500);
   }
-
 }

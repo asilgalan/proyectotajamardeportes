@@ -19,7 +19,6 @@ export class OrganizadorComponent implements OnInit
   public toastTipo: 'success' | 'error' = 'success';
   public toastMensaje = '';
   
-
   public organizadores:Alumno[] = [];
 
   constructor(private _serviceOrganizadores:ServiceOrganizadores,
@@ -54,7 +53,6 @@ export class OrganizadorComponent implements OnInit
 
       this._serviceOrganizadores.postOrganizador(id).then(response =>
       {
-        console.log(response);
         this.lanzarToast('success', '¡Organizador añadido correctamente!');
         this.mostrarOrganizadores();
       })

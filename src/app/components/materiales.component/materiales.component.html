@@ -27,7 +27,7 @@
         <!-- CONTENIDO DEL EVENTO -->
         <div class="event-content">
 
-          <!-- Actividades -->
+          <!-- ACTIVIDADES -->
           <div *ngIf="idEventoSeleccionado === evento.idEvento" class="activity-list">
             <div *ngIf="actividadesEvento && actividadesEvento.length === 0"
               class="custom-navbar p-3 rounded-4 text-muted text-center">
@@ -50,7 +50,7 @@
                 </button>
               </div>
 
-              <!-- Chat -->
+              <!-- CHAT -->
               <div *ngIf="idActividadSeleccionada === actividad.idActividad" class="material-chat">
                 <div *ngIf="materialesActividad && materialesActividad.length === 0" class="text-muted text-center p-3">
                   No hay materiales para esta actividad.
