@@ -13,6 +13,7 @@ import { ActividadEventoResponse } from '../../interface/actividades.interface';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../auth/services/auth.service';
 import { Equipo } from '../../models/equipo';
+import { CapitanActividadService } from '../../services/capitanActividad.service';
 
 @Component({
   selector: 'app-partido-resultado',
@@ -22,14 +23,13 @@ import { Equipo } from '../../models/equipo';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PartidoResultadoComponent implements OnInit { 
-
+  public capitanService=inject(CapitanActividadService);
   private partidoResultadoService = inject(PartidoResultadoService);
   private equipoService = inject(EquipoService);
   private actividadService = inject(ActividadesService);
   private actividadEventoService = inject(ActividadEventoService);
   private eventoService = inject(ServiceEventos);
   public authService = inject(AuthService);
-
   public partidoResultados = signal<PartidoResultado[]>([]);
   public eventos = signal<evento[]>([]);
   public actividades = signal<ActividadEventoResponse[]>([]);
@@ -42,6 +42,7 @@ export class PartidoResultadoComponent implements OnInit {
   public errorMessage = signal<string | null>(null);
   public modalErrorMessage = signal<string | null>(null);
   private allPartidosCache = signal<PartidoResultado[]>([]);
+  public isCapitan = signal<boolean>(false);
   
   // Signals para crear resultado
   public showModalCrear = signal<boolean>(false);
@@ -68,7 +69,9 @@ export class PartidoResultadoComponent implements OnInit {
   ngOnInit(): void {
     this.loadEventos();
     this.loadAllPartidoResultados();
+   
   }
+
 
   abrirModalCrear(): void {
     this.showModalCrear.set(true);
@@ -86,6 +89,7 @@ export class PartidoResultadoComponent implements OnInit {
     this.showModalCrear.set(false);
     this.modalErrorMessage.set(null);
     this.resetFormCrear();
+
   }
 
   onEventoParaCrearChange(eventoId: string): void {
