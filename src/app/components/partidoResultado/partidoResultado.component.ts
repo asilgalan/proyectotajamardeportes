@@ -23,16 +23,13 @@ import { CapitanActividadService } from '../../services/capitanActividad.service
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PartidoResultadoComponent implements OnInit { 
-
+  public capitanService=inject(CapitanActividadService);
   private partidoResultadoService = inject(PartidoResultadoService);
   private equipoService = inject(EquipoService);
   private actividadService = inject(ActividadesService);
   private actividadEventoService = inject(ActividadEventoService);
   private eventoService = inject(ServiceEventos);
   public authService = inject(AuthService);
-  public capitanService = inject(CapitanActividadService);
-  public isCapitan = signal<boolean>(false);
-
   public partidoResultados = signal<PartidoResultado[]>([]);
   public eventos = signal<evento[]>([]);
   public actividades = signal<ActividadEventoResponse[]>([]);
@@ -45,6 +42,7 @@ export class PartidoResultadoComponent implements OnInit {
   public errorMessage = signal<string | null>(null);
   public modalErrorMessage = signal<string | null>(null);
   private allPartidosCache = signal<PartidoResultado[]>([]);
+  public isCapitan = signal<boolean>(false);
   
   // Signals para crear resultado
   public showModalCrear = signal<boolean>(false);
@@ -74,6 +72,7 @@ export class PartidoResultadoComponent implements OnInit {
     this.verificarCapitan();
   }
 
+
   abrirModalCrear(): void {
     this.showModalCrear.set(true);
     this.eventoService.getEventosCursoEscolar()
@@ -90,6 +89,7 @@ export class PartidoResultadoComponent implements OnInit {
     this.showModalCrear.set(false);
     this.modalErrorMessage.set(null);
     this.resetFormCrear();
+
   }
 
   onEventoParaCrearChange(eventoId: string): void {

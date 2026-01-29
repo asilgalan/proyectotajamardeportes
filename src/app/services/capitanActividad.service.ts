@@ -12,6 +12,8 @@ export class CapitanActividadService {
 
     private http=inject(HttpClient);
 
+   
+
     private apiUrl=environment.apiUrl;
 
     getCapitanActividad():Observable<CapitanActividad[]>{

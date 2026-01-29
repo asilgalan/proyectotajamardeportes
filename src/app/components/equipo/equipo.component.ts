@@ -30,6 +30,7 @@ export class EquipoComponent implements OnInit{
   public idEvento!: number;
   public nombreActividad!: string;
   public fechaEvento!: string;
+
   public mapaColores: { [key: number]: string } = {};
 
 
