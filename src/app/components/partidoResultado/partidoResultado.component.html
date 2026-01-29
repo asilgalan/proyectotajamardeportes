@@ -175,7 +175,7 @@
             </div>
 
             <!-- Botones de acción (admin y capitán) -->
-            @if(authService.isAdmin() ){
+            @if(authService.isAdmin() || isCapitan()){
               <div class="card-actions">
                 <button class="btn-edit-resultado" (click)="abrirModalEditar(resultado)" title="Editar resultado">
                   <i class="bi bi-pencil-fill me-1"></i>

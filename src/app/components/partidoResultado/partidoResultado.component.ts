@@ -69,7 +69,7 @@ export class PartidoResultadoComponent implements OnInit {
   ngOnInit(): void {
     this.loadEventos();
     this.loadAllPartidoResultados();
-   
+    this.verificarCapitan();
   }
 
 
@@ -472,5 +472,16 @@ export class PartidoResultadoComponent implements OnInit {
         this.partidoResultados.set(partidosActualizados);
         this.cerrarModalEliminar();
       });
+  }
+
+  verificarCapitan(): void {
+    this.capitanService.getCapitanActividadByIdUsuarioCapitan(this.authService.currentUser()?.idUsuario!).subscribe({
+      next: (capitanUsuario) => {
+        this.isCapitan.set(true);
+      },
+      error: () => {
+        console.log("Error");
+      }
+    });
   }
 }
