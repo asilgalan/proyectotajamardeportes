@@ -2,7 +2,7 @@
   <div class="page-header">
     <h1 class="page-title">Resultados de Partidos</h1>
     <p class="page-subtitle">Consulta los resultados de todos los partidos disputados</p>
-    @if (authService.isAdmin()) {
+    @if (authService.isAdmin() || isCapitan()) {
       <button class="btn-crear-resultado" (click)="abrirModalCrear()">
         <i class="bi bi-plus-circle me-2"></i>
         Crear Resultado
@@ -175,7 +175,7 @@
             </div>
 
             <!-- Botones de acción (solo admin) -->
-            @if(authService.isAdmin()){
+            @if(authService.isAdmin() || isCapitan()){
               <div class="card-actions">
                 <button class="btn-edit-resultado" (click)="abrirModalEditar(resultado)" title="Editar resultado">
                   <i class="bi bi-pencil-fill me-1"></i>

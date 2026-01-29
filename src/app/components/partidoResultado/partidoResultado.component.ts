@@ -13,6 +13,7 @@ import { ActividadEventoResponse } from '../../interface/actividades.interface';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../auth/services/auth.service';
 import { Equipo } from '../../models/equipo';
+import { CapitanActividadService } from '../../services/capitanActividad.service';
 
 @Component({
   selector: 'app-partido-resultado',
@@ -29,6 +30,8 @@ export class PartidoResultadoComponent implements OnInit {
   private actividadEventoService = inject(ActividadEventoService);
   private eventoService = inject(ServiceEventos);
   public authService = inject(AuthService);
+  public capitanService = inject(CapitanActividadService);
+  public isCapitan = signal<boolean>(false);
 
   public partidoResultados = signal<PartidoResultado[]>([]);
   public eventos = signal<evento[]>([]);
@@ -68,6 +71,7 @@ export class PartidoResultadoComponent implements OnInit {
   ngOnInit(): void {
     this.loadEventos();
     this.loadAllPartidoResultados();
+    this.verificarCapitan();
   }
 
   abrirModalCrear(): void {
@@ -468,5 +472,16 @@ export class PartidoResultadoComponent implements OnInit {
         this.partidoResultados.set(partidosActualizados);
         this.cerrarModalEliminar();
       });
+  }
+
+  verificarCapitan(): void {
+    this.capitanService.getCapitanActividadByIdUsuarioCapitan(this.authService.currentUser()?.idUsuario!).subscribe({
+      next: (capitanUsuario) => {
+        this.isCapitan.set(true);
+      },
+      error: () => {
+        console.log("Error");
+      }
+    });
   }
 }
