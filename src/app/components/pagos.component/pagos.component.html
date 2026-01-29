@@ -12,7 +12,7 @@
           <select name="eventosPrecio" #eventoPrecio (change)="seleccionarEventoPrecio()">
             <option value="" disabled selected>-- Selecciona un evento --</option>
             <option *ngFor="let evento of eventosPrecios" [value]="evento.idEvento">
-              {{ evento.fechaEvento }}
+              {{ evento.fechaEvento | date:'dd' }} {{ evento.fechaEvento | date:'MMM' | uppercase }}
             </option>
           </select>
         </div>
@@ -47,7 +47,7 @@
           <select name="eventosPago" #eventoPago (change)="seleccionarEventoPago()">
             <option value="" disabled selected>-- Selecciona un evento --</option>
             <option *ngFor="let evento of eventosPagos" [value]="evento.idEvento">
-              {{evento.fechaEvento}}
+              {{ evento.fechaEvento | date:'dd' }} {{ evento.fechaEvento | date:'MMM' | uppercase }}
             </option>
           </select>
         </div>
