@@ -46,4 +46,9 @@ export class ServiceEventos {
 
         return this._http.get<evento>(this.urlEventos + request);
     }
+
+    deleteEventoDelPanico(idEvento:number):Observable<void>{
+    
+        return this._http.delete<void>(`${this.urlEventos}/Eventos/DeleteEventoPanic/${idEvento}`)
+    }
     }

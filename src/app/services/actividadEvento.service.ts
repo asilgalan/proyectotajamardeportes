@@ -51,7 +51,7 @@ export class ActividadEventoService {
     }
      deleteActividadDelPanico(idEventoActividad:number):Observable<void>{
     
-            return this.http.get<void>(`${this.apiUrl}/ActividadesEvento/DeleteEventoActividadPanic/${idEventoActividad}`)
+            return this.http.delete<void>(`${this.apiUrl}/ActividadesEvento/DeleteEventoActividadPanic/${idEventoActividad}`)
         }
 
     getActividadesEventoByEventoidByActividadid(eventoId:number, actividadId:number):Observable<any>{

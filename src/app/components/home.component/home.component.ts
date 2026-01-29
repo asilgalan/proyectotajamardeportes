@@ -407,227 +407,34 @@ export class HomeComponent implements OnInit ,OnChanges{
     const idEvento = this.eventoSeleccionado?.idEvento;
     if (!idEvento) return;
 
-  
-
-   
-    this.equipoService.getEquiposPorEvento(idEvento)
-      .pipe(
-        switchMap(equipos => {
-      
-          if (equipos.length === 0) {
-            return of('sin-equipos');
-          }
-
-        
-          const deleteMiembros$ = equipos.map(equipo =>
-            this.miembroEquiposService.getMiembroEquipos().pipe(
-              switchMap(miembros => {
-                const miembrosDelEquipo = miembros.filter(m => m.idEquipo === equipo.idEquipo);
-            
-                if (miembrosDelEquipo.length === 0) return of('sin-miembros');
-                return forkJoin(
-                  miembrosDelEquipo.map(m => this.miembroEquiposService.deleteMiembroEquiposPorId(m.idMiembroEquipo))
-                );
-              })
-            )
-          );
-
-          return forkJoin(deleteMiembros$).pipe(
-            switchMap((resultMiembros) => {
-            
-              // Eliminar todos los equipos
-              return forkJoin(
-                equipos.map(equipo => this.equipoService.deleteEquipoPorId(equipo.idEquipo))
-              );
-            })
-          );
-        }),
-        switchMap((resultEquipos) => {
-        
-          // Luego eliminar todas las inscripciones del evento
-          return this.inscripcionesService.getInscripciones();
-        }),
-        switchMap((inscripciones: any) => {
-          // Obtener actividades del evento para filtrar inscripciones
-          return this.actividadesService.getActividadesByIdEnvento(idEvento).pipe(
-            switchMap(actividades => {
-             
-              const idsEventoActividad = actividades.map(act => act.idEventoActividad);
-              const inscripcionesDelEvento = (inscripciones as any[]).filter(
-                i => idsEventoActividad.includes(i.idEventoActividad)
-              );
-
-          
-              if (inscripcionesDelEvento.length === 0) {
-                return of({ actividades, inscripcionesEliminadas: 'sin-inscripciones' });
-              }
-
-              return forkJoin(
-                inscripcionesDelEvento.map(i =>
-                  this.inscripcionesService.deleteInscripcionById(i.idInscripcion)
-                )
-              ).pipe(
-                switchMap((resultInscripciones) => {
-                
-                  return of({ actividades, inscripcionesEliminadas: true });
-                })
-              );
-            })
-          );
-        }),
-        // Eliminar todas las relaciones ActividadEvento
-        switchMap((result: any) => {
-          const actividades = result.actividades;
-         
-          
-          if (actividades.length === 0) {
-           
-            return of('sin-actividades');
-          }
-
-          // Eliminar una por una para ver cuál falla
-          const deleteOneByOne = (index: number): any => {
-            if (index >= actividades.length) {
-            
-              return of('completado');
-            }
-
-            const act = actividades[index];
-           
-            
-            // Primero eliminar los PrecioActividad asociados
-            return from(this.precioActividadService.getPrecioActividad()).pipe(
-              switchMap(precios => {
-                const preciosDeEstaActividad = (precios as any[]).filter(
-                  p => p.idEventoActividad === act.idEventoActividad
-                );
-             
-                
-                if (preciosDeEstaActividad.length === 0) {
-                  return of('sin-precios');
-                }
-                
-                // Eliminar todos los precios
-                const deletePrecios$ = preciosDeEstaActividad.map(p => 
-                  from(this.precioActividadService.deletePrecioActividad(p.idPrecioActividad))
-                );
-                return forkJoin(deletePrecios$);
-              }),
-              switchMap(() => {
-               
-                // Ahora sí eliminar el ActividadEvento
-                return this.actividadEventoService.deleteActividadEvento(act.idEventoActividad);
-              }),
-              switchMap(() => {
-               
-                return deleteOneByOne(index + 1);
-              })
-            );
-          };
-
-          return deleteOneByOne(0);
-        }),
-        // Finalmente eliminar el evento
-        switchMap(() => {
-          
-          return this._service.deleteEventoById(idEvento);
-        })
-      )
-      .subscribe({
-        next: () => {
-         
-          this.cerrarModalEliminarEvento();
-          this.cerrarModalEditarEvento();
-          this.getEventoCurosEscolar();
-          if (this.idEvento === idEvento) {
-            this.idEvento = null;
-          }
-        },
-        error: (err) => {
-     
-          this.cerrarModalEliminarEvento();
-          this.mensajeError = ' No se pudo eliminar el evento.';
-          this.showModalError = true;
+    this._service.deleteEventoDelPanico(idEvento).subscribe({
+      next: () => {
+        this.cerrarModalEliminarEvento();
+        this.cerrarModalEditarEvento();
+        this.getEventoCurosEscolar();
+        if (this.idEvento === idEvento) {
+          this.idEvento = null;
         }
-      });
+      },
+      error: (err) => {
+        this.cerrarModalEliminarEvento();
+        this.mensajeError = 'No se pudo eliminar el evento.';
+        this.showModalError = true;
+      }
+    });
   }
 
   confirmarCancelEvento() {
     if (!this.eventoSeleccionado || this.eventoSeleccionado.fechaEvento < this.now) return;
     
     const idEvento = this.eventoSeleccionado.idEvento;
-   
-    this.actividadesService.getActividadesByIdEnvento(idEvento).pipe(
-      switchMap(actividades => {
-        if (actividades.length === 0) {
-          return this._service.deleteEventoById(idEvento);
-        }
-        
-        const idsEventoActividad = actividades.map(act => act.idEventoActividad);
-        
-        //  Obtener equipos del evento y borrar miembros
-        return this.equipoService.getEquiposPorEvento(idEvento).pipe(
-          switchMap(equipos => {
-            if (equipos.length === 0) {
-              return of(null);
-            }
-            // Obtener todos los miembros de todos los equipos
-            const getMiembrosRequests = equipos.map(eq => 
-              this.equipoService.getUsuariosPorEquipo(eq.idEquipo)
-            );
-            return forkJoin(getMiembrosRequests).pipe(
-              switchMap(miembrosArrays => {
-                const todosMiembros = miembrosArrays.flat();
-                if (todosMiembros.length === 0) {
-                  return of(null);
-                }
-                // Borrar todos los miembros
-                const deleteMiembros = todosMiembros.map((m: any) => 
-                  this.miembroEquiposService.deleteMiembroEquiposPorId(m.idMiembroEquipo)
-                );
-                return forkJoin(deleteMiembros);
-              }),
-             // Borrar equipos
-              switchMap(() => {
-                const deleteEquipos = equipos.map(eq => 
-                  this.equipoService.deleteEquipoPorId(eq.idEquipo)
-                );
-                return forkJoin(deleteEquipos);
-              })
-            );
-          }),
-          // Borrar inscripciones
-          switchMap(() => this.inscripcionesService.getInscripciones()),
-          switchMap((todasInscripciones: any) => {
-            const inscripcionesEvento = todasInscripciones.filter((insc: any) => 
-              idsEventoActividad.includes(insc.idEventoActividad)
-            );
-            if (inscripcionesEvento.length > 0) {
-              const deleteInscripciones = inscripcionesEvento.map((insc: any) => 
-                this.inscripcionesService.deleteInscripcionById(insc.idInscripcion)
-              );
-              return forkJoin(deleteInscripciones);
-            }
-            return of(null);
-          }),
-          // Borrar ActividadEvento
-          switchMap(() => {
-            const deleteActividades = actividades.map(act => 
-              this.actividadEventoService.deleteActividadEvento(act.idEventoActividad)
-            );
-            return forkJoin(deleteActividades);
-          }),
-          //Borrar evento
-          switchMap(() => this._service.deleteEventoById(idEvento))
-        );
-      })
-    ).subscribe({
+
+    this._service.deleteEventoDelPanico(idEvento).subscribe({
       next: () => {
         this.getEventoCurosEscolar();
         this.cerrarModalCancelEvento();
       },
       error: (err) => {
-      
         this.mensajeError = 'No se pudo cancelar el evento.';
         this.showModalError = true;
       }
