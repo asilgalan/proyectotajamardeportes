@@ -477,10 +477,24 @@ export class PartidoResultadoComponent implements OnInit {
   verificarCapitan(): void {
     this.capitanService.getCapitanActividadByIdUsuarioCapitan(this.authService.currentUser()?.idUsuario!).subscribe({
       next: (capitanUsuario) => {
-        this.isCapitan.set(true);
+        console.log('Tipo de capitanUsuario:', typeof capitanUsuario);
+        console.log('capitanUsuario:', capitanUsuario);
+        console.log('¿Es array?', Array.isArray(capitanUsuario));
+        console.log('Tiene length?', capitanUsuario?.length);
+        
+        // Verificar si es un array y tiene elementos
+        if(Array.isArray(capitanUsuario) && capitanUsuario.length > 0){
+          this.isCapitan.set(true);
+        }else if(capitanUsuario && typeof capitanUsuario === 'object' && !Array.isArray(capitanUsuario)){
+          // Si es un objeto (no array), también es capitán
+          this.isCapitan.set(true);
+        }else{
+          this.isCapitan.set(false);
+        }
       },
       error: () => {
-        console.log("Error");
+        console.log("Error al verificar capitán");
+        this.isCapitan.set(false);
       }
     });
   }
