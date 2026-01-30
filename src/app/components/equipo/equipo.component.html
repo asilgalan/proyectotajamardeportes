@@ -12,7 +12,7 @@
         </div>
     </header>
 
-    @if(this.authService.isAdmin() || organizadorService.esOrganizador() || isCapitan) {
+    @if(this.authService.isAdmin() || isCapitan) {
         <div class="actions-toolbar">
             <button class="btn-secondary-action" (click)="verInscritos()">
                 <i class="bi bi-people"></i> <span>Ver Inscritos</span>
@@ -33,7 +33,7 @@
             @for (equipo of equipos; track equipo.idEquipo) {
                 <article class="team-card">
 
-                    @if(this.authService.isAdmin() || organizadorService.esOrganizador() || isCapitan){
+                    @if(this.authService.isAdmin() ||  isCapitan){
                         <button class="btn-delete-card" title="Eliminar equipo" (click)="abrirModalEliminar(equipo.idEquipo)">
                             <i class="bi bi-trash"></i>
                         </button>
